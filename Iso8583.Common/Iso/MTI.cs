@@ -17,7 +17,8 @@ namespace Iso8583.Common.Iso
         /// <param name="messageClass"></param>
         /// <param name="messageFunction"></param>
         /// <param name="messageOrigin"></param>
-        public MTI(Iso8583Version isoVersion, MessageClass messageClass, MessageFunction messageFunction, MessageOrigin messageOrigin)
+        public MTI(Iso8583Version isoVersion, MessageClass messageClass, MessageFunction messageFunction,
+            MessageOrigin messageOrigin)
         {
             _isoVersion = isoVersion;
             _messageClass = messageClass;
@@ -29,6 +30,9 @@ namespace Iso8583.Common.Iso
         /// returns the MTI value
         /// </summary>
         /// <returns></returns>
-        public int Value() => (int)_isoVersion + (int)_messageClass + (int)_messageFunction +(int) _messageOrigin;
+        public int Value()
+        {
+            return (int) _isoVersion + (int) _messageClass + (int) _messageFunction + (int) _messageOrigin;
+        }
     }
 }

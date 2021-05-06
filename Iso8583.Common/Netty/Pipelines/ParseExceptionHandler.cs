@@ -32,10 +32,7 @@ namespace Iso8583.Common.Netty.Pipelines
 
         public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
         {
-            if (exception is ParseException cause)
-            {
-                context.WriteAndFlushAsync(CreateErrorResponseMessage(cause));
-            }
+            if (exception is ParseException cause) context.WriteAndFlushAsync(CreateErrorResponseMessage(cause));
 
             context.FireExceptionCaught(exception);
         }

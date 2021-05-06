@@ -8,7 +8,7 @@ namespace Iso8583.Common.Netty
     /// This interface will be implemented by the various handlers in the pipeline
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IIsoMessageListener<in T> where T: IsoMessage
+    public interface IIsoMessageListener<in T> where T : IsoMessage
     {
         /// <summary>
         ///  return true when a given message can be handled by <see cref="HandleMessage"/>
@@ -25,5 +25,5 @@ namespace Iso8583.Common.Netty
         /// <param name="isoMessage">the iso message to handle</param>
         /// <returns>true f message should be handled by subsequent message listeners</returns>
         bool HandleMessage(IChannelHandlerContext context, T isoMessage);
-    }   
+    }
 }

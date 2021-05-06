@@ -9,7 +9,7 @@ namespace Iso8583.Common.Netty.Pipelines
     /// listens to the iso Echo message and handle it
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class EchoMessageListener<T>: IIsoMessageListener<T> where T: IsoMessage
+    public class EchoMessageListener<T> : IIsoMessageListener<T> where T : IsoMessage
     {
         private readonly IMessageFactory<T> _messageFactory;
 
@@ -25,7 +25,7 @@ namespace Iso8583.Common.Netty.Pipelines
         /// <inheritdoc />
         public bool CanHandleMessage(T isoMessage)
         {
-            return isoMessage != null &&  (isoMessage.Type & (int) MessageClass.NETWORK_MANAGEMENT) != 0;
+            return isoMessage != null && (isoMessage.Type & (int) MessageClass.NETWORK_MANAGEMENT) != 0;
         }
 
         /// <summary>

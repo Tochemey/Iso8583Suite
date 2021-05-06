@@ -9,7 +9,7 @@ namespace Iso8583.Common.Netty.Pipelines
     /// This handler helps listen to idle state in the network connectivity and send
     /// an echo iso message as kind of health check
     /// </summary>
-    public class IdleEventHandler: ChannelHandlerAdapter
+    public class IdleEventHandler : ChannelHandlerAdapter
     {
         private readonly IMessageFactory<IsoMessage> _messageFactory;
 

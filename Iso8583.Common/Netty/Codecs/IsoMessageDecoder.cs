@@ -24,26 +24,23 @@ namespace Iso8583.Common.Netty.Codecs
             _messageFactory = messageFactory;
         }
 
-        
+
         protected override void Decode(IChannelHandlerContext context, IByteBuffer input, List<object> output)
         {
             // return when the byte buffer cannot be read
-           if(!input.IsReadable()) return;
-           
-           // create a byte array with the size of readable bytes in the byte buffer
-           var bytea = new byte[input.ReadableBytes];
-           
-           // read the bytes from the byte buffer
-           input.ReadBytes(bytea);
-           
-           // create a new iso message from the byte array
-           var isoMessage = _messageFactory.ParseMessage(bytea, 0);
-           if (isoMessage == null)
-           {
-               throw new ParseException("Can't parse ISO8583 message");
-           }
+            if (!input.IsReadable()) return;
 
-           output.Add(isoMessage);
+            // create a byte array with the size of readable bytes in the byte buffer
+            var bytea = new byte[input.ReadableBytes];
+
+            // read the bytes from the byte buffer
+            input.ReadBytes(bytea);
+
+            // create a new iso message from the byte array
+            var isoMessage = _messageFactory.ParseMessage(bytea, 0);
+            if (isoMessage == null) throw new ParseException("Can't parse ISO8583 message");
+
+            output.Add(isoMessage);
         }
     }
 }
