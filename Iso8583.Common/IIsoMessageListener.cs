@@ -1,8 +1,7 @@
-using System.Threading.Tasks;
 using DotNetty.Transport.Channels;
 using NetCore8583;
 
-namespace Iso8583.Common.Netty
+namespace Iso8583.Common
 {
     /// <summary>
     /// This interface will be implemented by the various handlers in the pipeline

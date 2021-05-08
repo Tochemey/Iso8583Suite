@@ -17,4 +17,8 @@
       <PackageReference Include="NLog.Extensions.Logging" Version="1.7.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Iso8583.Common\Iso8583.Common.csproj" />
+    </ItemGroup>
+
 </Project>

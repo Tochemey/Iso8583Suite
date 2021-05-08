@@ -29,6 +29,14 @@ namespace Iso8583.Common.Netty.Pipelines
             _messageListeners = new List<IIsoMessageListener<T>>();
         }
 
+        /// <summary>
+        /// default constructor
+        /// </summary>
+        public CompositeIsoMessageHandler(): this(true, new LoggerFactory().CreateLogger<CompositeIsoMessageHandler<T>>())
+        {
+            // TODO: check the logger
+        }
+
         public override void ChannelRead(IChannelHandlerContext context, object message)
         {
             T isoMessage;

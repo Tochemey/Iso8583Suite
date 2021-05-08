@@ -12,7 +12,7 @@ namespace Iso8583.Common.Netty.Pipelines
 
         private const char MaskChar = '*';
 
-        private static readonly int[] DefaultMaskedFields =
+        public static readonly int[] DefaultMaskedFields =
         {
             34, // PAN extended
             35, // track 2
