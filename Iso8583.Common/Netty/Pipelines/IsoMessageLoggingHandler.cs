@@ -8,8 +8,6 @@ namespace Iso8583.Common.Netty.Pipelines
 {
     public class IsoMessageLoggingHandler : LoggingHandler
     {
-        public override bool IsSharable => true;
-
         private const char MaskChar = '*';
 
         public static readonly int[] DefaultMaskedFields =
@@ -28,7 +26,7 @@ namespace Iso8583.Common.Netty.Pipelines
         private readonly bool _printSensitiveData;
 
         /// <summary>
-        /// creates a new instance of the <see cref="IsoMessageLoggingHandler"/>
+        ///     creates a new instance of the <see cref="IsoMessageLoggingHandler" />
         /// </summary>
         /// <param name="level">the log level</param>
         /// <param name="printSensitiveData">should print sensible data or not</param>
@@ -59,6 +57,8 @@ namespace Iso8583.Common.Netty.Pipelines
             _maskedFields = maskedFields is {Length: > 0} ? maskedFields : DefaultMaskedFields;
         }
 
+        public override bool IsSharable => true;
+
         /// <summary>
         ///     Formats an event and returns the formatted message.
         /// </summary>
@@ -77,7 +77,7 @@ namespace Iso8583.Common.Netty.Pipelines
 
 
         /// <summary>
-        /// formats the iso message
+        ///     formats the iso message
         /// </summary>
         /// <param name="isoMessage">the iso message to format</param>
         /// <returns>the formatted iso message</returns>
@@ -115,7 +115,7 @@ namespace Iso8583.Common.Netty.Pipelines
 
 
         /// <summary>
-        /// masks the PAN
+        ///     masks the PAN
         /// </summary>
         /// <param name="fullPan">the unmasked PAN value</param>
         /// <returns>the masked value</returns>

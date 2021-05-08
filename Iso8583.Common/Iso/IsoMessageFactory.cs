@@ -6,8 +6,8 @@ namespace Iso8583.Common.Iso
 {
     public class IsoMessageFactory<T> : IMessageFactory<T> where T : IsoMessage
     {
-        private readonly MessageFactory<T> _messageFactory;
         private readonly Iso8583Version _isoVersion;
+        private readonly MessageFactory<T> _messageFactory;
 
         /// <summary>
         ///     creates a new instance of IsoMessageFactory given the message factory and the Iso 8583 Version

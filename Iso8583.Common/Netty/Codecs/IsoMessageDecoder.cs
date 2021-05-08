@@ -9,14 +9,14 @@ using NetCore8583.Util;
 namespace Iso8583.Common.Netty.Codecs
 {
     /// <summary>
-    /// Decodes any Iso 8583 message coming from the wire
+    ///     Decodes any Iso 8583 message coming from the wire
     /// </summary>
     public class IsoMessageDecoder : ByteToMessageDecoder
     {
         private readonly IMessageFactory<IsoMessage> _messageFactory;
 
         /// <summary>
-        /// creates a new instance of the decoder given the iso message factory
+        ///     creates a new instance of the decoder given the iso message factory
         /// </summary>
         /// <param name="messageFactory"></param>
         public IsoMessageDecoder(IMessageFactory<IsoMessage> messageFactory)

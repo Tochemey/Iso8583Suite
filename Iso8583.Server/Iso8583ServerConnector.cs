@@ -1,57 +1,90 @@
+using System;
 using System.Threading.Tasks;
 using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using Iso8583.Common;
 using Iso8583.Common.Iso;
-using Iso8583.Common.Netty;
 using Iso8583.Common.Netty.Pipelines;
 using Microsoft.Extensions.Logging;
 using NetCore8583;
 
 namespace Iso8583.Server
 {
-    public abstract class Iso8583ServerConnector<T, C, B>
+    public abstract class Iso8583ServerConnector<T, B, C>
         where T : IsoMessage
         where C : ConnectorConfiguration
         where B : ServerBootstrap
     {
+        private readonly AtomicReference<IChannel> _channelRef;
+
         /// <summary>
-        /// creates a new instance of Iso8583ServerConnector
+        ///     the server bootstrap. <see cref="ServerBootstrap" />
+        /// </summary>
+        private B _bootstrap;
+
+        /// <summary>
+        ///     creates a new instance of Iso8583ServerConnector
         /// </summary>
         /// <param name="messageHandler">the message handler</param>
         /// <param name="messageFactory">the message factory</param>
         /// <param name="configuration">the configuration</param>
-        /// <param name="logger">the logger instance</param>
         protected Iso8583ServerConnector(CompositeIsoMessageHandler<T> messageHandler,
             IMessageFactory<T> messageFactory,
-            C configuration, ILogger<Iso8583ServerConnector<T, C, B>> logger)
+            C configuration)
         {
             MessageHandler = messageHandler;
             MessageFactory = messageFactory;
             Configuration = configuration;
-            _logger = logger;
             _channelRef = new AtomicReference<IChannel>();
             if (configuration.AddEchoMessageListener)
                 MessageHandler.AddListener(new EchoMessageListener<T>(messageFactory));
         }
 
         /// <summary>
-        /// auxiliary constructor to create a new of Iso8583ServerConnector
+        ///     auxiliary constructor to create a new of Iso8583ServerConnector
         /// </summary>
         /// <param name="messageFactory">the message factory</param>
         /// <param name="configuration">the configuration</param>
-        /// <param name="logger">the logger instance</param>
         protected Iso8583ServerConnector(IMessageFactory<T> messageFactory,
-            C configuration, ILogger<Iso8583ServerConnector<T, C, B>> logger)
+            C configuration)
         {
             MessageHandler = new CompositeIsoMessageHandler<T>();
             MessageFactory = messageFactory;
             Configuration = configuration;
-            _logger = logger;
             _channelRef = new AtomicReference<IChannel>();
             if (configuration.AddEchoMessageListener)
                 MessageHandler.AddListener(new EchoMessageListener<T>(messageFactory));
         }
+
+        /// <summary>
+        ///     the message handler
+        /// </summary>
+        public CompositeIsoMessageHandler<T> MessageHandler { get; }
+
+        /// <summary>
+        ///     the message factory
+        /// </summary>
+        public IMessageFactory<T> MessageFactory { get; }
+
+        /// <summary>
+        ///     the server configuration
+        /// </summary>
+        public C Configuration { get; }
+
+        /// <summary>
+        ///     the connector configurer
+        /// </summary>
+        public IServerConnectorConfigurer<C, B> ConnectorConfigurer { get; set; }
+
+        /// <summary>
+        ///     the boss event loop group. <see cref="MultithreadEventLoopGroup" />
+        /// </summary>
+        public MultithreadEventLoopGroup BossEventLoopGroup { get; set; }
+
+        /// <summary>
+        ///     the worker thread event loop group. <see cref="MultithreadEventLoopGroup" />
+        /// </summary>
+        public MultithreadEventLoopGroup WorkerEventLoopGroup { get; set; }
 
         protected abstract B CreateBootstrap();
 
@@ -61,11 +94,10 @@ namespace Iso8583.Server
         }
 
         /// <summary>
-        /// initialize the server
+        ///     initialize the server
         /// </summary>
         public void Init()
         {
-            _logger.LogInformation("Initializing");
             BossEventLoopGroup = CreateBossEventLoopGroup();
             WorkerEventLoopGroup = CreateWorkerEventLoopGroup();
             _bootstrap = CreateBootstrap();
@@ -73,7 +105,7 @@ namespace Iso8583.Server
 
 
         /// <summary>
-        /// creates the boss worker thread group
+        ///     creates the boss worker thread group
         /// </summary>
         /// <returns></returns>
         protected MultithreadEventLoopGroup CreateBossEventLoopGroup()
@@ -82,21 +114,19 @@ namespace Iso8583.Server
         }
 
         /// <summary>
-        /// creates the worker threads group
+        ///     creates the worker threads group
         /// </summary>
         protected MultithreadEventLoopGroup CreateWorkerEventLoopGroup()
         {
             var group = new MultithreadEventLoopGroup(Configuration.WorkerThreadCount);
-            _logger.LogDebug("Created worker EventLoopGroup with {ExecCount} executor threads",
-                Configuration.WorkerThreadCount);
             return group;
         }
 
 
         /// <summary>
-        /// shutdown the system
+        ///     shutdown the system
         /// </summary>
-        public async Task Shutdown()
+        protected async Task Shutdown()
         {
             if (WorkerEventLoopGroup != null)
             {
@@ -113,14 +143,14 @@ namespace Iso8583.Server
 
 
         /// <summary>
-        /// configures the server bootstrap
+        ///     configures the server bootstrap
         /// </summary>
         /// <param name="bootstrap">the server bootstrap</param>
         protected void ConfigureBootstrap(B bootstrap)
         {
-            bootstrap.ChildOption(ChannelOption.TcpNodelay,
-                true).ChildOption(ChannelOption.AutoRead,
-                true);
+            bootstrap
+                .ChildOption(ChannelOption.TcpNodelay, true)
+                .ChildOption(ChannelOption.AutoRead, true);
 
             ConnectorConfigurer?.ConfigureBootstrap(bootstrap,
                 Configuration);
@@ -128,7 +158,7 @@ namespace Iso8583.Server
 
 
         /// <summary>
-        /// adds a iso message handler
+        ///     adds a iso message handler
         /// </summary>
         /// <param name="handler">the iso message handler</param>
         public void AddMessageListener(IIsoMessageListener<T> handler)
@@ -137,7 +167,7 @@ namespace Iso8583.Server
         }
 
         /// <summary>
-        /// removes an iso message handler
+        ///     removes an iso message handler
         /// </summary>
         /// <param name="handler">the iso message handler</param>
         public void RemoveMessageListener(IIsoMessageListener<T> handler)
@@ -147,7 +177,7 @@ namespace Iso8583.Server
 
 
         /// <summary>
-        /// sets the network channel
+        ///     sets the network channel
         /// </summary>
         /// <param name="channel">the channel</param>
         protected void SetChannel(IChannel channel)
@@ -156,50 +186,13 @@ namespace Iso8583.Server
         }
 
         /// <summary>
-        /// gets the network channel
+        ///     gets the network channel
         /// </summary>
         /// <returns></returns>
         protected IChannel GetChannel()
         {
             return _channelRef.Value;
         }
-
-        /// <summary>
-        /// the message handler
-        /// </summary>
-        public CompositeIsoMessageHandler<T> MessageHandler { get; }
-
-        /// <summary>
-        /// the message factory
-        /// </summary>
-        public IMessageFactory<T> MessageFactory { get; }
-
-        /// <summary>
-        /// the server configuration
-        /// </summary>
-        public C Configuration { get; }
-
-        /// <summary>
-        /// the connector configurer
-        /// </summary>
-        public IServerConnectorConfigurer<C> ConnectorConfigurer { get; set; }
-
-        /// <summary>
-        /// the boss event loop group. <see cref="MultithreadEventLoopGroup"/>
-        /// </summary>
-        public MultithreadEventLoopGroup BossEventLoopGroup { get; set; }
-
-        /// <summary>
-        ///  the worker thread event loop group. <see cref="MultithreadEventLoopGroup"/>
-        /// </summary>
-        public MultithreadEventLoopGroup WorkerEventLoopGroup { get; set; }
-
-        /// <summary>
-        /// the server bootstrap. <see cref="ServerBootstrap"/>
-        /// </summary>
-        private B _bootstrap;
-
-        private readonly AtomicReference<IChannel> _channelRef;
-        private readonly ILogger<Iso8583ServerConnector<T, C, B>> _logger;
+        
     }
 }

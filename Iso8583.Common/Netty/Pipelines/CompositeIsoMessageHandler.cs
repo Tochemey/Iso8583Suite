@@ -8,17 +8,17 @@ using NetCore8583;
 namespace Iso8583.Common.Netty.Pipelines
 {
     /// <summary>
-    /// Handles iso messages with a chain of <see cref="IIsoMessageListener{T}"/>
+    ///     Handles iso messages with a chain of <see cref="IIsoMessageListener{T}" />
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class CompositeIsoMessageHandler<T> : ChannelHandlerAdapter where T : IsoMessage
     {
+        private readonly bool _failOnError;
         private readonly ILogger<CompositeIsoMessageHandler<T>> _logger;
         private readonly IList<IIsoMessageListener<T>> _messageListeners;
-        private readonly bool _failOnError;
 
         /// <summary>
-        /// create a new instance of <see cref="CompositeIsoMessageHandler{T}"/>
+        ///     create a new instance of <see cref="CompositeIsoMessageHandler{T}" />
         /// </summary>
         /// <param name="failOnError"></param>
         /// <param name="logger"></param>
@@ -30,7 +30,7 @@ namespace Iso8583.Common.Netty.Pipelines
         }
 
         /// <summary>
-        /// default constructor
+        ///     default constructor
         /// </summary>
         public CompositeIsoMessageHandler() : this(true,
             new LoggerFactory().CreateLogger<CompositeIsoMessageHandler<T>>())
@@ -59,7 +59,7 @@ namespace Iso8583.Common.Netty.Pipelines
         }
 
         /// <summary>
-        /// adds a new iso message listener
+        ///     adds a new iso message listener
         /// </summary>
         /// <param name="listener">the message listener</param>
         /// <exception cref="ArgumentNullException">is thrown when the listener is null</exception>
@@ -71,7 +71,7 @@ namespace Iso8583.Common.Netty.Pipelines
         }
 
         /// <summary>
-        /// adds a list if iso message listeners
+        ///     adds a list if iso message listeners
         /// </summary>
         /// <param name="listeners">the list of iso message listeners</param>
         /// <exception cref="ArgumentNullException">thrown when the list of listeners is null or empty</exception>
@@ -84,7 +84,7 @@ namespace Iso8583.Common.Netty.Pipelines
         }
 
         /// <summary>
-        /// removes a given listener
+        ///     removes a given listener
         /// </summary>
         /// <param name="listener">the listener to remove</param>
         public void RemoveListener(IIsoMessageListener<T> listener)
@@ -93,7 +93,7 @@ namespace Iso8583.Common.Netty.Pipelines
         }
 
         /// <summary>
-        /// handles the iso message received by passing around to the various registered listeners
+        ///     handles the iso message received by passing around to the various registered listeners
         /// </summary>
         /// <param name="context">the channel handler context</param>
         /// <param name="isoMessage">the iso message to handle</param>
@@ -114,7 +114,7 @@ namespace Iso8583.Common.Netty.Pipelines
         }
 
         /// <summary>
-        /// passes the message handling to the appropriate listener
+        ///     passes the message handling to the appropriate listener
         /// </summary>
         /// <param name="listener">the message listener</param>
         /// <param name="isoMessage">the iso message</param>

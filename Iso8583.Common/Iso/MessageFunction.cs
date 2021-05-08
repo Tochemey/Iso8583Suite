@@ -6,7 +6,7 @@ namespace Iso8583.Common.Iso
     ///     system. Requests are end-to-end messages (e.g., from acquirer to issuer and back with time-outs and automatic
     ///     reversals in place), while advices are point-to-point messages (e.g., from terminal to acquirer, from acquirer to
     ///     network, from network to issuer, with transmission guaranteed over each link, but not necessarily immediately).
-    ///  <see cref="https://en.wikipedia.org/wiki/ISO_8583#Message_function"/>
+    ///     <see cref="https://en.wikipedia.org/wiki/ISO_8583#Message_function" />
     /// </summary>
     public enum MessageFunction
     {

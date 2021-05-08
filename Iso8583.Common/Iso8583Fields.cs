@@ -10,11 +10,6 @@ namespace Iso8583.Common.Netty
     {
         private static readonly Dictionary<string, string> _fields = new();
 
-        public static Dictionary<string, string> Fields()
-        {
-            return _fields;
-        }
-
 
         static Iso8583Fields()
         {
@@ -35,6 +30,11 @@ namespace Iso8583.Common.Netty
                         string.Join("=",
                             line.Split('=').Skip(1).ToArray()));
             }
+        }
+
+        public static Dictionary<string, string> Fields()
+        {
+            return _fields;
         }
     }
 }

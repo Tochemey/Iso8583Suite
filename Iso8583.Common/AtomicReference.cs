@@ -2,14 +2,8 @@ using System.Threading;
 
 namespace Iso8583.Common
 {
-    /// <summary>
-    /// Implementation of the java.concurrent.util AtomicReference type.
-    /// Uses <see cref="Volatile"/> internally to enforce ordering of writes
-    /// without any explicit locking. .NET's strong memory on write guarantees might already enforce
-    /// this ordering, but the addition of the Volatile guarantees it.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class AtomicReference<T> where T : class
+public class AtomicReference<T>
+        where T : class
     {
         /// <summary>
         /// Sets the initial value of this <see cref="AtomicReference{T}"/> to <paramref name="originalValue"/>.
@@ -25,7 +19,7 @@ namespace Iso8583.Common
         /// </summary>
         public AtomicReference()
         {
-            atomicValue = default;
+            atomicValue = default(T);
         }
 
         // ReSharper disable once InconsistentNaming
@@ -85,7 +79,7 @@ namespace Iso8583.Common
         /// <returns>The result of the conversion.</returns>
         public static implicit operator AtomicReference<T>(T value)
         {
-            return new(value);
+            return new AtomicReference<T>(value);
         }
 
         #endregion
