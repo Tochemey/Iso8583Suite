@@ -57,32 +57,32 @@ namespace Iso8583.Server
     /// <summary>
     ///   the message handler
     /// </summary>
-    public CompositeIsoMessageHandler<T> MessageHandler { get; }
+    protected CompositeIsoMessageHandler<T> MessageHandler { get; }
 
     /// <summary>
     ///   the message factory
     /// </summary>
-    public IMessageFactory<T> MessageFactory { get; }
+    protected IMessageFactory<T> MessageFactory { get; }
 
     /// <summary>
     ///   the server configuration
     /// </summary>
-    public C Configuration { get; }
+    protected C Configuration { get; }
 
     /// <summary>
     ///   the connector configurer
     /// </summary>
-    public IServerConnectorConfigurer<C, B> ConnectorConfigurer { get; set; }
+    protected IServerConnectorConfigurer<C, B> ConnectorConfigurer { get; set; }
 
     /// <summary>
     ///   the boss event loop group. <see cref="MultithreadEventLoopGroup" />
     /// </summary>
-    public MultithreadEventLoopGroup BossEventLoopGroup { get; set; }
+    protected MultithreadEventLoopGroup BossEventLoopGroup { get; private set; }
 
     /// <summary>
     ///   the worker thread event loop group. <see cref="MultithreadEventLoopGroup" />
     /// </summary>
-    public MultithreadEventLoopGroup WorkerEventLoopGroup { get; set; }
+    protected MultithreadEventLoopGroup WorkerEventLoopGroup { get; private set; }
 
     protected abstract B CreateBootstrap();
 
