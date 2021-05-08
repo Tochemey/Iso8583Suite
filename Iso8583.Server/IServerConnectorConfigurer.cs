@@ -8,7 +8,7 @@ namespace Iso8583.Server
     /// This interface helps configure the server bootstrap
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IServerConnectorConfigurer<in T> where T: ConnectorConfiguration
+    public interface IServerConnectorConfigurer<in T> where T : ConnectorConfiguration
     {
         /// <summary>
         ///     Hook added before the completion of the bootstrap configuration
@@ -25,6 +25,5 @@ namespace Iso8583.Server
         /// <param name="configuration">the configuration</param>
         void ConfigurePipeline(IChannelPipeline pipeline,
             T configuration);
-
     }
 }

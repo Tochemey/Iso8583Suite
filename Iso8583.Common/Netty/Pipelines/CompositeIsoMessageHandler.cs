@@ -32,7 +32,8 @@ namespace Iso8583.Common.Netty.Pipelines
         /// <summary>
         /// default constructor
         /// </summary>
-        public CompositeIsoMessageHandler(): this(true, new LoggerFactory().CreateLogger<CompositeIsoMessageHandler<T>>())
+        public CompositeIsoMessageHandler() : this(true,
+            new LoggerFactory().CreateLogger<CompositeIsoMessageHandler<T>>())
         {
             // TODO: check the logger
         }
