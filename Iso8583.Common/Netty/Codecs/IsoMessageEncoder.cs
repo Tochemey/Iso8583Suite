@@ -7,10 +7,10 @@ using NetCore8583.Util;
 
 namespace Iso8583.Common.Netty.Codecs
 {
-    /// <summary>
-    ///   Encode iso message to sent over the wire
-    /// </summary>
-    public class IsoMessageEncoder : MessageToByteEncoder<IsoMessage>
+  /// <summary>
+  ///   Encode iso message to sent over the wire
+  /// </summary>
+  public class IsoMessageEncoder : MessageToByteEncoder<IsoMessage>
   {
     private readonly bool _encodeLengthHeaderAsString;
     private readonly int _lengthHeaderLength;

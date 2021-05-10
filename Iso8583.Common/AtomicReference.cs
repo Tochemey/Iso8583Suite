@@ -15,18 +15,12 @@ namespace Iso8583.Common
     ///   Sets the initial value of this <see cref="AtomicReference{T}" /> to <paramref name="originalValue" />.
     /// </summary>
     /// <param name="originalValue">TBD</param>
-    public AtomicReference(T originalValue)
-    {
-      atomicValue = originalValue;
-    }
+    public AtomicReference(T originalValue) => atomicValue = originalValue;
 
     /// <summary>
     ///   Default constructor
     /// </summary>
-    public AtomicReference()
-    {
-      atomicValue = default;
-    }
+    public AtomicReference() => atomicValue = default;
 
     /// <summary>
     ///   The current value of this <see cref="AtomicReference{T}" />
@@ -55,10 +49,7 @@ namespace Iso8583.Common
     /// </summary>
     /// <param name="newValue">The new value</param>
     /// <returns>The old value</returns>
-    public T GetAndSet(T newValue)
-    {
-      return Interlocked.Exchange(ref atomicValue, newValue);
-    }
+    public T GetAndSet(T newValue) => Interlocked.Exchange(ref atomicValue, newValue);
 
     #region Conversion operators
 
@@ -67,20 +58,14 @@ namespace Iso8583.Common
     /// </summary>
     /// <param name="atomicReference">The reference to convert</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator T(AtomicReference<T> atomicReference)
-    {
-      return atomicReference.Value;
-    }
+    public static implicit operator T(AtomicReference<T> atomicReference) => atomicReference.Value;
 
     /// <summary>
     ///   Performs an implicit conversion from <typeparamref name="T" /> to <see cref="AtomicReference{T}" />.
     /// </summary>
     /// <param name="value">The reference to convert</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator AtomicReference<T>(T value)
-    {
-      return new(value);
-    }
+    public static implicit operator AtomicReference<T>(T value) => new(value);
 
     #endregion
   }

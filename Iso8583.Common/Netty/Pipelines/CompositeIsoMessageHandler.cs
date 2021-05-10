@@ -7,11 +7,11 @@ using NetCore8583;
 
 namespace Iso8583.Common.Netty.Pipelines
 {
-    /// <summary>
-    ///   Handles iso messages with a chain of <see cref="IIsoMessageListener{T}" />
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class CompositeIsoMessageHandler<T> : ChannelHandlerAdapter where T : IsoMessage
+  /// <summary>
+  ///   Handles iso messages with a chain of <see cref="IIsoMessageListener{T}" />
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
+  public class CompositeIsoMessageHandler<T> : ChannelHandlerAdapter where T : IsoMessage
   {
     private readonly bool _failOnError;
     private readonly ILogger<CompositeIsoMessageHandler<T>> _logger;

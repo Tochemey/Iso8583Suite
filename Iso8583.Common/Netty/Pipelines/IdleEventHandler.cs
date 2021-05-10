@@ -5,11 +5,11 @@ using NetCore8583;
 
 namespace Iso8583.Common.Netty.Pipelines
 {
-    /// <summary>
-    ///   This handler helps listen to idle state in the network connectivity and send
-    ///   an echo iso message as kind of health check
-    /// </summary>
-    public class IdleEventHandler : ChannelHandlerAdapter
+  /// <summary>
+  ///   This handler helps listen to idle state in the network connectivity and send
+  ///   an echo iso message as kind of health check
+  /// </summary>
+  public class IdleEventHandler : ChannelHandlerAdapter
   {
     private readonly IMessageFactory<IsoMessage> _messageFactory;
 
@@ -17,10 +17,7 @@ namespace Iso8583.Common.Netty.Pipelines
     ///   creates a new instance of <see cref="IdleEventHandler" />
     /// </summary>
     /// <param name="messageFactory"></param>
-    public IdleEventHandler(IMessageFactory<IsoMessage> messageFactory)
-    {
-      _messageFactory = messageFactory;
-    }
+    public IdleEventHandler(IMessageFactory<IsoMessage> messageFactory) => _messageFactory = messageFactory;
 
 
     public override void UserEventTriggered(IChannelHandlerContext context, object evt)

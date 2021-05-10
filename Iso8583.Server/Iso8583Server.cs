@@ -5,20 +5,21 @@ using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
 using Iso8583.Common.Iso;
+using Iso8583.Common.Netty.Pipelines;
 using NetCore8583;
 
 namespace Iso8583.Server
 {
-    /// <summary>
-    ///   An instance of this class will help bootstrap an iso 8583 server
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class Iso8583Server<T> : Iso8583ServerConnector<T, ServerBootstrap, ServerConfiguration> where T : IsoMessage
+  /// <summary>
+  ///   An instance of this class will help bootstrap an iso 8583 server
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
+  public class Iso8583Server<T> : ServerConnector<T, ServerConfiguration> where T : IsoMessage
   {
-      /// <summary>
-      ///   server port
-      /// </summary>
-      private readonly int _port;
+    /// <summary>
+    ///   server port
+    /// </summary>
+    private readonly int _port;
 
     private readonly IPEndPoint _socketAddress;
 
@@ -56,8 +57,8 @@ namespace Iso8583.Server
       boostrap.Group(BossEventLoopGroup, WorkerEventLoopGroup)
         .ChildOption(ChannelOption.SoKeepalive, true)
         .Channel<TcpServerSocketChannel>().LocalAddress(_socketAddress)
-        .ChildHandler(new Iso8583ServerChannelInitializer<ISocketChannel, ServerBootstrap, ServerConfiguration>(
-          Configuration, ConnectorConfigurer, WorkerEventLoopGroup,
+        .ChildHandler(new Iso8583ChannelInitializer<ISocketChannel, ServerConfiguration>(
+          Configuration, ConnectorConfigurator, WorkerEventLoopGroup,
           MessageFactory as IMessageFactory<IsoMessage>, MessageHandler
         ));
       ConfigureBootstrap(boostrap);

@@ -1,9 +1,9 @@
 namespace Iso8583.Common.Iso
 {
-    /// <summary>
-    ///   Message type indicator
-    /// </summary>
-    public class MTI
+  /// <summary>
+  ///   Message type indicator
+  /// </summary>
+  public class MTI
   {
     private readonly Iso8583Version _isoVersion;
     private readonly MessageClass _messageClass;
@@ -30,9 +30,6 @@ namespace Iso8583.Common.Iso
     ///   returns the MTI value
     /// </summary>
     /// <returns></returns>
-    public int Value()
-    {
-      return (int) _isoVersion + (int) _messageClass + (int) _messageFunction + (int) _messageOrigin;
-    }
+    public int Value() => (int) _isoVersion + (int) _messageClass + (int) _messageFunction + (int) _messageOrigin;
   }
 }

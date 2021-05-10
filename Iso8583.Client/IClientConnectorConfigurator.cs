@@ -4,20 +4,18 @@ using Iso8583.Common;
 
 namespace Iso8583.Client
 {
-  
   /// <summary>
-  ///  This interface helps configure the client bootstrap
+  ///   This interface helps configure the client bootstrap
   /// </summary>
-  public interface IClientConnectorConfigurer<in T, in B> 
+  public interface IClientConnectorConfigurator<in T>: IPipelineConfigurator<T>
     where T : ConnectorConfiguration
-    where B: Bootstrap
   {
     /// <summary>
     ///   Hook added before the completion of the bootstrap configuration
     /// </summary>
     /// <param name="bootstrap">the server bootstrap</param>
     /// <param name="configuration">the configuration</param>
-    void ConfigureBootstrap(B bootstrap,
+    void ConfigureBootstrap(Bootstrap bootstrap,
       T configuration);
 
     /// <summary>
