@@ -8,10 +8,10 @@ using NetCore8583.Util;
 
 namespace Iso8583.Common.Netty.Codecs
 {
-    /// <summary>
-    ///   Decodes any Iso 8583 message coming from the wire
-    /// </summary>
-    public class IsoMessageDecoder : ByteToMessageDecoder
+  /// <summary>
+  ///   Decodes any Iso 8583 message coming from the wire
+  /// </summary>
+  public class IsoMessageDecoder : ByteToMessageDecoder
   {
     private readonly IMessageFactory<IsoMessage> _messageFactory;
 
@@ -19,10 +19,7 @@ namespace Iso8583.Common.Netty.Codecs
     ///   creates a new instance of the decoder given the iso message factory
     /// </summary>
     /// <param name="messageFactory"></param>
-    public IsoMessageDecoder(IMessageFactory<IsoMessage> messageFactory)
-    {
-      _messageFactory = messageFactory;
-    }
+    public IsoMessageDecoder(IMessageFactory<IsoMessage> messageFactory) => _messageFactory = messageFactory;
 
 
     protected override void Decode(IChannelHandlerContext context, IByteBuffer input, List<object> output)

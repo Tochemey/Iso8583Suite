@@ -32,9 +32,6 @@ namespace Iso8583.Common.Netty
       }
     }
 
-    public static Dictionary<string, string> Fields()
-    {
-      return _fields;
-    }
+    public static Dictionary<string, string> Fields() => _fields;
   }
 }

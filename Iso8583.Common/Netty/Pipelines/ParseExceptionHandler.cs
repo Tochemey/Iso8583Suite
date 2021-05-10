@@ -6,10 +6,10 @@ using NetCore8583.Util;
 
 namespace Iso8583.Common.Netty.Pipelines
 {
-    /// <summary>
-    ///   Iso Message parsing exception handler
-    /// </summary>
-    public class ParseExceptionHandler : ChannelHandlerAdapter
+  /// <summary>
+  ///   Iso Message parsing exception handler
+  /// </summary>
+  public class ParseExceptionHandler : ChannelHandlerAdapter
   {
     private readonly bool _includeErrorDetails;
     private readonly IMessageFactory<IsoMessage> _messageFactory;

@@ -3,35 +3,35 @@ using Iso8583.Common.Netty.Pipelines;
 
 namespace Iso8583.Common
 {
-    /// <summary>
-    ///   ConnectorConfiguration abstract class
-    /// </summary>
-    public abstract class ConnectorConfiguration
+  /// <summary>
+  ///   ConnectorConfiguration abstract class
+  /// </summary>
+  public abstract class ConnectorConfiguration
   {
-      /// <summary>
-      ///   Default read/write idle timeout in seconds (ping interval) = 30 sec.
-      /// </summary>
-      private const int DefaultIdleTimeout = 30;
+    /// <summary>
+    ///   Default read/write idle timeout in seconds (ping interval) = 30 sec.
+    /// </summary>
+    private const int DefaultIdleTimeout = 30;
 
-      /// <summary>
-      ///   Default (max message length) = 8192
-      /// </summary>
-      private const int DefaultMaxFrameLength = 8192;
+    /// <summary>
+    ///   Default (max message length) = 8192
+    /// </summary>
+    private const int DefaultMaxFrameLength = 8192;
 
-      /// <summary>
-      ///   Default (length of TCP Frame length) = 2
-      /// </summary>
-      private const int DefaultFrameLengthFieldLength = 2;
+    /// <summary>
+    ///   Default (length of TCP Frame length) = 2
+    /// </summary>
+    private const int DefaultFrameLengthFieldLength = 2;
 
-      /// <summary>
-      ///   Default (compensation value to add to the value of the length field) = 0
-      /// </summary>
-      private const int DefaultFrameLengthFieldAdjust = 0;
+    /// <summary>
+    ///   Default (compensation value to add to the value of the length field) = 0
+    /// </summary>
+    private const int DefaultFrameLengthFieldAdjust = 0;
 
-      /// <summary>
-      ///   Default  (the offset of the length field) = 0
-      /// </summary>
-      private const int DefaultFrameLengthFieldOffset = 0;
+    /// <summary>
+    ///   Default  (the offset of the length field) = 0
+    /// </summary>
+    private const int DefaultFrameLengthFieldOffset = 0;
 
     private static readonly int[] DefaultSensitiveDataFields = IsoMessageLoggingHandler.DefaultMaskedFields;
 

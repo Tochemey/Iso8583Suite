@@ -29,10 +29,7 @@ namespace Iso8583.Common.Iso
     }
 
     /// <inheritdoc />
-    public T NewMessage(int type)
-    {
-      return _messageFactory.NewMessage(type);
-    }
+    public T NewMessage(int type) => _messageFactory.NewMessage(type);
 
     /// <inheritdoc />
     public T NewMessage(MessageClass messageClass, MessageFunction messageFunction, MessageOrigin messageOrigin)
@@ -42,16 +39,10 @@ namespace Iso8583.Common.Iso
     }
 
     /// <inheritdoc />
-    public T CreateResponse(T request)
-    {
-      return _messageFactory.CreateResponse(request);
-    }
+    public T CreateResponse(T request) => _messageFactory.CreateResponse(request);
 
     /// <inheritdoc />
-    public T CreateResponse(T request, bool copyAllFields)
-    {
-      return _messageFactory.CreateResponse(request, copyAllFields);
-    }
+    public T CreateResponse(T request, bool copyAllFields) => _messageFactory.CreateResponse(request, copyAllFields);
 
     /// <inheritdoc />
     public T ParseMessage(byte[] buf, int isoHeaderLength, bool binaryIsoHeader = false)
@@ -64,9 +55,6 @@ namespace Iso8583.Common.Iso
     ///   convenient method to create a default message factory
     /// </summary>
     /// <returns>the created message factory</returns>
-    private static MessageFactory<T> DefaultMessageFactory()
-    {
-      return ConfigParser.CreateDefault() as MessageFactory<T>;
-    }
+    private static MessageFactory<T> DefaultMessageFactory() => ConfigParser.CreateDefault() as MessageFactory<T>;
   }
 }

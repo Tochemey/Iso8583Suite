@@ -4,11 +4,11 @@ using NetCore8583;
 
 namespace Iso8583.Common.Netty.Pipelines
 {
-    /// <summary>
-    ///   listens to the iso Echo message and handle it
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class EchoMessageListener<T> : IIsoMessageListener<T> where T : IsoMessage
+  /// <summary>
+  ///   listens to the iso Echo message and handle it
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
+  public class EchoMessageListener<T> : IIsoMessageListener<T> where T : IsoMessage
   {
     private readonly IMessageFactory<T> _messageFactory;
 
@@ -16,16 +16,11 @@ namespace Iso8583.Common.Netty.Pipelines
     ///   creates a new instance of the EchoMessageListener
     /// </summary>
     /// <param name="messageFactory"></param>
-    public EchoMessageListener(IMessageFactory<T> messageFactory)
-    {
-      _messageFactory = messageFactory;
-    }
+    public EchoMessageListener(IMessageFactory<T> messageFactory) => _messageFactory = messageFactory;
 
     /// <inheritdoc />
-    public bool CanHandleMessage(T isoMessage)
-    {
-      return isoMessage != null && (isoMessage.Type & (int) MessageClass.NETWORK_MANAGEMENT) != 0;
-    }
+    public bool CanHandleMessage(T isoMessage) =>
+      isoMessage != null && (isoMessage.Type & (int) MessageClass.NETWORK_MANAGEMENT) != 0;
 
     /// <summary>
     ///   sends EchoResponse message. Always returns <code>false</code>.

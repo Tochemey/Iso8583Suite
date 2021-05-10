@@ -3,10 +3,10 @@ using DotNetty.Transport.Channels;
 
 namespace Iso8583.Server
 {
-    /// <summary>
-    ///   Server Connector Configuration
-    /// </summary>
-    public class ServerConnectorConfiguration : IServerConnectorConfigurer<ServerConfiguration, ServerBootstrap>
+  /// <summary>
+  ///   Server Connector Configurator
+  /// </summary>
+  public class ServerConnectorConfigurator : IServerConnectorConfigurator<ServerConfiguration>
   {
     public void ConfigureBootstrap(ServerBootstrap bootstrap, ServerConfiguration configuration)
     {
