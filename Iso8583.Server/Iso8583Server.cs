@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using System.Threading.Tasks;
 using DotNetty.Transport.Bootstrapping;
@@ -67,16 +66,6 @@ namespace Iso8583.Server
     }
 
     /// <summary>
-    ///   checks whether the server has started or not
-    /// </summary>
-    /// <returns>true when the server has started and false otherwise</returns>
-    public bool IsStarted()
-    {
-      var channel = GetChannel();
-      return channel is {Open: true};
-    }
-
-    /// <summary>
     ///   starts the iso 8583 server
     /// </summary>
     public async Task Start()
@@ -100,16 +89,8 @@ namespace Iso8583.Server
     private async Task Stop()
     {
       var channel = GetChannel();
-      try
-      {
-        await channel.DeregisterAsync();
-        await channel.CloseAsync();
-      }
-      catch (Exception e)
-      {
-        // TODO use some logging tool
-        Console.WriteLine(e);
-      }
+      await channel.DeregisterAsync();
+      await channel.CloseAsync();
     }
   }
 }

@@ -57,7 +57,6 @@ namespace Iso8583.Client
       _bootstrap = CreateBootstrap();
     }
 
-
     /// <summary>
     ///   configures the client bootstrap
     /// </summary>
