@@ -143,13 +143,23 @@ namespace Iso8583.Common
     protected IChannel GetChannel() => _channelRef.Value;
 
     /// <summary>
-    ///   checks whether the server has started or not
+    ///   checks whether the channel has started or not
     /// </summary>
     /// <returns>true when the server has started and false otherwise</returns>
     public bool IsStarted()
     {
       var channel = GetChannel();
       return channel is {Open: true};
+    }
+
+    /// <summary>
+    /// checks whether the channel is active or not
+    /// </summary>
+    /// <returns>true when the channel is inactive or not</returns>
+    public bool IsChannelInactive() 
+    {
+      var channel = GetChannel();
+      return channel is not {Active: true};
     }
   }
 }

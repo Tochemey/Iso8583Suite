@@ -67,7 +67,9 @@ namespace Iso8583.Server
     {
       bootstrap
         .Option(ChannelOption.TcpNodelay, true)
-        .Option(ChannelOption.AutoRead, true);
+        .Option(ChannelOption.AutoRead, true)
+        .Option(ChannelOption.SoKeepalive, true)
+        .Option(ChannelOption.SoReuseaddr, true);
 
       ConnectorConfigurator?.ConfigureBootstrap(bootstrap,
         Configuration);

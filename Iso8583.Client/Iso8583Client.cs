@@ -17,9 +17,11 @@ namespace Iso8583.Client
   public class Iso8583Client<T> : ClientConnector<T, ClientConfiguration>, ISend where T : IsoMessage
   {
     /// <summary>
-    ///   server port
+    ///   server address
     /// </summary>
     private IPEndPoint _endPoint;
+
+    private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
     /// <summary>
     ///   creates a new instance of <see cref="Iso8583Client{T}" />
@@ -79,10 +81,9 @@ namespace Iso8583.Client
         Configuration, ConnectorConfigurator, WorkerEventLoopGroup,
         MessageFactory as IMessageFactory<IsoMessage>, MessageHandler
       ));
+
       ConfigureBootstrap(bootstrap);
       bootstrap.Validate();
-
-      // TODO handle reconnection
       return bootstrap;
     }
 
@@ -119,6 +120,28 @@ namespace Iso8583.Client
       var channel = GetChannel();
       await channel.CloseAsync();
       await Shutdown();
+    }
+  
+    /// <summary>
+    /// try reconnect back when the connection is closed
+    /// </summary>
+    private async Task TryReconnect()
+    {
+      if (IsChannelInactive())
+      {
+        await semaphoreSlim.WaitAsync();
+        try
+        {
+          if (IsChannelInactive())
+          {
+            await Connect(_endPoint);
+          }
+        }
+        finally
+        {
+          semaphoreSlim.Release();
+        }
+      }
     }
   }
 }
