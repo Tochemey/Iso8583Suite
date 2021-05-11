@@ -94,7 +94,7 @@ namespace Iso8583.Common.Netty.Pipelines
     /// </summary>
     /// <param name="configuration">the connector configuration</param>
     /// <returns>the logging handler <see cref="IsoMessageLoggingHandler" /></returns>
-    private IChannelHandler CreateLoggingHandler(TC configuration) =>
+    private static IChannelHandler CreateLoggingHandler(TC configuration) =>
       new IsoMessageLoggingHandler(LogLevel.DEBUG, configuration.LogSensitiveData,
         configuration.LogFieldDescription, configuration.SensitiveDataFields);
 
@@ -103,7 +103,7 @@ namespace Iso8583.Common.Netty.Pipelines
     /// </summary>
     /// <param name="configuration">the connector configuration</param>
     /// <returns></returns>
-    private IChannelHandler CreateLengthFieldBasedFrameDecoder(TC configuration)
+    private static IChannelHandler CreateLengthFieldBasedFrameDecoder(TC configuration)
     {
       var lengthFieldLength = configuration.FrameLenghtFieldLength;
       return configuration.EncodeFrameLengthAsString
