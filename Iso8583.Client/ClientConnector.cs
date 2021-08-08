@@ -52,7 +52,6 @@ namespace Iso8583.Client
     /// </summary>
     protected override void Init()
     {
-      BossEventLoopGroup = CreateBossEventLoopGroup();
       WorkerEventLoopGroup = CreateWorkerEventLoopGroup();
       _bootstrap = CreateBootstrap();
     }

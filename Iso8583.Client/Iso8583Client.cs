@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNetty.Transport.Bootstrapping;
@@ -21,7 +20,12 @@ namespace Iso8583.Client
     /// <summary>
     ///   server address
     /// </summary>
-    private IPEndPoint _endPoint;
+    private string _host;
+
+    /// <summary>
+    ///   server port
+    /// </summary>
+    private int _port;
 
     /// <summary>
     ///   creates a new instance of <see cref="Iso8583Client{T}" />
@@ -74,9 +78,8 @@ namespace Iso8583.Client
     protected override Bootstrap CreateBootstrap()
     {
       var bootstrap = new Bootstrap();
-      bootstrap.Group(BossEventLoopGroup);
+      bootstrap.Group(WorkerEventLoopGroup);
       bootstrap.Channel<TcpSocketChannel>();
-      bootstrap.RemoteAddress(_endPoint);
       bootstrap.Handler(new Iso8583ChannelInitializer<ISocketChannel, ClientConfiguration>(
         Configuration, ConnectorConfigurator, WorkerEventLoopGroup,
         MessageFactory as IMessageFactory<IsoMessage>, MessageHandler
@@ -87,20 +90,6 @@ namespace Iso8583.Client
       return bootstrap;
     }
 
-    /// <summary>
-    ///   connects to the iso 8583 server
-    /// </summary>
-    private async Task Connect(IPEndPoint address)
-    {
-      // initialize the client
-      Init();
-      _endPoint = address;
-      // TODO handle reconnection
-
-      // bind to socket and set the connection channel
-      var channel = await GetBootstrap().ConnectAsync(_endPoint);
-      SetChannel(channel);
-    }
 
     /// <summary>
     ///   connects to the iso8583 server
@@ -109,10 +98,14 @@ namespace Iso8583.Client
     /// <param name="port">the iso server port</param>
     public async Task Connect(string host, int port)
     {
-      var endpoint = new IPEndPoint(IPAddress.Parse(host), port);
-      // set the endpoint channel
-      _endPoint = endpoint;
-      await Connect(_endPoint);
+      // initialize the client
+      Init();
+
+      // bind to socket and set the connection channel
+      var channel = await GetBootstrap().ConnectAsync(host, port);
+      SetChannel(channel);
+      _host = host;
+      _port = port;
     }
 
     /// <summary>
@@ -122,7 +115,7 @@ namespace Iso8583.Client
     {
       var channel = GetChannel();
       await channel.CloseAsync();
-      await Shutdown();
+      await WorkerEventLoopGroup.ShutdownGracefullyAsync();
     }
 
     /// <summary>
@@ -145,7 +138,7 @@ namespace Iso8583.Client
         await _semaphoreSlim.WaitAsync();
         try
         {
-          if (IsChannelInactive()) await Connect(_endPoint);
+          if (IsChannelInactive()) await Connect(_host, _port);
         }
         finally
         {

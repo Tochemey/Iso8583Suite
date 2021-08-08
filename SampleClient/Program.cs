@@ -6,6 +6,9 @@ using Iso8583.Client;
 using Iso8583.Common;
 using Iso8583.Common.Iso;
 using NetCore8583;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
 namespace SampleClient
 {
@@ -13,10 +16,15 @@ namespace SampleClient
   {
     private static IsoMessage _receivedMessage;
 
+    private readonly Logger _logger = new LoggerConfiguration().MinimumLevel.Debug()
+      .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+      .Enrich.FromLogContext()
+      .WriteTo.Console().CreateLogger();
+
     private static async Task Main(string[] args)
     {
-      const int serverPort = 8583;
-      const string serverHost = "0.0.0.0";
+      const int serverPort = 9000;
+      const string serverHost = "localhost";
 
       // create a message factory
       // let us create a message factory
@@ -64,7 +72,7 @@ namespace SampleClient
         message.SetField(42, new IsoValue(IsoType.ALPHA, "502101143255555", 15));
         message.SetField(45, new IsoValue(IsoType.LLVAR, track1, track1.Length));
         message.SetField(49, new IsoValue(IsoType.NUMERIC, "840", 3));
-        
+
         // send the iso message to the iso server
         await client.Send(message);
       }
@@ -72,10 +80,10 @@ namespace SampleClient
       // let us wait for response
       while (_receivedMessage == null)
         Thread.Sleep(100);
-      
+
       // disconnect 
       await client.Disconnect();
-      
+
       // close the program on a key pressed
       Console.ReadKey();
     }

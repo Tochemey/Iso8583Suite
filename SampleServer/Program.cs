@@ -6,6 +6,9 @@ using Iso8583.Common;
 using Iso8583.Common.Iso;
 using Iso8583.Server;
 using NetCore8583;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
 namespace SampleServer
 {
@@ -13,11 +16,16 @@ namespace SampleServer
   {
     private static IsoMessage _receivedMessage;
 
+    private static readonly Logger _logger = new LoggerConfiguration().MinimumLevel.Debug()
+      .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+      .Enrich.FromLogContext()
+      .WriteTo.Console().CreateLogger();
+
     private static async Task Main(string[] args)
     {
       try
       {
-        const int isoServerPort = 8583;
+        const int isoServerPort = 9000;
         // let us create a message factory
         var messageFactory = new IsoMessageFactory<IsoMessage>(Iso8583Version.V1987);
 
@@ -29,7 +37,7 @@ namespace SampleServer
         };
 
         // let us create the iso server providing port to bind to, ServerConfiguration, and MessageFactory
-        var server = new Iso8583Server<IsoMessage>(isoServerPort, serverConfig, messageFactory);
+        var server = new Iso8583Server<IsoMessage>(isoServerPort, serverConfig, messageFactory, _logger);
 
         // let us add some custom listener
         server.AddMessageListener(new CustomListener(messageFactory));

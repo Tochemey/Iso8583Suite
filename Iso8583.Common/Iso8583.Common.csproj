@@ -5,23 +5,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="DotNetty.Buffers" Version="0.6.0"/>
-        <PackageReference Include="DotNetty.Codecs" Version="0.6.0"/>
-        <PackageReference Include="DotNetty.Common" Version="0.6.0"/>
-        <PackageReference Include="DotNetty.Handlers" Version="0.6.0"/>
-        <PackageReference Include="DotNetty.Transport" Version="0.6.0"/>
+        <PackageReference Include="DotNetty.Buffers" Version="0.7.0"/>
+        <PackageReference Include="DotNetty.Codecs" Version="0.7.0"/>
+        <PackageReference Include="DotNetty.Common" Version="0.7.0"/>
+        <PackageReference Include="DotNetty.Handlers" Version="0.7.0"/>
+        <PackageReference Include="DotNetty.Transport" Version="0.7.0"/>
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2"/>
         <PackageReference Include="NetCore8583" Version="1.0.3"/>
-        <PackageReference Include="NLog" Version="4.7.9"/>
-        <PackageReference Include="NLog.Extensions.Logging" Version="1.7.2"/>
+        <PackageReference Include="NLog" Version="4.7.10"/>
+        <PackageReference Include="NLog.Extensions.Logging" Version="1.7.3"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="iso8583fields.ini"/>
-        <EmbeddedResource Include="iso8583fields.ini">
+        <None Update="iso8583fields.ini">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </EmbeddedResource>
+        </None>
     </ItemGroup>
 
 </Project>

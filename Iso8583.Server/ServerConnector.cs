@@ -1,5 +1,4 @@
 using DotNetty.Transport.Bootstrapping;
-using DotNetty.Transport.Channels;
 using Iso8583.Common;
 using Iso8583.Common.Iso;
 using Iso8583.Common.Netty.Pipelines;
@@ -65,12 +64,6 @@ namespace Iso8583.Server
     /// <param name="bootstrap">the server bootstrap</param>
     protected void ConfigureBootstrap(ServerBootstrap bootstrap)
     {
-      bootstrap
-        .Option(ChannelOption.TcpNodelay, true)
-        .Option(ChannelOption.AutoRead, true)
-        .Option(ChannelOption.SoKeepalive, true)
-        .Option(ChannelOption.SoReuseaddr, true);
-
       ConnectorConfigurator?.ConfigureBootstrap(bootstrap,
         Configuration);
     }

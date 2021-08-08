@@ -1,11 +1,13 @@
 using System.Net;
 using System.Threading.Tasks;
+using DotNetty.Handlers.Logging;
 using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
 using Iso8583.Common.Iso;
 using Iso8583.Common.Netty.Pipelines;
 using NetCore8583;
+using Serilog.Core;
 
 namespace Iso8583.Server
 {
@@ -15,12 +17,12 @@ namespace Iso8583.Server
   /// <typeparam name="T"></typeparam>
   public class Iso8583Server<T> : ServerConnector<T, ServerConfiguration> where T : IsoMessage
   {
+    private readonly Logger _logger;
+
     /// <summary>
     ///   server port
     /// </summary>
     private readonly int _port;
-
-    private readonly IPEndPoint _socketAddress;
 
     /// <summary>
     ///   creates a new instance of <see cref="Iso8583Server{T}" />
@@ -28,25 +30,27 @@ namespace Iso8583.Server
     /// <param name="port">the server port</param>
     /// <param name="configuration">the server configuration</param>
     /// <param name="messageFactory">the message factory</param>
-    public Iso8583Server(int port, ServerConfiguration configuration, IMessageFactory<T> messageFactory) : base(
+    /// <param name="logger">logger</param>
+    public Iso8583Server(int port, ServerConfiguration configuration, IMessageFactory<T> messageFactory,
+      Logger logger) : base(
       messageFactory, configuration)
     {
       _port = port;
-      _socketAddress = new IPEndPoint(IPAddress.Any,
-        port);
+      _logger = logger;
     }
+
 
     /// <summary>
     ///   creates a new instance of <see cref="Iso8583Server{T}" />
     /// </summary>
     /// <param name="port">the server port</param>
     /// <param name="messageFactory">the message factory</param>
-    public Iso8583Server(int port, IMessageFactory<T> messageFactory) : base(
+    /// <param name="logger">logger</param>
+    public Iso8583Server(int port, IMessageFactory<T> messageFactory, Logger logger) : base(
       messageFactory, new ServerConfiguration())
     {
       _port = port;
-      _socketAddress = new IPEndPoint(IPAddress.Any,
-        port);
+      _logger = logger;
     }
 
 
@@ -55,7 +59,13 @@ namespace Iso8583.Server
       var boostrap = new ServerBootstrap();
       boostrap.Group(BossEventLoopGroup, WorkerEventLoopGroup)
         .ChildOption(ChannelOption.SoKeepalive, true)
-        .Channel<TcpServerSocketChannel>().LocalAddress(_socketAddress)
+        .ChildOption(ChannelOption.SoLinger, 0)
+        .ChildOption(ChannelOption.TcpNodelay,
+          true)
+        .ChildOption(ChannelOption.SoReuseaddr,
+          true)
+        .Channel<TcpServerSocketChannel>()
+        .Handler(new LoggingHandler(LogLevel.INFO))
         .ChildHandler(new Iso8583ChannelInitializer<ISocketChannel, ServerConfiguration>(
           Configuration, ConnectorConfigurator, WorkerEventLoopGroup,
           MessageFactory as IMessageFactory<IsoMessage>, MessageHandler
@@ -70,21 +80,25 @@ namespace Iso8583.Server
     /// </summary>
     public async Task Start()
     {
-      // initialize the client
+      // initialize the server
       Init();
 
       // bind to socket and set the connection channel
-      var channel = await GetBootstrap().BindAsync();
+      var channel = await GetBootstrap().BindAsync(IPAddress.Any, _port);
       SetChannel(channel);
+
+      if (channel.Open && channel.Active)
+        _logger.Information("Iso8583 Server started on: {addr}", channel.LocalAddress);
     }
 
     /// <summary>
     ///   shutdowns the iso server gracefully
     /// </summary>
-    public new async Task Shutdown()
+    public async Task Shutdown()
     {
       await Stop();
-      await base.Shutdown();
+      await WorkerEventLoopGroup.ShutdownGracefullyAsync();
+      await BossEventLoopGroup.ShutdownGracefullyAsync();
     }
 
     /// <summary>

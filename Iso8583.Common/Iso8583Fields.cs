@@ -2,36 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace Iso8583.Common
 {
   public static class Iso8583Fields
   {
-    private static readonly Dictionary<string, string> _fields = new();
+    public static readonly Dictionary<string, string> Fields =
+      ReadIniFile(AppDomain.CurrentDomain.BaseDirectory + "iso8583Fields.ini");
 
 
-    static Iso8583Fields()
+    private static Dictionary<string, string> ReadIniFile(string fileName)
     {
-      var assembly = Assembly.GetExecutingAssembly();
-      var resourceName = assembly.GetManifestResourceNames()
-        .Single(str => str.EndsWith("iso8583Fields.ini"));
-      using var stream = assembly.GetManifestResourceStream(resourceName);
-      using var reader = new StreamReader(stream ??
-                                          throw new InvalidOperationException(
-                                            "unable to load ISO8583 field descriptions"));
-      string line;
-      while ((line = reader.ReadLine()) != null)
+      return File.ReadLines(fileName).Select(s => s.Split('=')).Select(s => new
       {
-        line = line.Trim();
-        if (line.Length == 0) continue; // empty line
-        if (line.Contains("="))
-          _fields.Add(line.Split('=')[0],
-            string.Join("=",
-              line.Split('=').Skip(1).ToArray()));
-      }
+        key = s[0], value = string.Join("=", s.Select((o, n) => new
+        {
+          n,
+          o
+        }).Where(o => o.n > 0).Select(o => o.o))
+      }).ToDictionary(o => o.key, o => o.value);
     }
-
-    public static Dictionary<string, string> Fields() => _fields;
   }
 }

@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using DotNetty.Transport.Channels;
 using Iso8583.Common.Iso;
 using Iso8583.Common.Netty.Pipelines;
@@ -10,7 +9,7 @@ namespace Iso8583.Common
     where T : IsoMessage
     where TC : ConnectorConfiguration
   {
-    protected readonly AtomicReference<IChannel> _channelRef;
+    private readonly AtomicReference<IChannel> _channelRef;
 
     /// <summary>
     ///   creates a new instance of Iso8583ServerConnector
@@ -83,48 +82,19 @@ namespace Iso8583.Common
     /// <summary>
     ///   creates the worker threads group
     /// </summary>
-    protected MultithreadEventLoopGroup CreateWorkerEventLoopGroup()
-    {
-      var group = new MultithreadEventLoopGroup(Configuration.WorkerThreadCount);
-      return group;
-    }
-
-
-    /// <summary>
-    ///   shutdown the system
-    /// </summary>
-    protected async Task Shutdown()
-    {
-      if (WorkerEventLoopGroup != null)
-      {
-        await WorkerEventLoopGroup.ShutdownGracefullyAsync();
-        WorkerEventLoopGroup = null;
-      }
-
-      if (BossEventLoopGroup != null)
-      {
-        await BossEventLoopGroup.ShutdownGracefullyAsync();
-        BossEventLoopGroup = null;
-      }
-    }
+    protected MultithreadEventLoopGroup CreateWorkerEventLoopGroup() => new(Configuration.WorkerThreadCount);
 
     /// <summary>
     ///   adds a iso message handler
     /// </summary>
     /// <param name="handler">the iso message handler</param>
-    public void AddMessageListener(IIsoMessageListener<T> handler)
-    {
-      MessageHandler.AddListener(handler);
-    }
+    public void AddMessageListener(IIsoMessageListener<T> handler) => MessageHandler.AddListener(handler);
 
     /// <summary>
     ///   removes an iso message handler
     /// </summary>
     /// <param name="handler">the iso message handler</param>
-    public void RemoveMessageListener(IIsoMessageListener<T> handler)
-    {
-      MessageHandler.RemoveListener(handler);
-    }
+    public void RemoveMessageListener(IIsoMessageListener<T> handler) => MessageHandler.RemoveListener(handler);
 
 
     /// <summary>

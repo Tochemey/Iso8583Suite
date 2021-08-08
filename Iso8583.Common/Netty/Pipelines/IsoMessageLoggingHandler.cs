@@ -38,7 +38,7 @@ namespace Iso8583.Common.Netty.Pipelines
       bool printFieldDescriptions = true,
       params int[] maskedFields) : base(level)
     {
-      var fields = Iso8583Fields.Fields();
+      var fields = Iso8583Fields.Fields;
       try
       {
         foreach (var key in fields.Keys)
