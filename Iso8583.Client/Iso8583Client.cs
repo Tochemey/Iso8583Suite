@@ -16,12 +16,12 @@ namespace Iso8583.Client
   /// <typeparam name="T"></typeparam>
   public class Iso8583Client<T> : ClientConnector<T, ClientConfiguration>, ISend where T : IsoMessage
   {
+    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
+
     /// <summary>
     ///   server address
     /// </summary>
     private IPEndPoint _endPoint;
-
-    private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
     /// <summary>
     ///   creates a new instance of <see cref="Iso8583Client{T}" />
@@ -49,7 +49,7 @@ namespace Iso8583.Client
       var channel = GetChannel();
 
       // send the message when the channel is writable
-      if (channel is {IsWritable: true}) await channel.WriteAndFlushAsync(message);
+      if (channel is { IsWritable: true }) await channel.WriteAndFlushAsync(message);
     }
 
     /// <inheritdoc />
@@ -90,12 +90,15 @@ namespace Iso8583.Client
     /// <summary>
     ///   connects to the iso 8583 server
     /// </summary>
-    public async Task Connect(IPEndPoint address)
+    private async Task Connect(IPEndPoint address)
     {
+      // initialize the client
+      Init();
       _endPoint = address;
       // TODO handle reconnection
-      var bootstrap = GetBootstrap();
-      var channel = await bootstrap.ConnectAsync(_endPoint);
+
+      // bind to socket and set the connection channel
+      var channel = await GetBootstrap().ConnectAsync(_endPoint);
       SetChannel(channel);
     }
 
@@ -121,25 +124,32 @@ namespace Iso8583.Client
       await channel.CloseAsync();
       await Shutdown();
     }
-  
+
     /// <summary>
-    /// try reconnect back when the connection is closed
+    ///   checks whether the client is connected to the iso8583 server
+    /// </summary>
+    /// <returns></returns>
+    public bool IsConnected()
+    {
+      var channel = GetChannel();
+      return channel is { Active: true };
+    }
+
+    /// <summary>
+    ///   try reconnect back when the connection is closed
     /// </summary>
     private async Task TryReconnect()
     {
       if (IsChannelInactive())
       {
-        await semaphoreSlim.WaitAsync();
+        await _semaphoreSlim.WaitAsync();
         try
         {
-          if (IsChannelInactive())
-          {
-            await Connect(_endPoint);
-          }
+          if (IsChannelInactive()) await Connect(_endPoint);
         }
         finally
         {
-          semaphoreSlim.Release();
+          _semaphoreSlim.Release();
         }
       }
     }

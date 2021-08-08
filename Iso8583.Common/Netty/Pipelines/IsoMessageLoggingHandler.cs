@@ -54,7 +54,7 @@ namespace Iso8583.Common.Netty.Pipelines
 
       _printSensitiveData = printSensitiveData;
       _printFieldDescriptions = printFieldDescriptions;
-      _maskedFields = maskedFields is {Length: > 0} ? maskedFields : DefaultMaskedFields;
+      _maskedFields = maskedFields is { Length: > 0 } ? maskedFields : DefaultMaskedFields;
     }
 
     public override bool IsSharable => true;

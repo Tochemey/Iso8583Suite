@@ -20,7 +20,7 @@ namespace Iso8583.Common.Netty.Pipelines
 
     /// <inheritdoc />
     public bool CanHandleMessage(T isoMessage) =>
-      isoMessage != null && (isoMessage.Type & (int) MessageClass.NETWORK_MANAGEMENT) != 0;
+      isoMessage != null && (isoMessage.Type & (int)MessageClass.NETWORK_MANAGEMENT) != 0;
 
     /// <summary>
     ///   sends EchoResponse message. Always returns <code>false</code>.

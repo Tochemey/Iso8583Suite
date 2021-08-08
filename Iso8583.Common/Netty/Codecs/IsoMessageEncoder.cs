@@ -31,20 +31,20 @@ namespace Iso8583.Common.Netty.Codecs
       switch (_lengthHeaderLength)
       {
         case 0:
-          output.WriteBytes(message.WriteData().ToUnsignedBytes());
+          output.WriteBytes(message.WriteData().ToUint8());
           break;
         default:
         {
           if (_encodeLengthHeaderAsString)
           {
-            var bytea = message.WriteData().ToUnsignedBytes();
+            var bytea = message.WriteData().ToUint8();
             var lengthHeader = Convert.ToString(bytea.Length).PadLeft(_lengthHeaderLength, '0');
             output.WriteBytes(lengthHeader.GetBytes());
             output.WriteBytes(bytea);
           }
           else
           {
-            output.WriteBytes(message.WriteToBuffer(_lengthHeaderLength).ToUnsignedBytes());
+            output.WriteBytes(message.WriteToBuffer(_lengthHeaderLength).ToUint8());
           }
 
           break;

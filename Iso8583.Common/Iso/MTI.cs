@@ -30,6 +30,6 @@ namespace Iso8583.Common.Iso
     ///   returns the MTI value
     /// </summary>
     /// <returns></returns>
-    public int Value() => (int) _isoVersion + (int) _messageClass + (int) _messageFunction + (int) _messageOrigin;
+    public int Value() => (int)_isoVersion + (int)_messageClass + (int)_messageFunction + (int)_messageOrigin;
   }
 }

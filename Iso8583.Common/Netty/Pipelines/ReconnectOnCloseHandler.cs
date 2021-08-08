@@ -1,6 +1,5 @@
 using System;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using DotNetty.Transport.Channels;
 
@@ -13,6 +12,7 @@ namespace Iso8583.Common.Netty.Pipelines
   {
     private readonly Func<EndPoint, Task> _connectFunc;
     private readonly int _retryAfter;
+
     public ReconnectOnCloseHandler(Func<EndPoint, Task> connectFunc, int retryAfter)
     {
       _connectFunc = connectFunc;
@@ -25,10 +25,8 @@ namespace Iso8583.Common.Netty.Pipelines
       // TODO better logging
       Console.WriteLine("ChannelInactive connected to {0}", context.Channel.RemoteAddress);
 
-      context.Channel.EventLoop.Schedule(_ => _connectFunc((EndPoint) _), context.Channel.RemoteAddress,
+      context.Channel.EventLoop.Schedule(_ => _connectFunc((EndPoint)_), context.Channel.RemoteAddress,
         TimeSpan.FromMilliseconds(_retryAfter));
     }
-
-
   }
 }

@@ -47,7 +47,7 @@ namespace Iso8583.Common.Iso
     /// <inheritdoc />
     public T ParseMessage(byte[] buf, int isoHeaderLength, bool binaryIsoHeader = false)
     {
-      var bytea = buf.ToSignedBytes();
+      var bytea = buf.ToInt8();
       return _messageFactory.ParseMessage(bytea, isoHeaderLength, binaryIsoHeader);
     }
 

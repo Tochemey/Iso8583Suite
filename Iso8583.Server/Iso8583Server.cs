@@ -70,6 +70,10 @@ namespace Iso8583.Server
     /// </summary>
     public async Task Start()
     {
+      // initialize the client
+      Init();
+
+      // bind to socket and set the connection channel
       var channel = await GetBootstrap().BindAsync();
       SetChannel(channel);
     }

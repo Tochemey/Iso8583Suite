@@ -149,17 +149,17 @@ namespace Iso8583.Common
     public bool IsStarted()
     {
       var channel = GetChannel();
-      return channel is {Open: true};
+      return channel is { Open: true };
     }
 
     /// <summary>
-    /// checks whether the channel is active or not
+    ///   checks whether the channel is active or not
     /// </summary>
     /// <returns>true when the channel is inactive or not</returns>
-    public bool IsChannelInactive() 
+    protected bool IsChannelInactive()
     {
       var channel = GetChannel();
-      return channel is not {Active: true};
+      return channel is not { Active: true };
     }
   }
 }

@@ -22,7 +22,7 @@ namespace Iso8583.Common.Netty.Pipelines
 
     public override void UserEventTriggered(IChannelHandlerContext context, object evt)
     {
-      if (evt is not IdleStateEvent {State: IdleState.ReaderIdle or IdleState.AllIdle}) return;
+      if (evt is not IdleStateEvent { State: IdleState.ReaderIdle or IdleState.AllIdle }) return;
       var message = _messageFactory.NewMessage(MessageClass.NETWORK_MANAGEMENT, MessageFunction.REQUEST,
         MessageOrigin.ACQUIRER);
       context.WriteAndFlushAsync(message);

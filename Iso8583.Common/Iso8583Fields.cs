@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Iso8583.Common.Netty
+namespace Iso8583.Common
 {
   public static class Iso8583Fields
   {

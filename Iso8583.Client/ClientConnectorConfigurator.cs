@@ -1,6 +1,5 @@
 using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
-using Iso8583.Common.Netty.Pipelines;
 
 namespace Iso8583.Client
 {
