@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;

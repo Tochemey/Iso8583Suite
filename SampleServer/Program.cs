@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNetty.Transport.Channels;
@@ -6,6 +7,7 @@ using Iso8583.Common;
 using Iso8583.Common.Iso;
 using Iso8583.Server;
 using NetCore8583;
+using NetCore8583.Parse;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -26,8 +28,13 @@ namespace SampleServer
       try
       {
         const int isoServerPort = 9000;
+        // create a message factory
+        var mfact = ConfigParser.CreateDefault();
+        mfact.UseBinaryMessages = false;
+        mfact.Encoding = Encoding.ASCII;
+      
         // let us create a message factory
-        var messageFactory = new IsoMessageFactory<IsoMessage>(Iso8583Version.V1987);
+        var messageFactory = new IsoMessageFactory<IsoMessage>(mfact,Iso8583Version.V1987);
 
         // let us configure the server
         var serverConfig = new ServerConfiguration

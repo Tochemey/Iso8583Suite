@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNetty.Transport.Channels;
@@ -30,6 +31,7 @@ namespace SampleClient
       // create a message factory
       var mfact = ConfigParser.CreateDefault();
       mfact.UseBinaryMessages = false;
+      mfact.Encoding = Encoding.ASCII;
       
       // let us create a message factory
       var messageFactory = new IsoMessageFactory<IsoMessage>(mfact,Iso8583Version.V1987);
@@ -70,8 +72,8 @@ namespace SampleClient
       message.SetField(3, new IsoValue(IsoType.NUMERIC, "004000", 6));
       message.SetField(4, new IsoValue(IsoType.NUMERIC, "000000000100", 12));
       message.SetField(11, new IsoValue(IsoType.ALPHA, "100304", 6));
-      message.SetField(12, new IsoValue(IsoType.DATE12, new DateTime()));
-      message.SetField(14, new IsoValue(IsoType.DATE_EXP, "1702"));
+      message.SetField(12, new IsoValue(IsoType.DATE12, DateTime.UtcNow));
+      message.SetField(14, new IsoValue(IsoType.DATE_EXP,  new DateTime(2017, 2, 1)));
       message.SetField(19, new IsoValue(IsoType.NUMERIC, "840", 3));
       message.SetField(22, new IsoValue(IsoType.ALPHA, "A00101A03346", 12));
       message.SetField(24, new IsoValue(IsoType.NUMERIC, "100", 3));

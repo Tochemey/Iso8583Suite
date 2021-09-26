@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
@@ -28,23 +29,30 @@ namespace Iso8583.Common.Netty.Codecs
 
     protected override void Encode(IChannelHandlerContext context, IsoMessage message, IByteBuffer output)
     {
+      sbyte[] bytea;
+      byte[] streamToSend;
       switch (_lengthHeaderLength)
       {
         case 0:
-          output.WriteBytes(message.WriteData().ToUint8());
+          bytea = message.WriteData();
+          streamToSend = Encoding.ASCII.GetBytes(bytea.ToString(Encoding.ASCII));
+          output.WriteBytes(streamToSend);
           break;
         default:
         {
           if (_encodeLengthHeaderAsString)
           {
-            var bytea = message.WriteData().ToUint8();
-            var lengthHeader = Convert.ToString(bytea.Length).PadLeft(_lengthHeaderLength, '0');
+            bytea = message.WriteData();
+            streamToSend = Encoding.ASCII.GetBytes(bytea.ToString(Encoding.ASCII));
+            var lengthHeader = Convert.ToString(streamToSend.Length).PadLeft(_lengthHeaderLength, '0');
             output.WriteBytes(lengthHeader.GetBytes());
-            output.WriteBytes(bytea);
+            output.WriteBytes(streamToSend);
           }
           else
           {
-            output.WriteBytes((byte[])(Array)message.WriteToBuffer(_lengthHeaderLength));
+            bytea = message.WriteToBuffer(_lengthHeaderLength);
+            streamToSend = Encoding.ASCII.GetBytes(bytea.ToString(Encoding.ASCII));
+            output.WriteBytes(streamToSend);
           }
 
           break;
