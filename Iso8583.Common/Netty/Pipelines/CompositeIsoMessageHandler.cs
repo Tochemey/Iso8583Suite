@@ -40,14 +40,19 @@ namespace Iso8583.Common.Netty.Pipelines
 
     public override void ChannelRead(IChannelHandlerContext context, object message)
     {
+      // TODO remove this line after debugging
+      Console.WriteLine("received message on channel");
+
       T isoMessage;
       try
       {
         // here we are doing some casting that may fail
         isoMessage = message as T;
+        if (isoMessage != null) Console.WriteLine("message received type {0:X4}", isoMessage.Type);
       }
       catch (Exception)
       {
+        // TODO fix the logger it seems not working
         _logger.LogError("IsoMessage subclass {Sublclass} is not supported by {Class}. Doing nothing",
           message.GetType(),
           GetType());
@@ -56,6 +61,14 @@ namespace Iso8583.Common.Netty.Pipelines
 
       DoHandleMessage(context, isoMessage);
       base.ChannelRead(context, message);
+    }
+    
+    public override void ChannelReadComplete(IChannelHandlerContext context) => context.Flush();
+    
+    public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
+    {
+      Console.WriteLine("Exception: " + exception);
+      context.CloseAsync();
     }
 
     /// <summary>
@@ -66,8 +79,16 @@ namespace Iso8583.Common.Netty.Pipelines
     public void AddListener(IIsoMessageListener<T> listener)
     {
       // Let us make sure that listener is not null
-      if (listener != null) _messageListeners.Add(listener);
-      else throw new ArgumentNullException(nameof(listener));
+      if (listener != null)
+      {
+        // TODO remove this line when debugging is done
+        Console.WriteLine("adding listener {0}", listener.GetType());
+        _messageListeners.Add(listener);
+      }
+      else
+      {
+        throw new ArgumentNullException(nameof(listener));
+      }
     }
 
     /// <summary>
@@ -99,12 +120,19 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <param name="isoMessage">the iso message to handle</param>
     private void DoHandleMessage(IChannelHandlerContext context, T isoMessage)
     {
+      // TODO remove this line after debugging
+      Console.WriteLine("composite handler handling message received type {0:X4}", isoMessage.Type);
+
       var nextListener = true;
       var size = _messageListeners.Count;
       var i = 0;
       while (nextListener && i < size)
       {
         var listener = _messageListeners[i];
+        // TODO remove this line when debugging is done
+        var t = isoMessage.Type.ToString("X4");
+        Console.WriteLine($"{listener.GetType()} is receiving message {t} to handle");
+
         nextListener = HandleMessageWithListener(listener, context, isoMessage);
         if (nextListener == false)
           _logger.LogTrace("Stopping further processing of message {Message} after handler {Handler}",
@@ -125,13 +153,20 @@ namespace Iso8583.Common.Netty.Pipelines
     {
       try
       {
-        if (listener.CanHandleMessage(isoMessage))
+        if (!listener.CanHandleMessage(isoMessage))
         {
-          _logger.LogDebug("Handling IsoMessage[@type=0x{Type}] with {Listener}",
-            isoMessage.Type.ToString("x4"),
-            listener);
-          return listener.HandleMessage(context, isoMessage);
+          // TODO replace this with a good logger
+          var t = isoMessage.Type.ToString("X4");
+          Console.WriteLine($"{listener.GetType()} cannot handle message {t}");
+          return true;
         }
+        
+        // TODO replace this with a good logger
+        _logger.LogDebug("Handling IsoMessage[@type=0x{Type}] with {Listener}",
+          isoMessage.Type.ToString("x4"),
+          listener);
+        
+        return listener.HandleMessage(context, isoMessage);
       }
       catch (Exception e)
       {

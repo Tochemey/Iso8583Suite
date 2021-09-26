@@ -17,7 +17,7 @@ namespace SampleServer
     private static IsoMessage _receivedMessage;
 
     private static readonly Logger _logger = new LoggerConfiguration().MinimumLevel.Debug()
-      .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+      .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
       .Enrich.FromLogContext()
       .WriteTo.Console().CreateLogger();
 
@@ -33,7 +33,8 @@ namespace SampleServer
         var serverConfig = new ServerConfiguration
         {
           LogSensitiveData = true,
-          ReplyOnError = true
+          ReplyOnError = true,
+          AddLoggingHandler = true
         };
 
         // let us create the iso server providing port to bind to, ServerConfiguration, and MessageFactory
@@ -47,6 +48,7 @@ namespace SampleServer
 
         // check the server has started
         if (server.IsStarted())
+          _logger.Information("server started ready to handle requests");
           // let us wait for request to come
           while (_receivedMessage == null)
             Thread.Sleep(100);
@@ -69,10 +71,14 @@ namespace SampleServer
 
       public CustomListener(IsoMessageFactory<IsoMessage> messageFactory) => _messageFactory = messageFactory;
 
-      public bool CanHandleMessage(IsoMessage isoMessage) => isoMessage.Type == 0x1100;
+      public bool CanHandleMessage(IsoMessage isoMessage) => (int)isoMessage.Type == 0x1100;
 
       public bool HandleMessage(IChannelHandlerContext context, IsoMessage isoMessage)
       {
+        var t = isoMessage.Type.ToString("X4");
+        // TODO remove this line when debugging is done
+        Console.WriteLine($"{this.GetType()} handling message type {t}");
+        
         // cache the received message
         _receivedMessage = isoMessage;
         var response = _messageFactory.CreateResponse(isoMessage);

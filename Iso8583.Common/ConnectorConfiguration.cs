@@ -48,7 +48,7 @@ namespace Iso8583.Common
       ReplyOnError = false;
       MaxFrameLength = DefaultMaxFrameLength;
       IdleTimeout = DefaultIdleTimeout;
-      FrameLenghtFieldLength = DefaultFrameLengthFieldLength;
+      FrameLengthFieldLength = DefaultFrameLengthFieldLength;
       FrameLengthFieldOffset = DefaultFrameLengthFieldOffset;
       FrameLengthFieldAdjust = DefaultFrameLengthFieldAdjust;
       SensitiveDataFields = DefaultSensitiveDataFields;
@@ -112,7 +112,7 @@ namespace Iso8583.Common
     /// <summary>
     ///   length of TCP frame length field. Default value is 2
     /// </summary>
-    public int FrameLenghtFieldLength { get; set; }
+    public int FrameLengthFieldLength { get; set; }
 
     /// <summary>
     ///   The offset of the length field. Default value is 0

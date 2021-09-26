@@ -9,7 +9,7 @@ namespace Iso8583.Common
     where T : IsoMessage
     where TC : ConnectorConfiguration
   {
-    private readonly AtomicReference<IChannel> _channelRef;
+    private IChannel _channel;
 
     /// <summary>
     ///   creates a new instance of Iso8583ServerConnector
@@ -24,7 +24,6 @@ namespace Iso8583.Common
       MessageHandler = messageHandler;
       MessageFactory = messageFactory;
       Configuration = configuration;
-      _channelRef = new AtomicReference<IChannel>();
       if (configuration.AddEchoMessageListener)
         MessageHandler.AddListener(new EchoMessageListener<T>(messageFactory));
     }
@@ -40,7 +39,6 @@ namespace Iso8583.Common
       MessageHandler = new CompositeIsoMessageHandler<T>();
       MessageFactory = messageFactory;
       Configuration = configuration;
-      _channelRef = new AtomicReference<IChannel>();
       if (configuration.AddEchoMessageListener)
         MessageHandler.AddListener(new EchoMessageListener<T>(messageFactory));
     }
@@ -64,25 +62,29 @@ namespace Iso8583.Common
     /// <summary>
     ///   the boss event loop group. <see cref="MultithreadEventLoopGroup" />
     /// </summary>
-    protected MultithreadEventLoopGroup BossEventLoopGroup { get; set; }
+    protected MultithreadEventLoopGroup BossEventLoopGroup { get; private  set; } 
 
     /// <summary>
     ///   the worker thread event loop group. <see cref="MultithreadEventLoopGroup" />
     /// </summary>
-    protected MultithreadEventLoopGroup WorkerEventLoopGroup { get; set; }
-
-    protected abstract void Init();
+    protected MultithreadEventLoopGroup WorkerEventLoopGroup { get; private set; }
 
     /// <summary>
     ///   creates the boss worker thread group
     /// </summary>
     /// <returns></returns>
-    protected MultithreadEventLoopGroup CreateBossEventLoopGroup() => new(1);
+    protected void CreateBossEventLoopGroup()
+    {
+      WorkerEventLoopGroup = new MultithreadEventLoopGroup();
+    }
 
     /// <summary>
     ///   creates the worker threads group
     /// </summary>
-    protected MultithreadEventLoopGroup CreateWorkerEventLoopGroup() => new(Configuration.WorkerThreadCount);
+    protected void CreateWorkerEventLoopGroup()
+    {
+      BossEventLoopGroup = new MultithreadEventLoopGroup(Configuration.WorkerThreadCount);
+    } 
 
     /// <summary>
     ///   adds a iso message handler
@@ -103,14 +105,14 @@ namespace Iso8583.Common
     /// <param name="channel">the channel</param>
     protected void SetChannel(IChannel channel)
     {
-      _channelRef.GetAndSet(channel);
+      _channel = channel;
     }
 
     /// <summary>
     ///   gets the network channel
     /// </summary>
     /// <returns></returns>
-    protected IChannel GetChannel() => _channelRef.Value;
+    protected IChannel GetChannel() => _channel;
 
     /// <summary>
     ///   checks whether the channel has started or not
@@ -119,7 +121,7 @@ namespace Iso8583.Common
     public bool IsStarted()
     {
       var channel = GetChannel();
-      return channel is { Open: true };
+      return channel is { IsOpen: true };
     }
 
     /// <summary>
@@ -129,7 +131,7 @@ namespace Iso8583.Common
     protected bool IsChannelInactive()
     {
       var channel = GetChannel();
-      return channel is not { Active: true };
+      return channel is not { IsActive: true };
     }
   }
 }

@@ -13,7 +13,7 @@ namespace Iso8583.Server
     /// <summary>
     ///   the server bootstrap. <see cref="ServerBootstrap" />
     /// </summary>
-    private ServerBootstrap _bootstrap;
+    protected ServerBootstrap Bootstrap;
 
     /// <summary>
     ///   creates a new instance of Iso8583ServerConnector
@@ -44,19 +44,8 @@ namespace Iso8583.Server
     protected IServerConnectorConfigurator<TC> ConnectorConfigurator { get; set; }
 
     protected abstract ServerBootstrap CreateBootstrap();
-
-    protected ServerBootstrap GetBootstrap() => _bootstrap;
-
-    /// <summary>
-    ///   initialize the server
-    /// </summary>
-    protected override void Init()
-    {
-      BossEventLoopGroup = CreateBossEventLoopGroup();
-      WorkerEventLoopGroup = CreateWorkerEventLoopGroup();
-      _bootstrap = CreateBootstrap();
-    }
-
+    
+    protected ServerBootstrap GetBootstrap() => Bootstrap;
 
     /// <summary>
     ///   configures the server bootstrap

@@ -44,7 +44,7 @@ namespace Iso8583.Common.Netty.Codecs
           }
           else
           {
-            output.WriteBytes(message.WriteToBuffer(_lengthHeaderLength).ToUint8());
+            output.WriteBytes((byte[])(Array)message.WriteToBuffer(_lengthHeaderLength));
           }
 
           break;

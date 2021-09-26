@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Threading.Tasks;
 using DotNetty.Handlers.Logging;
@@ -37,6 +38,8 @@ namespace Iso8583.Server
     {
       _port = port;
       _logger = logger;
+      CreateBossEventLoopGroup();
+      CreateWorkerEventLoopGroup();
     }
 
 
@@ -51,11 +54,16 @@ namespace Iso8583.Server
     {
       _port = port;
       _logger = logger;
+      CreateBossEventLoopGroup();
+      CreateWorkerEventLoopGroup();
     }
 
 
     protected override ServerBootstrap CreateBootstrap()
     {
+      // TODO remove this line after debugging
+      Console.WriteLine("creating boostrap");
+
       var boostrap = new ServerBootstrap();
       boostrap.Group(BossEventLoopGroup, WorkerEventLoopGroup)
         .ChildOption(ChannelOption.SoKeepalive, true)
@@ -66,7 +74,7 @@ namespace Iso8583.Server
           true)
         .Channel<TcpServerSocketChannel>()
         .Handler(new LoggingHandler(LogLevel.INFO))
-        .ChildHandler(new Iso8583ChannelInitializer<ISocketChannel, ServerConfiguration>(
+        .ChildHandler(new Iso8583ChannelInitializer<ServerConfiguration>(
           Configuration, ConnectorConfigurator, WorkerEventLoopGroup,
           MessageFactory as IMessageFactory<IsoMessage>, MessageHandler
         ));
@@ -80,15 +88,15 @@ namespace Iso8583.Server
     /// </summary>
     public async Task Start()
     {
-      // initialize the server
-      Init();
-
+      // set the server bootstrap
+      Bootstrap = CreateBootstrap();
+      
       // bind to socket and set the connection channel
-      var channel = await GetBootstrap().BindAsync(IPAddress.Any, _port);
+      var channel = await GetBootstrap().BindAsync(_port);
       SetChannel(channel);
 
-      if (channel.Open && channel.Active)
-        _logger.Information("Iso8583 Server started on: {addr}", channel.LocalAddress);
+      if (channel.IsOpen && channel.IsActive)
+        _logger.Information("Iso8583 Server started on: {Addr}", channel.LocalAddress);
     }
 
     /// <summary>

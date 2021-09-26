@@ -1,3 +1,4 @@
+using System;
 using DotNetty.Codecs;
 using DotNetty.Handlers.Logging;
 using DotNetty.Handlers.Timeout;
@@ -14,7 +15,7 @@ namespace Iso8583.Common.Netty.Pipelines
   /// </summary>
   /// <typeparam name="T"></typeparam>
   /// <typeparam name="TC"></typeparam>
-  public class Iso8583ChannelInitializer<T, TC> : ChannelInitializer<T> where T : ISocketChannel
+  public class Iso8583ChannelInitializer<TC> : ChannelInitializer<ISocketChannel> 
     where TC : ConnectorConfiguration
   {
     private readonly IChannelHandler _channelHandler;
@@ -43,29 +44,7 @@ namespace Iso8583.Common.Netty.Pipelines
     }
 
     protected IMessageFactory<IsoMessage> MessageFactory { get; }
-
-    protected override void InitChannel(T channel)
-    {
-      var isoMessageEncoder = CreateIsoMessageEncoder(_configuration);
-      var loggingHandler = CreateLoggingHandler(_configuration);
-      var parseExceptionHandler = CreateParseExceptionHandler();
-
-      var pipeline = channel.Pipeline;
-
-      // set the channel pipeline
-      pipeline.AddLast(
-        "lengthFieldFrameDecoder",
-        CreateLengthFieldBasedFrameDecoder(_configuration)
-      );
-      pipeline.AddLast("iso8583Decoder", CreateIsoMessageDecoder(MessageFactory));
-      pipeline.AddLast("iso8583Encoder", isoMessageEncoder);
-      if (_configuration.AddLoggingHandler) pipeline.AddLast(_workerGroup, "logging", loggingHandler);
-      if (_configuration.ReplyOnError) pipeline.AddLast(_workerGroup, "replyOnError", parseExceptionHandler);
-      pipeline.AddLast("idleState", new IdleStateHandler(0, 0, _configuration.IdleTimeout));
-      pipeline.AddLast("idleEventHandler", new IdleEventHandler(MessageFactory));
-      pipeline.AddLast(_workerGroup, _channelHandler);
-      _configurator?.ConfigurePipeline(pipeline, _configuration);
-    }
+    
 
     /// <summary>
     ///   creates the iso 8583 message encoder given the connector configuration
@@ -73,7 +52,7 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <param name="configuration">the connector configuration</param>
     /// <returns>the message encoder <see cref="IsoMessageEncoder" /></returns>
     private IsoMessageEncoder CreateIsoMessageEncoder(TC configuration) =>
-      new(configuration.FrameLenghtFieldLength, configuration.EncodeFrameLengthAsString);
+      new(configuration.FrameLengthFieldLength, configuration.EncodeFrameLengthAsString);
 
     /// <summary>
     ///   creates the iso 8583 message decoder given the message factory
@@ -105,7 +84,7 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <returns></returns>
     private static IChannelHandler CreateLengthFieldBasedFrameDecoder(TC configuration)
     {
-      var lengthFieldLength = configuration.FrameLenghtFieldLength;
+      var lengthFieldLength = configuration.FrameLengthFieldLength;
       return configuration.EncodeFrameLengthAsString
         ? new StringLengthFieldBasedFrameDecoder(
           configuration.MaxFrameLength,
@@ -121,6 +100,29 @@ namespace Iso8583.Common.Netty.Pipelines
           configuration.FrameLengthFieldAdjust,
           lengthFieldLength
         );
+    }
+
+    protected override void InitChannel(ISocketChannel channel)
+    {
+      var isoMessageEncoder = CreateIsoMessageEncoder(_configuration);
+      var loggingHandler = CreateLoggingHandler(_configuration);
+      var parseExceptionHandler = CreateParseExceptionHandler();
+
+      var pipeline = channel.Pipeline;
+
+      // set the channel pipeline
+      pipeline.AddLast(
+        "lengthFieldFrameDecoder",
+        CreateLengthFieldBasedFrameDecoder(_configuration)
+      );
+      pipeline.AddLast("iso8583Decoder", CreateIsoMessageDecoder(MessageFactory));
+      pipeline.AddLast("iso8583Encoder", isoMessageEncoder);
+      if (_configuration.AddLoggingHandler) pipeline.AddLast(_workerGroup, "logging", loggingHandler);
+      if (_configuration.ReplyOnError) pipeline.AddLast(_workerGroup, "replyOnError", parseExceptionHandler);
+      pipeline.AddLast("idleState", new IdleStateHandler(0, 0, _configuration.IdleTimeout));
+      pipeline.AddLast("idleEventHandler", new IdleEventHandler(MessageFactory));
+      pipeline.AddLast(_workerGroup, _channelHandler);
+      _configurator?.ConfigurePipeline(pipeline, _configuration);
     }
   }
 }

@@ -14,7 +14,7 @@ namespace Iso8583.Client
     /// <summary>
     ///   the client bootstrap. <see cref="Bootstrap" />
     /// </summary>
-    private Bootstrap _bootstrap;
+    protected Bootstrap Bootstrap;
 
     /// <summary>
     ///   creates a new instance of Iso8583ServerConnector
@@ -42,20 +42,10 @@ namespace Iso8583.Client
     ///   the connector configurator
     /// </summary>
     protected IClientConnectorConfigurator<TC> ConnectorConfigurator { get; set; }
+    
 
-    protected abstract Bootstrap CreateBootstrap();
-
-    protected Bootstrap GetBootstrap() => _bootstrap;
-
-    /// <summary>
-    ///   initialize the server
-    /// </summary>
-    protected override void Init()
-    {
-      WorkerEventLoopGroup = CreateWorkerEventLoopGroup();
-      _bootstrap = CreateBootstrap();
-    }
-
+    protected Bootstrap GetBootstrap() => Bootstrap;
+    
     /// <summary>
     ///   configures the client bootstrap
     /// </summary>

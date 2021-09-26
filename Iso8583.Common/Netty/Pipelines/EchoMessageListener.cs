@@ -1,3 +1,4 @@
+using System;
 using DotNetty.Transport.Channels;
 using Iso8583.Common.Iso;
 using NetCore8583;
@@ -20,7 +21,7 @@ namespace Iso8583.Common.Netty.Pipelines
 
     /// <inheritdoc />
     public bool CanHandleMessage(T isoMessage) =>
-      isoMessage != null && (isoMessage.Type & (int)MessageClass.NETWORK_MANAGEMENT) != 0;
+      isoMessage is { Type: (int)MessageClass.NETWORK_MANAGEMENT };
 
     /// <summary>
     ///   sends EchoResponse message. Always returns <code>false</code>.
@@ -30,6 +31,10 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <returns><code>false</code> - message should not be handled by any other handler</returns>
     public bool HandleMessage(IChannelHandlerContext context, T isoMessage)
     {
+      var t = isoMessage.Type.ToString("X4");
+      // TODO remove this line when debugging is done
+      Console.WriteLine($"{this.GetType()} handling message type {t}");
+      
       var response = _messageFactory.CreateResponse(isoMessage);
       context.WriteAndFlushAsync(response);
       return false;

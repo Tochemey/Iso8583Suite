@@ -1,7 +1,9 @@
 using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNetty.Transport.Bootstrapping;
+using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
 using Iso8583.Common.Iso;
 using Iso8583.Common.Netty.Pipelines;
@@ -36,6 +38,7 @@ namespace Iso8583.Client
       IMessageFactory<T> messageFactory) : base(
       messageFactory, configuration)
     {
+      CreateBossEventLoopGroup();
     }
 
     /// <summary>
@@ -44,6 +47,7 @@ namespace Iso8583.Client
     /// <param name="messageFactory">the message factory</param>
     public Iso8583Client(IMessageFactory<T> messageFactory) : base(messageFactory, new ClientConfiguration())
     {
+      CreateBossEventLoopGroup();
     }
 
     /// <inheritdoc />
@@ -75,12 +79,12 @@ namespace Iso8583.Client
       }
     }
 
-    protected override Bootstrap CreateBootstrap()
+    private Bootstrap CreateBootstrap()
     {
       var bootstrap = new Bootstrap();
       bootstrap.Group(WorkerEventLoopGroup);
       bootstrap.Channel<TcpSocketChannel>();
-      bootstrap.Handler(new Iso8583ChannelInitializer<ISocketChannel, ClientConfiguration>(
+      bootstrap.Handler(new Iso8583ChannelInitializer<ClientConfiguration>(
         Configuration, ConnectorConfigurator, WorkerEventLoopGroup,
         MessageFactory as IMessageFactory<IsoMessage>, MessageHandler
       ));
@@ -98,11 +102,12 @@ namespace Iso8583.Client
     /// <param name="port">the iso server port</param>
     public async Task Connect(string host, int port)
     {
-      // initialize the client
-      Init();
-
+      // set the client bootstrap
+      Bootstrap = CreateBootstrap();
+      
       // bind to socket and set the connection channel
-      var channel = await GetBootstrap().ConnectAsync(host, port);
+      var ipAddress = IPAddress.Parse(host);
+      var channel = await GetBootstrap().ConnectAsync(new IPEndPoint(ipAddress, port));
       SetChannel(channel);
       _host = host;
       _port = port;
@@ -125,7 +130,7 @@ namespace Iso8583.Client
     public bool IsConnected()
     {
       var channel = GetChannel();
-      return channel is { Active: true };
+      return channel is { IsActive: true };
     }
 
     /// <summary>

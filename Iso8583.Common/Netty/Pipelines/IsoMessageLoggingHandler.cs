@@ -65,7 +65,7 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <param name="ctx">the channel handler context</param>
     /// <param name="eventName">the name of the event</param>
     /// <param name="arg">the argument of the event</param>
-    protected new string Format(IChannelHandlerContext ctx,
+    protected override string Format(IChannelHandlerContext ctx,
       string eventName,
       object arg)
     {

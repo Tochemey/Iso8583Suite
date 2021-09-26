@@ -37,7 +37,7 @@ namespace Iso8583.Common.Netty.Codecs
     /// <param name="length">the length of the frame length field</param>
     /// <param name="order">the preferred <see cref="T:DotNetty.Buffers.ByteOrder" /> of buffer.</param>
     /// <returns>a long integer that represents the unadjusted length of the next frame</returns>
-    public new long GetUnadjustedFrameLength(
+    protected new long GetUnadjustedFrameLength(
       IByteBuffer buffer,
       int offset,
       int length,

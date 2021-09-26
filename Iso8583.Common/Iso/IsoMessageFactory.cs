@@ -1,3 +1,4 @@
+using System;
 using NetCore8583;
 using NetCore8583.Parse;
 using NetCore8583.Util;
