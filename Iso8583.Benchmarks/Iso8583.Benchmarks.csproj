@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
+    <PackageReference Include="NetCore8583" Version="2.4.0" />
+    <PackageReference Include="SpanNetty.Buffers" Version="0.7.2012.2221" />
+    <PackageReference Include="SpanNetty.Transport" Version="0.7.2012.2221" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="n8583.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Iso8583.Common\Iso8583.Common.csproj" />
+    <ProjectReference Include="..\Iso8583.Client\Iso8583.Client.csproj" />
+    <ProjectReference Include="..\Iso8583.Server\Iso8583.Server.csproj" />
+  </ItemGroup>
+
+</Project>

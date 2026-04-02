@@ -1,10 +1,25 @@
+// Copyright 2021-2026 Arsene Tochemey Gandote
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
+using System.Runtime.CompilerServices;
 using System.Text;
 using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
+using Iso8583.Common.Metrics;
 using NetCore8583;
-using NetCore8583.Util;
 
 namespace Iso8583.Common.Netty.Codecs
 {
@@ -15,49 +30,83 @@ namespace Iso8583.Common.Netty.Codecs
   {
     private readonly bool _encodeLengthHeaderAsString;
     private readonly int _lengthHeaderLength;
+    private readonly IIso8583Metrics _metrics;
 
     /// <summary>
     ///   creates a new instance of the encoder
     /// </summary>
     /// <param name="lengthHeaderLength"></param>
     /// <param name="encodeLengthHeaderAsString"></param>
-    public IsoMessageEncoder(int lengthHeaderLength, bool encodeLengthHeaderAsString)
+    /// <param name="metrics">optional metrics provider</param>
+    public IsoMessageEncoder(int lengthHeaderLength, bool encodeLengthHeaderAsString,
+      IIso8583Metrics metrics = null)
     {
       _lengthHeaderLength = lengthHeaderLength;
       _encodeLengthHeaderAsString = encodeLengthHeaderAsString;
+      _metrics = metrics ?? NullIso8583Metrics.Instance;
     }
 
     protected override void Encode(IChannelHandlerContext context, IsoMessage message, IByteBuffer output)
     {
-      sbyte[] bytea;
-      byte[] streamToSend;
       switch (_lengthHeaderLength)
       {
         case 0:
-          bytea = message.WriteData();
-          streamToSend = Encoding.ASCII.GetBytes(bytea.ToString(Encoding.ASCII));
-          output.WriteBytes(streamToSend);
+        {
+          var data = SBytesToBytes(message.WriteData());
+          output.WriteBytes(data);
           break;
+        }
         default:
         {
           if (_encodeLengthHeaderAsString)
           {
-            bytea = message.WriteData();
-            streamToSend = Encoding.ASCII.GetBytes(bytea.ToString(Encoding.ASCII));
-            var lengthHeader = Convert.ToString(streamToSend.Length).PadLeft(_lengthHeaderLength, '0');
-            output.WriteBytes(lengthHeader.GetBytes());
-            output.WriteBytes(streamToSend);
+            var data = SBytesToBytes(message.WriteData());
+            WriteLengthHeaderAscii(output, data.Length, _lengthHeaderLength);
+            output.WriteBytes(data);
           }
           else
           {
-            bytea = message.WriteToBuffer(_lengthHeaderLength);
-            streamToSend = Encoding.ASCII.GetBytes(bytea.ToString(Encoding.ASCII));
-            output.WriteBytes(streamToSend);
+            var data = SBytesToBytes(message.WriteToBuffer(_lengthHeaderLength));
+            output.WriteBytes(data);
           }
 
           break;
         }
       }
+
+      _metrics.MessageSent(message.Type);
+    }
+
+    /// <summary>
+    ///   Converts sbyte[] to byte[] using block copy (same memory layout, single allocation).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static byte[] SBytesToBytes(sbyte[] source)
+    {
+      var dest = new byte[source.Length];
+      Buffer.BlockCopy(source, 0, dest, 0, source.Length);
+      return dest;
+    }
+
+    /// <summary>
+    ///   Writes the length header as ASCII digits directly into the buffer.
+    ///   Avoids string allocation from Convert.ToString + PadLeft + GetBytes.
+    /// </summary>
+    private static void WriteLengthHeaderAscii(IByteBuffer buffer, int length, int headerLength)
+    {
+      // Write ASCII digits right-to-left, then pad with '0'
+      Span<byte> digits = stackalloc byte[headerLength];
+      digits.Fill((byte)'0');
+
+      var value = length;
+      for (var i = headerLength - 1; i >= 0 && value > 0; i--)
+      {
+        digits[i] = (byte)('0' + value % 10);
+        value /= 10;
+      }
+
+      for (var i = 0; i < headerLength; i++)
+        buffer.WriteByte(digits[i]);
     }
   }
 }

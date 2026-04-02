@@ -1,73 +1,92 @@
+// Copyright 2021-2026 Arsene Tochemey Gandote
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using DotNetty.Transport.Channels;
+using Iso8583.Common.Metrics;
 using Microsoft.Extensions.Logging;
 using NetCore8583;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Iso8583.Common.Netty.Pipelines
 {
   /// <summary>
-  ///   Handles iso messages with a chain of <see cref="IIsoMessageListener{T}" />
+  ///   Handles iso messages with a chain of <see cref="IIsoMessageListener{T}" />.
+  ///   Uses a copy-on-write array for thread-safe listener iteration.
   /// </summary>
   /// <typeparam name="T"></typeparam>
   public class CompositeIsoMessageHandler<T> : ChannelHandlerAdapter where T : IsoMessage
   {
+    private static readonly IIsoMessageListener<T>[] EmptyListeners = Array.Empty<IIsoMessageListener<T>>();
+
     private readonly bool _failOnError;
-    private readonly ILogger<CompositeIsoMessageHandler<T>> _logger;
-    private readonly IList<IIsoMessageListener<T>> _messageListeners;
+    private readonly ILogger _logger;
+    private readonly IIso8583Metrics _metrics;
+    private readonly object _listenerLock = new();
+
+    /// <summary>
+    ///   Copy-on-write snapshot of listeners. Reads are lock-free; writes take the lock.
+    /// </summary>
+    private volatile IIsoMessageListener<T>[] _listeners = EmptyListeners;
 
     /// <summary>
     ///   create a new instance of <see cref="CompositeIsoMessageHandler{T}" />
     /// </summary>
     /// <param name="failOnError"></param>
     /// <param name="logger"></param>
-    public CompositeIsoMessageHandler(bool failOnError, ILogger<CompositeIsoMessageHandler<T>> logger)
+    /// <param name="metrics">optional metrics provider</param>
+    public CompositeIsoMessageHandler(bool failOnError, ILogger logger, IIso8583Metrics metrics = null)
     {
       _failOnError = failOnError;
       _logger = logger;
-      _messageListeners = new List<IIsoMessageListener<T>>();
+      _metrics = metrics ?? NullIso8583Metrics.Instance;
     }
 
     /// <summary>
     ///   default constructor
     /// </summary>
-    public CompositeIsoMessageHandler() : this(true,
-      new LoggerFactory().CreateLogger<CompositeIsoMessageHandler<T>>())
+    public CompositeIsoMessageHandler() : this(true, Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance)
     {
-      // TODO: check the logger
     }
 
     public override void ChannelRead(IChannelHandlerContext context, object message)
     {
-      // TODO remove this line after debugging
-      Console.WriteLine("received message on channel");
-
-      T isoMessage;
-      try
+      if (message is not T isoMessage)
       {
-        // here we are doing some casting that may fail
-        isoMessage = message as T;
-        if (isoMessage != null) Console.WriteLine("message received type {0:X4}", isoMessage.Type);
-      }
-      catch (Exception)
-      {
-        // TODO fix the logger it seems not working
-        _logger.LogError("IsoMessage subclass {Sublclass} is not supported by {Class}. Doing nothing",
-          message.GetType(),
-          GetType());
+        _logger.LogWarning("Received message of type {Type} which is not a supported IsoMessage subclass. Ignoring",
+          message.GetType());
         return;
       }
 
-      DoHandleMessage(context, isoMessage);
-      base.ChannelRead(context, message);
+      // Run async handler chain without blocking the event loop.
+      // ContinueWith ensures exceptions are propagated to the pipeline instead of being silently lost.
+      DoHandleMessageAsync(context, isoMessage).ContinueWith(static (t, state) =>
+      {
+        var ctx = (IChannelHandlerContext)state!;
+        if (t.Exception != null)
+          ctx.FireExceptionCaught(t.Exception.InnerException ?? t.Exception);
+      }, context, TaskContinuationOptions.OnlyOnFaulted);
     }
-    
+
     public override void ChannelReadComplete(IChannelHandlerContext context) => context.Flush();
-    
+
     public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
     {
-      Console.WriteLine("Exception: " + exception);
+      _logger.LogError(exception, "Exception caught in channel pipeline");
       context.CloseAsync();
     }
 
@@ -78,30 +97,39 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <exception cref="ArgumentNullException">is thrown when the listener is null</exception>
     public void AddListener(IIsoMessageListener<T> listener)
     {
-      // Let us make sure that listener is not null
-      if (listener != null)
-      {
-        // TODO remove this line when debugging is done
-        Console.WriteLine("adding listener {0}", listener.GetType());
-        _messageListeners.Add(listener);
-      }
-      else
-      {
+      if (listener == null)
         throw new ArgumentNullException(nameof(listener));
+
+      lock (_listenerLock)
+      {
+        var current = _listeners;
+        var next = new IIsoMessageListener<T>[current.Length + 1];
+        Array.Copy(current, next, current.Length);
+        next[current.Length] = listener;
+        _listeners = next;
       }
+
+      _logger.LogDebug("Adding message listener {Listener}", listener.GetType().Name);
     }
 
     /// <summary>
-    ///   adds a list if iso message listeners
+    ///   adds a list of iso message listeners
     /// </summary>
     /// <param name="listeners">the list of iso message listeners</param>
     /// <exception cref="ArgumentNullException">thrown when the list of listeners is null or empty</exception>
     public void AddListeners(params IIsoMessageListener<T>[] listeners)
     {
-      if (listeners != null && listeners.Any())
-        foreach (var listener in listeners)
-          _messageListeners.Add(listener);
-      else throw new ArgumentNullException(nameof(listeners));
+      if (listeners == null || listeners.Length == 0)
+        throw new ArgumentNullException(nameof(listeners));
+
+      lock (_listenerLock)
+      {
+        var current = _listeners;
+        var next = new IIsoMessageListener<T>[current.Length + listeners.Length];
+        Array.Copy(current, next, current.Length);
+        Array.Copy(listeners, 0, next, current.Length, listeners.Length);
+        _listeners = next;
+      }
     }
 
     /// <summary>
@@ -110,7 +138,23 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <param name="listener">the listener to remove</param>
     public void RemoveListener(IIsoMessageListener<T> listener)
     {
-      _messageListeners.Remove(listener);
+      lock (_listenerLock)
+      {
+        var current = _listeners;
+        var index = Array.IndexOf(current, listener);
+        if (index < 0) return;
+
+        if (current.Length == 1)
+        {
+          _listeners = EmptyListeners;
+          return;
+        }
+
+        var next = new IIsoMessageListener<T>[current.Length - 1];
+        Array.Copy(current, 0, next, 0, index);
+        Array.Copy(current, index + 1, next, index, current.Length - index - 1);
+        _listeners = next;
+      }
     }
 
     /// <summary>
@@ -118,26 +162,37 @@ namespace Iso8583.Common.Netty.Pipelines
     /// </summary>
     /// <param name="context">the channel handler context</param>
     /// <param name="isoMessage">the iso message to handle</param>
-    private void DoHandleMessage(IChannelHandlerContext context, T isoMessage)
+    private async Task DoHandleMessageAsync(IChannelHandlerContext context, T isoMessage)
     {
-      // TODO remove this line after debugging
-      Console.WriteLine("composite handler handling message received type {0:X4}", isoMessage.Type);
+      _logger.LogDebug("Handling received message type 0x{Type}", isoMessage.Type.ToString("X4"));
 
-      var nextListener = true;
-      var size = _messageListeners.Count;
-      var i = 0;
-      while (nextListener && i < size)
+      var sw = Stopwatch.StartNew();
+
+      try
       {
-        var listener = _messageListeners[i];
-        // TODO remove this line when debugging is done
-        var t = isoMessage.Type.ToString("X4");
-        Console.WriteLine($"{listener.GetType()} is receiving message {t} to handle");
+        // Snapshot the listener array (copy-on-write: reads are lock-free)
+        var listeners = _listeners;
 
-        nextListener = HandleMessageWithListener(listener, context, isoMessage);
-        if (nextListener == false)
-          _logger.LogTrace("Stopping further processing of message {Message} after handler {Handler}",
-            isoMessage, listener);
-        i++;
+        for (var i = 0; i < listeners.Length; i++)
+        {
+          var listener = listeners[i];
+          var continueChain = await HandleMessageWithListenerAsync(listener, context, isoMessage);
+          if (!continueChain)
+          {
+            _logger.LogTrace("Stopping further processing of message 0x{Type} after handler {Handler}",
+              isoMessage.Type.ToString("X4"), listener.GetType().Name);
+            break;
+          }
+        }
+
+        sw.Stop();
+        _metrics.MessageHandled(isoMessage.Type, sw.Elapsed);
+      }
+      catch (Exception e)
+      {
+        sw.Stop();
+        _metrics.MessageError(isoMessage.Type, e);
+        throw;
       }
     }
 
@@ -148,30 +203,28 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <param name="isoMessage">the iso message</param>
     /// <param name="context">the channel handler context</param>
     /// <returns>true or false</returns>
-    private bool HandleMessageWithListener(IIsoMessageListener<T> listener, IChannelHandlerContext context,
-      T isoMessage)
+    private async Task<bool> HandleMessageWithListenerAsync(IIsoMessageListener<T> listener,
+      IChannelHandlerContext context, T isoMessage)
     {
       try
       {
         if (!listener.CanHandleMessage(isoMessage))
         {
-          // TODO replace this with a good logger
-          var t = isoMessage.Type.ToString("X4");
-          Console.WriteLine($"{listener.GetType()} cannot handle message {t}");
+          _logger.LogTrace("{Listener} cannot handle message 0x{Type}",
+            listener.GetType().Name, isoMessage.Type.ToString("X4"));
           return true;
         }
-        
-        // TODO replace this with a good logger
+
         _logger.LogDebug("Handling IsoMessage[@type=0x{Type}] with {Listener}",
           isoMessage.Type.ToString("x4"),
-          listener);
-        
-        return listener.HandleMessage(context, isoMessage);
+          listener.GetType().Name);
+
+        return await listener.HandleMessage(context, isoMessage);
       }
       catch (Exception e)
       {
-        _logger.LogDebug("cannot evaluate {Listener}.CanHandle({Arg}) due to {Err}", listener,
-          isoMessage.GetType(), e.Message);
+        _logger.LogError(e, "Error in {Listener} handling message 0x{Type}",
+          listener.GetType().Name, isoMessage.Type.ToString("X4"));
         if (_failOnError)
           throw;
       }

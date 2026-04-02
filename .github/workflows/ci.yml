@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  release:
+    types:
+      - published
+env:
+  # Stop wasting time caching packages
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  # Disable sending usage data to Microsoft
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # GitHub Packages Feed settings
+  GITHUB_FEED: https://nuget.pkg.github.com/Iso8583Suite/
+  GITHUB_USER: Tochemey
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Official NuGet Feed settings
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+  NUGET_KEY: ${{ secrets.NUGET_KEY }}
+
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+          dotnet-quality: 'ga'
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build -c Release --no-restore
+      - name: Test
+        if: matrix.os != 'ubuntu-latest'
+        run: dotnet test -c Release
+      - name: Test with Coverage
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet test -c Release --collect:"XPlat Code Coverage" --framework net8.0 --results-directory ./coverage
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./coverage
+          fail_ci_if_error: true
+      - name: Pack
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=0.0.0 -o nupkg Iso8583.Common/Iso8583.Common.csproj
+          dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=0.0.0 -o nupkg Iso8583.Client/Iso8583.Client.csproj
+          dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=0.0.0 -o nupkg Iso8583.Server/Iso8583.Server.csproj
+      - name: Upload Artifact
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: ./nupkg/*.nupkg
+  deploy:
+    needs: build
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+          dotnet-quality: 'ga'
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build -c Release --no-restore
+      - name: Create Release NuGet packages
+        run: |
+          arrTag=(${GITHUB_REF//\// })
+          VERSION="${arrTag[2]}"
+          echo Version: $VERSION
+          VERSION="${VERSION//v}"
+          echo Clean Version: $VERSION
+          dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=$VERSION -o nupkg Iso8583.Common/Iso8583.Common.csproj
+          dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=$VERSION -o nupkg Iso8583.Client/Iso8583.Client.csproj
+          dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=$VERSION -o nupkg Iso8583.Server/Iso8583.Server.csproj
+      - name: Push to GitHub Feed
+        run: |
+          for f in ./nupkg/*.nupkg
+          do
+            curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
+          done
+      - name: Push to NuGet Feed
+        run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY

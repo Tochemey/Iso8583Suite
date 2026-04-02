@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="NetCore8583" Version="2.4.0" />
+    <PackageReference Include="SpanNetty.Buffers" Version="0.7.2012.2221" />
+    <PackageReference Include="SpanNetty.Codecs" Version="0.7.2012.2221" />
+    <PackageReference Include="SpanNetty.Handlers" Version="0.7.2012.2221" />
+    <PackageReference Include="SpanNetty.Transport" Version="0.7.2012.2221" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="n8583.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Iso8583.Common\Iso8583.Common.csproj" />
+    <ProjectReference Include="..\Iso8583.Client\Iso8583.Client.csproj" />
+    <ProjectReference Include="..\Iso8583.Server\Iso8583.Server.csproj" />
+  </ItemGroup>
+
+</Project>

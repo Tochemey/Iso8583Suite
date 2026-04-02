@@ -1,53 +1,146 @@
+// Copyright 2021-2026 Arsene Tochemey Gandote
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
-using System.Text;
+using System.Collections.Generic;
 using DotNetty.Buffers;
 using DotNetty.Codecs;
+using DotNetty.Transport.Channels;
 
 namespace Iso8583.Common.Netty.Codecs
 {
   /// <summary>
-  ///   DotNetty's [LengthFieldBasedFrameDecoder] assumes the frame length header is a binary encoded integer.
-  ///   This overrides it's frame length decoding to implement the case when the frame length header is String encoded.
+  ///   A frame decoder for ISO8583 messages where the frame length header is encoded as an ASCII string.
+  ///   For example, a message of 152 bytes would have a header of "0152" (4 ASCII characters).
   /// </summary>
-  public class StringLengthFieldBasedFrameDecoder : LengthFieldBasedFrameDecoder
+  public class StringLengthFieldBasedFrameDecoder : ByteToMessageDecoder
   {
+    private readonly int _maxFrameLength;
+    private readonly int _lengthFieldOffset;
+    private readonly int _lengthFieldLength;
+    private readonly int _lengthAdjustment;
+    private readonly int _initialBytesToStrip;
+
     /// <summary>
-    ///   <see cref="LengthFieldBasedFrameDecoder" />
+    ///   Creates a new instance of the string-based frame decoder.
     /// </summary>
     /// <param name="maxFrameLength">
-    ///   the maximum length of the frame.  If the length of the frame is  greater than this value
-    ///   <see cref="TooLongFrameException" /> will be thrown
+    ///   The maximum length of the frame. If the length of the frame is greater than this value,
+    ///   <see cref="TooLongFrameException" /> will be thrown.
     /// </param>
-    /// <param name="lengthFieldOffset">the offset of the length field</param>
-    /// <param name="lengthFieldLength">the length of the length field</param>
-    /// <param name="lengthAdjustment">the compensation value to add to the value of the length field</param>
-    /// <param name="initialBytesToStrip">the number of first bytes to strip out from the decoded frame</param>
-    public StringLengthFieldBasedFrameDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength,
-      int lengthAdjustment, int initialBytesToStrip) : base(maxFrameLength, lengthFieldOffset, lengthFieldLength,
-      lengthAdjustment, initialBytesToStrip)
+    /// <param name="lengthFieldOffset">The offset of the length field.</param>
+    /// <param name="lengthFieldLength">The length of the length field (number of ASCII digits).</param>
+    /// <param name="lengthAdjustment">The compensation value to add to the value of the length field.</param>
+    /// <param name="initialBytesToStrip">The number of first bytes to strip out from the decoded frame.</param>
+    public StringLengthFieldBasedFrameDecoder(
+      int maxFrameLength,
+      int lengthFieldOffset,
+      int lengthFieldLength,
+      int lengthAdjustment,
+      int initialBytesToStrip)
     {
+      _maxFrameLength = maxFrameLength;
+      _lengthFieldOffset = lengthFieldOffset;
+      _lengthFieldLength = lengthFieldLength;
+      _lengthAdjustment = lengthAdjustment;
+      _initialBytesToStrip = initialBytesToStrip;
     }
 
+    protected override void Decode(IChannelHandlerContext context, IByteBuffer input, List<object> output)
+    {
+      var decoded = Decode(context, input);
+      if (decoded != null)
+      {
+        output.Add(decoded);
+      }
+    }
 
     /// <summary>
-    ///   Decodes the specified region of the buffer into an unadjusted frame length
+    ///   Decodes a frame from the input buffer.
     /// </summary>
-    /// <param name="buffer">the buffer we'll be extracting the frame length from</param>
-    /// <param name="offset">the offset from the absolute <see cref="P:DotNetty.Buffers.IByteBuffer.ReaderIndex" /></param>
-    /// <param name="length">the length of the frame length field</param>
-    /// <param name="order">the preferred <see cref="T:DotNetty.Buffers.ByteOrder" /> of buffer.</param>
-    /// <returns>a long integer that represents the unadjusted length of the next frame</returns>
-    protected new long GetUnadjustedFrameLength(
-      IByteBuffer buffer,
-      int offset,
-      int length,
-      ByteOrder order)
+    private object Decode(IChannelHandlerContext context, IByteBuffer input)
     {
-      var bytea = new byte[length];
-      buffer.GetBytes(offset, bytea);
-      if (order == ByteOrder.LittleEndian) Array.Reverse(bytea);
+      // Check if we have enough bytes to read the length field
+      if (input.ReadableBytes < _lengthFieldOffset + _lengthFieldLength)
+      {
+        return null;
+      }
 
-      return Encoding.Unicode.GetString(bytea).Length;
+      // Read the length field as ASCII string
+      var actualLengthFieldOffset = input.ReaderIndex + _lengthFieldOffset;
+      var frameLength = GetFrameLength(input, actualLengthFieldOffset, _lengthFieldLength);
+
+      // Apply length adjustment
+      frameLength += _lengthAdjustment + _lengthFieldOffset + _lengthFieldLength;
+
+      // Validate frame length
+      if (frameLength < 0)
+      {
+        input.SkipBytes(_lengthFieldOffset + _lengthFieldLength);
+        throw new CorruptedFrameException($"Negative frame length: {frameLength}");
+      }
+
+      if (frameLength > _maxFrameLength)
+      {
+        // Discard the bytes for this frame
+        var bytesToDiscard = Math.Min(frameLength, input.ReadableBytes);
+        input.SkipBytes((int)bytesToDiscard);
+        throw new TooLongFrameException($"Frame length exceeds {_maxFrameLength}: {frameLength}");
+      }
+
+      // Check if we have enough bytes for the complete frame
+      var frameLengthInt = (int)frameLength;
+      if (input.ReadableBytes < frameLengthInt)
+      {
+        return null;
+      }
+
+      // Skip initial bytes if configured
+      if (_initialBytesToStrip > frameLengthInt)
+      {
+        throw new CorruptedFrameException(
+          $"Initial bytes to strip ({_initialBytesToStrip}) exceeds frame length ({frameLengthInt})");
+      }
+
+      input.SkipBytes(_initialBytesToStrip);
+
+      // Extract the frame
+      var readerIndex = input.ReaderIndex;
+      var actualFrameLength = frameLengthInt - _initialBytesToStrip;
+      var frame = input.RetainedSlice(readerIndex, actualFrameLength);
+      input.SetReaderIndex(readerIndex + actualFrameLength);
+
+      return frame;
+    }
+
+    /// <summary>
+    ///   Parses the frame length from the ASCII-encoded length field.
+    ///   Zero-allocation: reads individual bytes and computes the integer directly.
+    /// </summary>
+    private long GetFrameLength(IByteBuffer buffer, int offset, int length)
+    {
+      long frameLength = 0;
+      for (var i = 0; i < length; i++)
+      {
+        var b = buffer.GetByte(offset + i);
+        if (b < (byte)'0' || b > (byte)'9')
+          throw new CorruptedFrameException(
+            $"Invalid character in frame length field at position {i}: 0x{b:X2}");
+        frameLength = frameLength * 10 + (b - '0');
+      }
+
+      return frameLength;
     }
   }
 }

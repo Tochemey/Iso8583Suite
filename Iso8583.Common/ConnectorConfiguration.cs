@@ -1,3 +1,17 @@
+// Copyright 2021-2026 Arsene Tochemey Gandote
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
 using Iso8583.Common.Netty.Pipelines;
 
@@ -52,7 +66,7 @@ namespace Iso8583.Common
       FrameLengthFieldOffset = DefaultFrameLengthFieldOffset;
       FrameLengthFieldAdjust = DefaultFrameLengthFieldAdjust;
       SensitiveDataFields = DefaultSensitiveDataFields;
-      WorkerThreadCount = Environment.ProcessorCount * 16;
+      WorkerThreadCount = Math.Max(2, Environment.ProcessorCount * 2);
     }
 
     /// <summary>
@@ -72,8 +86,9 @@ namespace Iso8583.Common
     public int IdleTimeout { get; set; }
 
     /// <summary>
-    ///   Returns number of threads in worker.
-    ///   Default value is Environment.ProcessorCount * 16
+    ///   Returns number of threads in worker event loop group.
+    ///   Default value is Environment.ProcessorCount * 2 (minimum 2).
+    ///   DotNetty event loops are non-blocking, so high multipliers are unnecessary.
     /// </summary>
     public int WorkerThreadCount { get; set; }
 
@@ -124,5 +139,27 @@ namespace Iso8583.Common
     ///   Default value is 0.
     /// </summary>
     public int FrameLengthFieldAdjust { get; set; }
+
+    /// <summary>
+    ///   SSL/TLS configuration. Null or Enabled=false means no TLS.
+    /// </summary>
+    public SslConfiguration Ssl { get; set; }
+
+    /// <summary>
+    ///   Validates the configuration and throws <see cref="ArgumentException"/> for invalid values.
+    /// </summary>
+    public virtual void Validate()
+    {
+      if (MaxFrameLength <= 0)
+        throw new ArgumentException($"{nameof(MaxFrameLength)} must be > 0, got {MaxFrameLength}");
+      if (IdleTimeout < 0)
+        throw new ArgumentException($"{nameof(IdleTimeout)} must be >= 0, got {IdleTimeout}");
+      if (WorkerThreadCount < 1)
+        throw new ArgumentException($"{nameof(WorkerThreadCount)} must be >= 1, got {WorkerThreadCount}");
+      if (FrameLengthFieldLength is < 0 or > 4)
+        throw new ArgumentException($"{nameof(FrameLengthFieldLength)} must be 0-4, got {FrameLengthFieldLength}");
+      if (FrameLengthFieldOffset < 0)
+        throw new ArgumentException($"{nameof(FrameLengthFieldOffset)} must be >= 0, got {FrameLengthFieldOffset}");
+    }
   }
 }

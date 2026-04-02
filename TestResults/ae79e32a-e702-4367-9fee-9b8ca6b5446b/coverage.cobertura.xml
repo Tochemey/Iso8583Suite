@@ -1,0 +1,3452 @@
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0.8613" branch-rate="0.7441" version="1.9" timestamp="1775173617" lines-covered="671" lines-valid="779" branches-covered="192" branches-valid="258">
+  <sources>
+    <source>/Users/tochemey/dev/Iso8583Suite/</source>
+  </sources>
+  <packages>
+    <package name="Iso8583.Client" line-rate="0.8" branch-rate="0.65" complexity="80">
+      <classes>
+        <class name="Iso8583.Client.ClientConfiguration" filename="Iso8583.Client/ClientConfiguration.cs" line-rate="0.9473" branch-rate="1" complexity="12">
+          <methods>
+            <method name="get_ReconnectInterval" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="31" hits="64" branch="False" />
+              </lines>
+            </method>
+            <method name="get_MaxReconnectDelay" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="36" hits="56" branch="False" />
+              </lines>
+            </method>
+            <method name="get_MaxReconnectAttempts" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="41" hits="56" branch="False" />
+              </lines>
+            </method>
+            <method name="get_AutoReconnect" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="46" hits="67" branch="False" />
+              </lines>
+            </method>
+            <method name="Validate" signature="()" line-rate="1" branch-rate="1" complexity="6">
+              <lines>
+                <line number="51" hits="28" branch="False" />
+                <line number="52" hits="28" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="13" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="53" hits="3" branch="False" />
+                <line number="54" hits="25" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="82" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="55" hits="1" branch="False" />
+                <line number="56" hits="24" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="151" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="57" hits="1" branch="False" />
+                <line number="58" hits="23" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Int32)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="20" hits="28" branch="False" />
+                <line number="22" hits="28" branch="False" />
+                <line number="23" hits="28" branch="False" />
+                <line number="24" hits="28" branch="False" />
+                <line number="25" hits="28" branch="False" />
+                <line number="26" hits="28" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="31" hits="64" branch="False" />
+            <line number="36" hits="56" branch="False" />
+            <line number="41" hits="56" branch="False" />
+            <line number="46" hits="67" branch="False" />
+            <line number="51" hits="28" branch="False" />
+            <line number="52" hits="28" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="13" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="53" hits="3" branch="False" />
+            <line number="54" hits="25" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="82" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="55" hits="1" branch="False" />
+            <line number="56" hits="24" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="151" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="57" hits="1" branch="False" />
+            <line number="58" hits="23" branch="False" />
+            <line number="15" hits="0" branch="False" />
+            <line number="20" hits="28" branch="False" />
+            <line number="22" hits="28" branch="False" />
+            <line number="23" hits="28" branch="False" />
+            <line number="24" hits="28" branch="False" />
+            <line number="25" hits="28" branch="False" />
+            <line number="26" hits="28" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.ClientConnector`2" filename="Iso8583.Client/ClientConnector.cs" line-rate="0.7857" branch-rate="0.5" complexity="6">
+          <methods>
+            <method name="get_ConnectorConfigurator" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="44" hits="54" branch="False" />
+              </lines>
+            </method>
+            <method name="GetBootstrap" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="47" hits="17" branch="False" />
+              </lines>
+            </method>
+            <method name="ConfigureBootstrap" signature="(DotNetty.Transport.Bootstrapping.Bootstrap)" line-rate="0.875" branch-rate="0.5" complexity="2">
+              <lines>
+                <line number="55" hits="17" branch="False" />
+                <line number="56" hits="17" branch="False" />
+                <line number="57" hits="17" branch="False" />
+                <line number="58" hits="17" branch="False" />
+                <line number="59" hits="17" branch="False" />
+                <line number="61" hits="17" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="53" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="62" hits="17" branch="False" />
+                <line number="63" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Netty.Pipelines.CompositeIsoMessageHandler`1&lt;T&gt;,Iso8583.Common.Iso.IMessageFactory`1&lt;T&gt;,TC)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="27" hits="0" branch="False" />
+                <line number="29" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Iso.IMessageFactory`1&lt;T&gt;,TC)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="37" hits="20" branch="False" />
+                <line number="39" hits="20" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="44" hits="54" branch="False" />
+            <line number="47" hits="17" branch="False" />
+            <line number="55" hits="17" branch="False" />
+            <line number="56" hits="17" branch="False" />
+            <line number="57" hits="17" branch="False" />
+            <line number="58" hits="17" branch="False" />
+            <line number="59" hits="17" branch="False" />
+            <line number="61" hits="17" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="53" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="62" hits="17" branch="False" />
+            <line number="63" hits="0" branch="False" />
+            <line number="27" hits="0" branch="False" />
+            <line number="29" hits="0" branch="False" />
+            <line number="37" hits="20" branch="False" />
+            <line number="39" hits="20" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.ClientConnectorConfigurator" filename="Iso8583.Client/ClientConnectorConfigurator.cs" line-rate="0" branch-rate="1" complexity="2">
+          <methods>
+            <method name="ConfigureBootstrap" signature="(DotNetty.Transport.Bootstrapping.Bootstrap,Iso8583.Client.ClientConfiguration)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="11" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="ConfigurePipeline" signature="(DotNetty.Transport.Channels.IChannelPipeline,Iso8583.Client.ClientConfiguration)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="11" hits="0" branch="False" />
+            <line number="15" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.Iso8583Client`1" filename="Iso8583.Client/Iso8583Client.cs" line-rate="0.7058" branch-rate="0.75" complexity="7">
+          <methods>
+            <method name="CreateBootstrap" signature="()" line-rate="0.6666" branch-rate="0.5" complexity="2">
+              <lines>
+                <line number="114" hits="17" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="11" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="116" hits="0" branch="False" />
+                <line number="117" hits="0" branch="False" />
+                <line number="118" hits="0" branch="False" />
+                <line number="119" hits="0" branch="False" />
+                <line number="120" hits="0" branch="False" />
+                <line number="121" hits="0" branch="False" />
+                <line number="124" hits="17" branch="False" />
+                <line number="125" hits="17" branch="False" />
+                <line number="126" hits="17" branch="False" />
+                <line number="127" hits="17" branch="False" />
+                <line number="128" hits="17" branch="False" />
+                <line number="129" hits="17" branch="False" />
+                <line number="130" hits="17" branch="False" />
+                <line number="131" hits="17" branch="False" />
+                <line number="133" hits="17" branch="False" />
+                <line number="134" hits="17" branch="False" />
+                <line number="135" hits="17" branch="False" />
+              </lines>
+            </method>
+            <method name="IsConnected" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="186" hits="5" branch="False" />
+                <line number="187" hits="5" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="8" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+            <method name="ThrowIfDisposed" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="232" hits="37" branch="False" />
+                <line number="233" hits="35" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Client.ClientConfiguration,Iso8583.Common.Iso.IMessageFactory`1&lt;T&gt;,Iso8583.Client.IClientConnectorConfigurator`1&lt;Iso8583.Client.ClientConfiguration&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="21" hits="20" branch="False" />
+                <line number="22" hits="20" branch="False" />
+                <line number="38" hits="20" branch="False" />
+                <line number="39" hits="20" branch="False" />
+                <line number="41" hits="20" branch="False" />
+                <line number="43" hits="20" branch="False" />
+                <line number="44" hits="20" branch="False" />
+                <line number="45" hits="20" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Iso.IMessageFactory`1&lt;T&gt;)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="51" hits="0" branch="False" />
+                <line number="53" hits="0" branch="False" />
+                <line number="54" hits="0" branch="False" />
+                <line number="55" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="114" hits="17" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="11" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="116" hits="0" branch="False" />
+            <line number="117" hits="0" branch="False" />
+            <line number="118" hits="0" branch="False" />
+            <line number="119" hits="0" branch="False" />
+            <line number="120" hits="0" branch="False" />
+            <line number="121" hits="0" branch="False" />
+            <line number="124" hits="17" branch="False" />
+            <line number="125" hits="17" branch="False" />
+            <line number="126" hits="17" branch="False" />
+            <line number="127" hits="17" branch="False" />
+            <line number="128" hits="17" branch="False" />
+            <line number="129" hits="17" branch="False" />
+            <line number="130" hits="17" branch="False" />
+            <line number="131" hits="17" branch="False" />
+            <line number="133" hits="17" branch="False" />
+            <line number="134" hits="17" branch="False" />
+            <line number="135" hits="17" branch="False" />
+            <line number="186" hits="5" branch="False" />
+            <line number="187" hits="5" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="8" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="232" hits="37" branch="False" />
+            <line number="233" hits="35" branch="False" />
+            <line number="21" hits="20" branch="False" />
+            <line number="22" hits="20" branch="False" />
+            <line number="38" hits="20" branch="False" />
+            <line number="39" hits="20" branch="False" />
+            <line number="41" hits="20" branch="False" />
+            <line number="43" hits="20" branch="False" />
+            <line number="44" hits="20" branch="False" />
+            <line number="45" hits="20" branch="False" />
+            <line number="51" hits="0" branch="False" />
+            <line number="53" hits="0" branch="False" />
+            <line number="54" hits="0" branch="False" />
+            <line number="55" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.Iso8583Client`1/&lt;Connect&gt;d__13" filename="Iso8583.Client/Iso8583Client.cs" line-rate="0.7142000000000001" branch-rate="0.3333" complexity="6">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="0.7142000000000001" branch-rate="0.3333" complexity="6">
+              <lines>
+                <line number="145" hits="18" branch="False" />
+                <line number="146" hits="17" branch="False" />
+                <line number="147" hits="17" branch="False" />
+                <line number="148" hits="17" branch="False" />
+                <line number="150" hits="17" branch="False" />
+                <line number="153" hits="17" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="91" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="155" hits="0" branch="False" />
+                <line number="156" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="197" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="157" hits="0" branch="False" />
+                <line number="158" hits="0" branch="False" />
+                <line number="161" hits="17" branch="False" />
+                <line number="162" hits="17" branch="False" />
+                <line number="165" hits="17" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="347" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="166" hits="17" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="145" hits="18" branch="False" />
+            <line number="146" hits="17" branch="False" />
+            <line number="147" hits="17" branch="False" />
+            <line number="148" hits="17" branch="False" />
+            <line number="150" hits="17" branch="False" />
+            <line number="153" hits="17" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="91" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="155" hits="0" branch="False" />
+            <line number="156" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="197" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="157" hits="0" branch="False" />
+            <line number="158" hits="0" branch="False" />
+            <line number="161" hits="17" branch="False" />
+            <line number="162" hits="17" branch="False" />
+            <line number="165" hits="17" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="347" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="166" hits="17" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.Iso8583Client`1/&lt;Disconnect&gt;d__14" filename="Iso8583.Client/Iso8583Client.cs" line-rate="1" branch-rate="1" complexity="2">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="173" hits="18" branch="False" />
+                <line number="174" hits="18" branch="False" />
+                <line number="175" hits="18" branch="False" />
+                <line number="176" hits="18" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="52" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="177" hits="17" branch="False" />
+                <line number="178" hits="18" branch="False" />
+                <line number="179" hits="18" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="173" hits="18" branch="False" />
+            <line number="174" hits="18" branch="False" />
+            <line number="175" hits="18" branch="False" />
+            <line number="176" hits="18" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="52" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="177" hits="17" branch="False" />
+            <line number="178" hits="18" branch="False" />
+            <line number="179" hits="18" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.Iso8583Client`1/&lt;DisposeAsync&gt;d__16" filename="Iso8583.Client/Iso8583Client.cs" line-rate="0.7777" branch-rate="1" complexity="2">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="0.7777" branch-rate="1" complexity="2">
+              <lines>
+                <line number="193" hits="5" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="25" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="194" hits="3" branch="False" />
+                <line number="198" hits="3" branch="False" />
+                <line number="199" hits="3" branch="False" />
+                <line number="200" hits="0" branch="False" />
+                <line number="203" hits="0" branch="False" />
+                <line number="205" hits="3" branch="False" />
+                <line number="206" hits="3" branch="False" />
+                <line number="207" hits="4" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="193" hits="5" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="25" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="194" hits="3" branch="False" />
+            <line number="198" hits="3" branch="False" />
+            <line number="199" hits="3" branch="False" />
+            <line number="200" hits="0" branch="False" />
+            <line number="203" hits="0" branch="False" />
+            <line number="205" hits="3" branch="False" />
+            <line number="206" hits="3" branch="False" />
+            <line number="207" hits="4" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.Iso8583Client`1/&lt;Send&gt;d__10" filename="Iso8583.Client/Iso8583Client.cs" line-rate="0.8181" branch-rate="0.5" complexity="6">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="0.8181" branch-rate="0.5" complexity="6">
+              <lines>
+                <line number="73" hits="1" branch="False" />
+                <line number="74" hits="1" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="40" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="75" hits="1" branch="False" />
+                <line number="77" hits="1" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="61" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="78" hits="0" branch="False" />
+                <line number="80" hits="1" branch="False" />
+                <line number="81" hits="1" branch="False" />
+                <line number="82" hits="1" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="205" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="83" hits="0" branch="False" />
+                <line number="85" hits="1" branch="False" />
+                <line number="86" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="73" hits="1" branch="False" />
+            <line number="74" hits="1" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="40" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="75" hits="1" branch="False" />
+            <line number="77" hits="1" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="61" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="78" hits="0" branch="False" />
+            <line number="80" hits="1" branch="False" />
+            <line number="81" hits="1" branch="False" />
+            <line number="82" hits="1" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="205" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="83" hits="0" branch="False" />
+            <line number="85" hits="1" branch="False" />
+            <line number="86" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.Iso8583Client`1/&lt;Send&gt;d__9" filename="Iso8583.Client/Iso8583Client.cs" line-rate="1" branch-rate="1" complexity="4">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="60" hits="11" branch="False" />
+                <line number="61" hits="10" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="30" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="62" hits="10" branch="False" />
+                <line number="64" hits="9" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="50" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="65" hits="1" branch="False" />
+                <line number="67" hits="8" branch="False" />
+                <line number="68" hits="8" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="60" hits="11" branch="False" />
+            <line number="61" hits="10" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="30" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="62" hits="10" branch="False" />
+            <line number="64" hits="9" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="50" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="65" hits="1" branch="False" />
+            <line number="67" hits="8" branch="False" />
+            <line number="68" hits="8" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.Iso8583Client`1/&lt;SendAndReceive&gt;d__11" filename="Iso8583.Client/Iso8583Client.cs" line-rate="0.6666" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="0.6666" branch-rate="1" complexity="1">
+              <lines>
+                <line number="92" hits="7" branch="False" />
+                <line number="95" hits="7" branch="False" />
+                <line number="99" hits="7" branch="False" />
+                <line number="100" hits="7" branch="False" />
+                <line number="101" hits="0" branch="False" />
+                <line number="104" hits="0" branch="False" />
+                <line number="105" hits="0" branch="False" />
+                <line number="108" hits="7" branch="False" />
+                <line number="109" hits="6" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="92" hits="7" branch="False" />
+            <line number="95" hits="7" branch="False" />
+            <line number="99" hits="7" branch="False" />
+            <line number="100" hits="7" branch="False" />
+            <line number="101" hits="0" branch="False" />
+            <line number="104" hits="0" branch="False" />
+            <line number="105" hits="0" branch="False" />
+            <line number="108" hits="7" branch="False" />
+            <line number="109" hits="6" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.Iso8583Client`1/&lt;TryReconnect&gt;d__17" filename="Iso8583.Client/Iso8583Client.cs" line-rate="0" branch-rate="0" complexity="10">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="0" branch-rate="0" complexity="10">
+              <lines>
+                <line number="214" hits="0" branch="True" condition-coverage="0% (0/4)">
+                  <conditions>
+                    <condition number="29" type="jump" coverage="0%" />
+                    <condition number="39" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="216" hits="0" branch="False" />
+                <line number="219" hits="0" branch="True" condition-coverage="0% (0/4)">
+                  <conditions>
+                    <condition number="155" type="jump" coverage="0%" />
+                    <condition number="165" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="220" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="178" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="222" hits="0" branch="False" />
+                <line number="223" hits="0" branch="False" />
+                <line number="226" hits="0" branch="False" />
+                <line number="228" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="214" hits="0" branch="True" condition-coverage="0% (0/4)">
+              <conditions>
+                <condition number="29" type="jump" coverage="0%" />
+                <condition number="39" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="216" hits="0" branch="False" />
+            <line number="219" hits="0" branch="True" condition-coverage="0% (0/4)">
+              <conditions>
+                <condition number="155" type="jump" coverage="0%" />
+                <condition number="165" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="220" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="178" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="222" hits="0" branch="False" />
+            <line number="223" hits="0" branch="False" />
+            <line number="226" hits="0" branch="False" />
+            <line number="228" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.PendingRequestManager`1" filename="Iso8583.Client/PendingRequestManager.cs" line-rate="1" branch-rate="0.8332999999999999" complexity="16">
+          <methods>
+            <method name="CancelAll" signature="()" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="60" hits="50" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="56" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="62" hits="4" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="41" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="63" hits="4" branch="False" />
+                <line number="65" hits="21" branch="False" />
+              </lines>
+            </method>
+            <method name="CanHandleMessage" signature="(T)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="70" hits="10" branch="False" />
+                <line number="71" hits="10" branch="False" />
+              </lines>
+            </method>
+            <method name="HandleMessage" signature="(DotNetty.Transport.Channels.IChannelHandlerContext,T)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="77" hits="9" branch="False" />
+                <line number="78" hits="9" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="21" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="80" hits="8" branch="False" />
+                <line number="81" hits="8" branch="False" />
+                <line number="84" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="BuildCorrelationKey" signature="(T)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="94" hits="17" branch="False" />
+                <line number="95" hits="16" branch="False" />
+              </lines>
+            </method>
+            <method name="BuildResponseCorrelationKey" signature="(T)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="108" hits="19" branch="False" />
+                <line number="109" hits="19" branch="False" />
+                <line number="110" hits="19" branch="False" />
+              </lines>
+            </method>
+            <method name="GetStan" signature="(T)" line-rate="1" branch-rate="0.6666" complexity="6">
+              <lines>
+                <line number="115" hits="36" branch="False" />
+                <line number="116" hits="36" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="14" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="117" hits="1" branch="False" />
+                <line number="118" hits="35" branch="True" condition-coverage="50% (2/4)">
+                  <conditions>
+                    <condition number="33" type="jump" coverage="50%" />
+                    <condition number="45" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+            <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="18" hits="29" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="60" hits="50" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="56" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="62" hits="4" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="41" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="63" hits="4" branch="False" />
+            <line number="65" hits="21" branch="False" />
+            <line number="70" hits="10" branch="False" />
+            <line number="71" hits="10" branch="False" />
+            <line number="77" hits="9" branch="False" />
+            <line number="78" hits="9" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="21" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="80" hits="8" branch="False" />
+            <line number="81" hits="8" branch="False" />
+            <line number="84" hits="1" branch="False" />
+            <line number="94" hits="17" branch="False" />
+            <line number="95" hits="16" branch="False" />
+            <line number="108" hits="19" branch="False" />
+            <line number="109" hits="19" branch="False" />
+            <line number="110" hits="19" branch="False" />
+            <line number="115" hits="36" branch="False" />
+            <line number="116" hits="36" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="14" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="117" hits="1" branch="False" />
+            <line number="118" hits="35" branch="True" condition-coverage="50% (2/4)">
+              <conditions>
+                <condition number="33" type="jump" coverage="50%" />
+                <condition number="45" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="18" hits="29" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.PendingRequestManager`1/&lt;&gt;c__DisplayClass1_0" filename="Iso8583.Client/PendingRequestManager.cs" line-rate="1" branch-rate="1" complexity="4">
+          <methods>
+            <method name="&lt;RegisterPending&gt;b__0" signature="()" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="42" hits="3" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="24" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="44" hits="3" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="37" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="45" hits="2" branch="False" />
+                <line number="47" hits="1" branch="False" />
+                <line number="48" hits="1" branch="False" />
+                <line number="50" hits="16" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="42" hits="3" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="24" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="44" hits="3" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="37" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="45" hits="2" branch="False" />
+            <line number="47" hits="1" branch="False" />
+            <line number="48" hits="1" branch="False" />
+            <line number="50" hits="16" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Client.PendingRequestManager`1/&lt;RegisterPending&gt;d__1" filename="Iso8583.Client/PendingRequestManager.cs" line-rate="1" branch-rate="1" complexity="2">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="29" hits="17" branch="False" />
+                <line number="30" hits="16" branch="False" />
+                <line number="32" hits="16" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="108" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="33" hits="1" branch="False" />
+                <line number="34" hits="1" branch="False" />
+                <line number="37" hits="15" branch="False" />
+                <line number="38" hits="15" branch="False" />
+                <line number="40" hits="15" branch="False" />
+                <line number="41" hits="15" branch="False" />
+                <line number="43" hits="15" branch="False" />
+                <line number="46" hits="15" branch="False" />
+                <line number="49" hits="15" branch="False" />
+                <line number="52" hits="15" branch="False" />
+                <line number="53" hits="8" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="29" hits="17" branch="False" />
+            <line number="30" hits="16" branch="False" />
+            <line number="32" hits="16" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="108" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="33" hits="1" branch="False" />
+            <line number="34" hits="1" branch="False" />
+            <line number="37" hits="15" branch="False" />
+            <line number="38" hits="15" branch="False" />
+            <line number="40" hits="15" branch="False" />
+            <line number="41" hits="15" branch="False" />
+            <line number="43" hits="15" branch="False" />
+            <line number="46" hits="15" branch="False" />
+            <line number="49" hits="15" branch="False" />
+            <line number="52" hits="15" branch="False" />
+            <line number="53" hits="8" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+    <package name="Iso8583.Common" line-rate="0.879" branch-rate="0.7555" complexity="265">
+      <classes>
+        <class name="Iso8583.Common.Iso8583Connector`2" filename="Iso8583.Common/AbstractConnector.cs" line-rate="0.6215999999999999" branch-rate="0.375" complexity="19">
+          <methods>
+            <method name="get_MessageHandler" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="51" hits="78" branch="False" />
+              </lines>
+            </method>
+            <method name="get_MessageFactory" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="56" hits="41" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Configuration" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="61" hits="104" branch="False" />
+              </lines>
+            </method>
+            <method name="get_BossEventLoopGroup" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="67" hits="74" branch="False" />
+              </lines>
+            </method>
+            <method name="get_WorkerEventLoopGroup" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="72" hits="170" branch="False" />
+              </lines>
+            </method>
+            <method name="CreateBossEventLoopGroup" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="79" hits="26" branch="False" />
+                <line number="80" hits="26" branch="False" />
+              </lines>
+            </method>
+            <method name="CreateWorkerEventLoopGroup" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="87" hits="46" branch="False" />
+                <line number="88" hits="46" branch="False" />
+              </lines>
+            </method>
+            <method name="AddMessageListener" signature="(Iso8583.Common.IIsoMessageListener`1&lt;T&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="94" hits="17" branch="False" />
+              </lines>
+            </method>
+            <method name="RemoveMessageListener" signature="(Iso8583.Common.IIsoMessageListener`1&lt;T&gt;)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="100" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="SetChannel" signature="(DotNetty.Transport.Channels.IChannel)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="109" hits="41" branch="False" />
+                <line number="110" hits="41" branch="False" />
+              </lines>
+            </method>
+            <method name="GetChannel" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="116" hits="66" branch="False" />
+              </lines>
+            </method>
+            <method name="IsStarted" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="124" hits="8" branch="False" />
+                <line number="125" hits="8" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="8" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+            <method name="IsChannelInactive" signature="()" line-rate="0" branch-rate="0" complexity="2">
+              <lines>
+                <line number="134" hits="0" branch="False" />
+                <line number="135" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="8" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Netty.Pipelines.CompositeIsoMessageHandler`1&lt;T&gt;,Iso8583.Common.Iso.IMessageFactory`1&lt;T&gt;,TC)" line-rate="0" branch-rate="0" complexity="2">
+              <lines>
+                <line number="20" hits="0" branch="False" />
+                <line number="21" hits="0" branch="False" />
+                <line number="22" hits="0" branch="False" />
+                <line number="24" hits="0" branch="False" />
+                <line number="25" hits="0" branch="False" />
+                <line number="26" hits="0" branch="False" />
+                <line number="27" hits="0" branch="False" />
+                <line number="28" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="49" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="29" hits="0" branch="False" />
+                <line number="30" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Iso.IMessageFactory`1&lt;T&gt;,TC)" line-rate="0.8887999999999999" branch-rate="0.5" complexity="2">
+              <lines>
+                <line number="37" hits="46" branch="False" />
+                <line number="38" hits="46" branch="False" />
+                <line number="40" hits="46" branch="False" />
+                <line number="41" hits="46" branch="False" />
+                <line number="42" hits="46" branch="False" />
+                <line number="43" hits="46" branch="False" />
+                <line number="44" hits="46" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="53" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="45" hits="0" branch="False" />
+                <line number="46" hits="46" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="51" hits="78" branch="False" />
+            <line number="56" hits="41" branch="False" />
+            <line number="61" hits="104" branch="False" />
+            <line number="67" hits="74" branch="False" />
+            <line number="72" hits="170" branch="False" />
+            <line number="79" hits="26" branch="False" />
+            <line number="80" hits="26" branch="False" />
+            <line number="87" hits="46" branch="False" />
+            <line number="88" hits="46" branch="False" />
+            <line number="94" hits="17" branch="False" />
+            <line number="100" hits="0" branch="False" />
+            <line number="109" hits="41" branch="False" />
+            <line number="110" hits="41" branch="False" />
+            <line number="116" hits="66" branch="False" />
+            <line number="124" hits="8" branch="False" />
+            <line number="125" hits="8" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="8" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="134" hits="0" branch="False" />
+            <line number="135" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="8" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="20" hits="0" branch="False" />
+            <line number="21" hits="0" branch="False" />
+            <line number="22" hits="0" branch="False" />
+            <line number="24" hits="0" branch="False" />
+            <line number="25" hits="0" branch="False" />
+            <line number="26" hits="0" branch="False" />
+            <line number="27" hits="0" branch="False" />
+            <line number="28" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="49" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="29" hits="0" branch="False" />
+            <line number="30" hits="0" branch="False" />
+            <line number="37" hits="46" branch="False" />
+            <line number="38" hits="46" branch="False" />
+            <line number="40" hits="46" branch="False" />
+            <line number="41" hits="46" branch="False" />
+            <line number="42" hits="46" branch="False" />
+            <line number="43" hits="46" branch="False" />
+            <line number="44" hits="46" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="53" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="45" hits="0" branch="False" />
+            <line number="46" hits="46" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.AtomicReference`1" filename="Iso8583.Common/AtomicReference.cs" line-rate="1" branch-rate="1" complexity="8">
+          <methods>
+            <method name="get_Value" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="30" hits="8" branch="False" />
+              </lines>
+            </method>
+            <method name="set_Value" signature="(T)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="31" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="CompareAndSet" signature="(T,T)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="43" hits="2" branch="False" />
+                <line number="44" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="GetAndSet" signature="(T)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="52" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="op_Implicit" signature="(Iso8583.Common.AtomicReference`1&lt;T&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="61" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="op_Implicit" signature="(T)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="68" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(T)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="18" hits="14" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="23" hits="2" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="30" hits="8" branch="False" />
+            <line number="31" hits="1" branch="False" />
+            <line number="43" hits="2" branch="False" />
+            <line number="44" hits="2" branch="False" />
+            <line number="52" hits="1" branch="False" />
+            <line number="61" hits="1" branch="False" />
+            <line number="68" hits="1" branch="False" />
+            <line number="18" hits="14" branch="False" />
+            <line number="23" hits="2" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.ConnectorConfiguration" filename="Iso8583.Common/ConnectorConfiguration.cs" line-rate="1" branch-rate="1" complexity="30">
+          <methods>
+            <method name="get_AddEchoMessageListener" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="61" hits="120" branch="False" />
+              </lines>
+            </method>
+            <method name="get_MaxFrameLength" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="66" hits="188" branch="False" />
+              </lines>
+            </method>
+            <method name="get_IdleTimeout" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="72" hits="216" branch="False" />
+              </lines>
+            </method>
+            <method name="get_WorkerThreadCount" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="79" hits="194" branch="False" />
+              </lines>
+            </method>
+            <method name="get_ReplyOnError" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="84" hits="110" branch="False" />
+              </lines>
+            </method>
+            <method name="get_AddLoggingHandler" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="89" hits="110" branch="False" />
+              </lines>
+            </method>
+            <method name="get_LogSensitiveData" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="96" hits="108" branch="False" />
+              </lines>
+            </method>
+            <method name="get_EncodeFrameLengthAsString" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="101" hits="181" branch="False" />
+              </lines>
+            </method>
+            <method name="get_SensitiveDataFields" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="106" hits="108" branch="False" />
+              </lines>
+            </method>
+            <method name="get_LogFieldDescription" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="111" hits="108" branch="False" />
+              </lines>
+            </method>
+            <method name="get_FrameLengthFieldLength" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="116" hits="260" branch="False" />
+              </lines>
+            </method>
+            <method name="get_FrameLengthFieldOffset" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="121" hits="175" branch="False" />
+              </lines>
+            </method>
+            <method name="get_FrameLengthFieldAdjust" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="127" hits="108" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Ssl" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="132" hits="36" branch="False" />
+              </lines>
+            </method>
+            <method name="Validate" signature="()" line-rate="1" branch-rate="1" complexity="14">
+              <lines>
+                <line number="139" hits="74" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="7" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="140" hits="3" branch="False" />
+                <line number="141" hits="71" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="76" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="142" hits="1" branch="False" />
+                <line number="143" hits="70" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="145" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="144" hits="2" branch="False" />
+                <line number="145" hits="68" branch="True" condition-coverage="100% (6/6)">
+                  <conditions>
+                    <condition number="216" type="jump" coverage="100%" />
+                    <condition number="220" type="jump" coverage="100%" />
+                    <condition number="232" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="146" hits="3" branch="False" />
+                <line number="147" hits="65" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="301" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="148" hits="1" branch="False" />
+                <line number="149" hits="64" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="41" hits="74" branch="False" />
+                <line number="43" hits="74" branch="False" />
+                <line number="44" hits="74" branch="False" />
+                <line number="45" hits="74" branch="False" />
+                <line number="46" hits="74" branch="False" />
+                <line number="47" hits="74" branch="False" />
+                <line number="48" hits="74" branch="False" />
+                <line number="49" hits="74" branch="False" />
+                <line number="50" hits="74" branch="False" />
+                <line number="51" hits="74" branch="False" />
+                <line number="52" hits="74" branch="False" />
+                <line number="53" hits="74" branch="False" />
+                <line number="54" hits="74" branch="False" />
+                <line number="55" hits="74" branch="False" />
+                <line number="56" hits="74" branch="False" />
+              </lines>
+            </method>
+            <method name=".cctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="36" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="61" hits="120" branch="False" />
+            <line number="66" hits="188" branch="False" />
+            <line number="72" hits="216" branch="False" />
+            <line number="79" hits="194" branch="False" />
+            <line number="84" hits="110" branch="False" />
+            <line number="89" hits="110" branch="False" />
+            <line number="96" hits="108" branch="False" />
+            <line number="101" hits="181" branch="False" />
+            <line number="106" hits="108" branch="False" />
+            <line number="111" hits="108" branch="False" />
+            <line number="116" hits="260" branch="False" />
+            <line number="121" hits="175" branch="False" />
+            <line number="127" hits="108" branch="False" />
+            <line number="132" hits="36" branch="False" />
+            <line number="139" hits="74" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="7" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="140" hits="3" branch="False" />
+            <line number="141" hits="71" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="76" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="142" hits="1" branch="False" />
+            <line number="143" hits="70" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="145" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="144" hits="2" branch="False" />
+            <line number="145" hits="68" branch="True" condition-coverage="100% (6/6)">
+              <conditions>
+                <condition number="216" type="jump" coverage="100%" />
+                <condition number="220" type="jump" coverage="100%" />
+                <condition number="232" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="146" hits="3" branch="False" />
+            <line number="147" hits="65" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="301" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="148" hits="1" branch="False" />
+            <line number="149" hits="64" branch="False" />
+            <line number="41" hits="74" branch="False" />
+            <line number="43" hits="74" branch="False" />
+            <line number="44" hits="74" branch="False" />
+            <line number="45" hits="74" branch="False" />
+            <line number="46" hits="74" branch="False" />
+            <line number="47" hits="74" branch="False" />
+            <line number="48" hits="74" branch="False" />
+            <line number="49" hits="74" branch="False" />
+            <line number="50" hits="74" branch="False" />
+            <line number="51" hits="74" branch="False" />
+            <line number="52" hits="74" branch="False" />
+            <line number="53" hits="74" branch="False" />
+            <line number="54" hits="74" branch="False" />
+            <line number="55" hits="74" branch="False" />
+            <line number="56" hits="74" branch="False" />
+            <line number="36" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Iso8583Fields" filename="Iso8583.Common/Iso8583Fields.cs" line-rate="0.9" branch-rate="0.5" complexity="6">
+          <methods>
+            <method name="get_Fields" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="12" hits="47" branch="False" />
+              </lines>
+            </method>
+            <method name="LoadFields" signature="()" line-rate="0.875" branch-rate="0.5" complexity="4">
+              <lines>
+                <line number="16" hits="1" branch="False" />
+                <line number="17" hits="1" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="27" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="18" hits="0" branch="False" />
+                <line number="20" hits="1" branch="False" />
+                <line number="21" hits="128" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="6" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="22" hits="128" branch="False" />
+                <line number="23" hits="128" branch="False" />
+                <line number="24" hits="257" branch="False" />
+              </lines>
+            </method>
+            <method name=".cctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="10" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="12" hits="47" branch="False" />
+            <line number="16" hits="1" branch="False" />
+            <line number="17" hits="1" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="27" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="18" hits="0" branch="False" />
+            <line number="20" hits="1" branch="False" />
+            <line number="21" hits="128" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="6" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="22" hits="128" branch="False" />
+            <line number="23" hits="128" branch="False" />
+            <line number="24" hits="257" branch="False" />
+            <line number="10" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.SslConfiguration" filename="Iso8583.Common/SslConfiguration.cs" line-rate="1" branch-rate="1" complexity="6">
+          <methods>
+            <method name="get_Enabled" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="11" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name="get_CertificatePath" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="16" hits="4" branch="False" />
+              </lines>
+            </method>
+            <method name="get_CertificatePassword" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="21" hits="4" branch="False" />
+              </lines>
+            </method>
+            <method name="get_MutualTls" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="26" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="get_CaCertificatePath" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="31" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="get_TargetHost" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="37" hits="3" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="11" hits="5" branch="False" />
+            <line number="16" hits="4" branch="False" />
+            <line number="21" hits="4" branch="False" />
+            <line number="26" hits="3" branch="False" />
+            <line number="31" hits="3" branch="False" />
+            <line number="37" hits="3" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Pipelines.CompositeIsoMessageHandler`1" filename="Iso8583.Common/Netty/Pipelines/CompositeIsoMessageHandler.cs" line-rate="0.8644" branch-rate="0.9" complexity="24">
+          <methods>
+            <method name="ChannelRead" signature="(DotNetty.Transport.Channels.IChannelHandlerContext,System.Object)" line-rate="1" branch-rate="0.875" complexity="8">
+              <lines>
+                <line number="54" hits="22" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="18" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="56" hits="1" branch="False" />
+                <line number="57" hits="1" branch="False" />
+                <line number="58" hits="1" branch="False" />
+                <line number="63" hits="21" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="66" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="64" hits="21" branch="False" />
+                <line number="65" hits="1" branch="False" />
+                <line number="66" hits="1" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="13" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="67" hits="1" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="28" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="68" hits="22" branch="False" />
+                <line number="69" hits="21" branch="False" />
+              </lines>
+            </method>
+            <method name="ChannelReadComplete" signature="(DotNetty.Transport.Channels.IChannelHandlerContext)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="71" hits="32" branch="False" />
+              </lines>
+            </method>
+            <method name="ExceptionCaught" signature="(DotNetty.Transport.Channels.IChannelHandlerContext,System.Exception)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="75" hits="1" branch="False" />
+                <line number="76" hits="1" branch="False" />
+                <line number="77" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="AddListener" signature="(Iso8583.Common.IIsoMessageListener`1&lt;T&gt;)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="86" hits="1044" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="1" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="87" hits="1" branch="False" />
+                <line number="89" hits="1043" branch="False" />
+                <line number="91" hits="1043" branch="False" />
+                <line number="92" hits="1043" branch="False" />
+                <line number="93" hits="1043" branch="False" />
+                <line number="94" hits="1043" branch="False" />
+                <line number="95" hits="1043" branch="False" />
+                <line number="96" hits="1043" branch="False" />
+                <line number="98" hits="1043" branch="False" />
+                <line number="99" hits="1043" branch="False" />
+              </lines>
+            </method>
+            <method name="AddListeners" signature="(Iso8583.Common.IIsoMessageListener`1&lt;T&gt;[])" line-rate="0.2" branch-rate="0.75" complexity="4">
+              <lines>
+                <line number="108" hits="2" branch="True" condition-coverage="75% (3/4)">
+                  <conditions>
+                    <condition number="1" type="jump" coverage="100%" />
+                    <condition number="5" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="109" hits="2" branch="False" />
+                <line number="111" hits="0" branch="False" />
+                <line number="113" hits="0" branch="False" />
+                <line number="114" hits="0" branch="False" />
+                <line number="115" hits="0" branch="False" />
+                <line number="116" hits="0" branch="False" />
+                <line number="117" hits="0" branch="False" />
+                <line number="118" hits="0" branch="False" />
+                <line number="119" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="RemoveListener" signature="(Iso8583.Common.IIsoMessageListener`1&lt;T&gt;)" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="127" hits="1002" branch="False" />
+                <line number="129" hits="1002" branch="False" />
+                <line number="130" hits="1002" branch="False" />
+                <line number="131" hits="1003" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="36" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="133" hits="1001" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="44" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="135" hits="66" branch="False" />
+                <line number="136" hits="66" branch="False" />
+                <line number="139" hits="935" branch="False" />
+                <line number="140" hits="935" branch="False" />
+                <line number="141" hits="935" branch="False" />
+                <line number="142" hits="935" branch="False" />
+                <line number="143" hits="935" branch="False" />
+                <line number="144" hits="1002" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Boolean,Microsoft.Extensions.Logging.ILogger,Iso8583.Common.Metrics.IIso8583Metrics)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="25" hits="59" branch="False" />
+                <line number="30" hits="59" branch="False" />
+                <line number="38" hits="59" branch="False" />
+                <line number="40" hits="59" branch="False" />
+                <line number="41" hits="59" branch="False" />
+                <line number="42" hits="59" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="47" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="43" hits="59" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="48" hits="57" branch="False" />
+                <line number="50" hits="57" branch="False" />
+              </lines>
+            </method>
+            <method name=".cctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="20" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="54" hits="22" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="18" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="56" hits="1" branch="False" />
+            <line number="57" hits="1" branch="False" />
+            <line number="58" hits="1" branch="False" />
+            <line number="63" hits="21" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="66" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="64" hits="21" branch="False" />
+            <line number="65" hits="1" branch="False" />
+            <line number="66" hits="1" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="13" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="67" hits="1" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="28" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="68" hits="22" branch="False" />
+            <line number="69" hits="21" branch="False" />
+            <line number="71" hits="32" branch="False" />
+            <line number="75" hits="1" branch="False" />
+            <line number="76" hits="1" branch="False" />
+            <line number="77" hits="1" branch="False" />
+            <line number="86" hits="1044" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="1" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="87" hits="1" branch="False" />
+            <line number="89" hits="1043" branch="False" />
+            <line number="91" hits="1043" branch="False" />
+            <line number="92" hits="1043" branch="False" />
+            <line number="93" hits="1043" branch="False" />
+            <line number="94" hits="1043" branch="False" />
+            <line number="95" hits="1043" branch="False" />
+            <line number="96" hits="1043" branch="False" />
+            <line number="98" hits="1043" branch="False" />
+            <line number="99" hits="1043" branch="False" />
+            <line number="108" hits="2" branch="True" condition-coverage="75% (3/4)">
+              <conditions>
+                <condition number="1" type="jump" coverage="100%" />
+                <condition number="5" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="109" hits="2" branch="False" />
+            <line number="111" hits="0" branch="False" />
+            <line number="113" hits="0" branch="False" />
+            <line number="114" hits="0" branch="False" />
+            <line number="115" hits="0" branch="False" />
+            <line number="116" hits="0" branch="False" />
+            <line number="117" hits="0" branch="False" />
+            <line number="118" hits="0" branch="False" />
+            <line number="119" hits="0" branch="False" />
+            <line number="127" hits="1002" branch="False" />
+            <line number="129" hits="1002" branch="False" />
+            <line number="130" hits="1002" branch="False" />
+            <line number="131" hits="1003" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="36" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="133" hits="1001" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="44" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="135" hits="66" branch="False" />
+            <line number="136" hits="66" branch="False" />
+            <line number="139" hits="935" branch="False" />
+            <line number="140" hits="935" branch="False" />
+            <line number="141" hits="935" branch="False" />
+            <line number="142" hits="935" branch="False" />
+            <line number="143" hits="935" branch="False" />
+            <line number="144" hits="1002" branch="False" />
+            <line number="25" hits="59" branch="False" />
+            <line number="30" hits="59" branch="False" />
+            <line number="38" hits="59" branch="False" />
+            <line number="40" hits="59" branch="False" />
+            <line number="41" hits="59" branch="False" />
+            <line number="42" hits="59" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="47" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="43" hits="59" branch="False" />
+            <line number="48" hits="57" branch="False" />
+            <line number="50" hits="57" branch="False" />
+            <line number="20" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Pipelines.CompositeIsoMessageHandler`1/&lt;DoHandleMessageAsync&gt;d__14" filename="Iso8583.Common/Netty/Pipelines/CompositeIsoMessageHandler.cs" line-rate="1" branch-rate="1" complexity="4">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="153" hits="21" branch="False" />
+                <line number="155" hits="21" branch="False" />
+                <line number="160" hits="21" branch="False" />
+                <line number="162" hits="48" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="354" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="164" hits="22" branch="False" />
+                <line number="165" hits="22" branch="False" />
+                <line number="166" hits="21" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="240" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="168" hits="18" branch="False" />
+                <line number="169" hits="18" branch="False" />
+                <line number="170" hits="18" branch="False" />
+                <line number="172" hits="3" branch="False" />
+                <line number="174" hits="20" branch="False" />
+                <line number="175" hits="20" branch="False" />
+                <line number="176" hits="20" branch="False" />
+                <line number="177" hits="1" branch="False" />
+                <line number="179" hits="1" branch="False" />
+                <line number="180" hits="1" branch="False" />
+                <line number="181" hits="1" branch="False" />
+                <line number="183" hits="20" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="153" hits="21" branch="False" />
+            <line number="155" hits="21" branch="False" />
+            <line number="160" hits="21" branch="False" />
+            <line number="162" hits="48" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="354" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="164" hits="22" branch="False" />
+            <line number="165" hits="22" branch="False" />
+            <line number="166" hits="21" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="240" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="168" hits="18" branch="False" />
+            <line number="169" hits="18" branch="False" />
+            <line number="170" hits="18" branch="False" />
+            <line number="172" hits="3" branch="False" />
+            <line number="174" hits="20" branch="False" />
+            <line number="175" hits="20" branch="False" />
+            <line number="176" hits="20" branch="False" />
+            <line number="177" hits="1" branch="False" />
+            <line number="179" hits="1" branch="False" />
+            <line number="180" hits="1" branch="False" />
+            <line number="181" hits="1" branch="False" />
+            <line number="183" hits="20" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Pipelines.CompositeIsoMessageHandler`1/&lt;HandleMessageWithListenerAsync&gt;d__15" filename="Iso8583.Common/Netty/Pipelines/CompositeIsoMessageHandler.cs" line-rate="1" branch-rate="1" complexity="4">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="197" hits="22" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="40" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="199" hits="2" branch="False" />
+                <line number="200" hits="2" branch="False" />
+                <line number="201" hits="2" branch="False" />
+                <line number="204" hits="20" branch="False" />
+                <line number="205" hits="20" branch="False" />
+                <line number="206" hits="20" branch="False" />
+                <line number="208" hits="20" branch="False" />
+                <line number="210" hits="2" branch="False" />
+                <line number="212" hits="2" branch="False" />
+                <line number="213" hits="2" branch="False" />
+                <line number="214" hits="2" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="392" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="215" hits="1" branch="False" />
+                <line number="216" hits="1" branch="False" />
+                <line number="218" hits="1" branch="False" />
+                <line number="219" hits="21" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="197" hits="22" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="40" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="199" hits="2" branch="False" />
+            <line number="200" hits="2" branch="False" />
+            <line number="201" hits="2" branch="False" />
+            <line number="204" hits="20" branch="False" />
+            <line number="205" hits="20" branch="False" />
+            <line number="206" hits="20" branch="False" />
+            <line number="208" hits="20" branch="False" />
+            <line number="210" hits="2" branch="False" />
+            <line number="212" hits="2" branch="False" />
+            <line number="213" hits="2" branch="False" />
+            <line number="214" hits="2" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="392" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="215" hits="1" branch="False" />
+            <line number="216" hits="1" branch="False" />
+            <line number="218" hits="1" branch="False" />
+            <line number="219" hits="21" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Pipelines.ConnectionTracker" filename="Iso8583.Common/Netty/Pipelines/ConnectionTracker.cs" line-rate="1" branch-rate="1" complexity="12">
+          <methods>
+            <method name="get_ActiveConnectionCount" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="39" hits="12" branch="False" />
+              </lines>
+            </method>
+            <method name="get_ActiveChannels" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="44" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="get_IsSharable" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="46" hits="36" branch="False" />
+              </lines>
+            </method>
+            <method name="ChannelActive" signature="(DotNetty.Transport.Channels.IChannelHandlerContext)" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="50" hits="33" branch="False" />
+                <line number="52" hits="33" branch="True" condition-coverage="100% (4/4)">
+                  <conditions>
+                    <condition number="19" type="jump" coverage="100%" />
+                    <condition number="28" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="54" hits="1" branch="False" />
+                <line number="55" hits="1" branch="False" />
+                <line number="56" hits="1" branch="False" />
+                <line number="57" hits="1" branch="False" />
+                <line number="58" hits="1" branch="False" />
+                <line number="61" hits="32" branch="False" />
+                <line number="62" hits="32" branch="False" />
+                <line number="63" hits="32" branch="False" />
+                <line number="64" hits="32" branch="False" />
+                <line number="66" hits="32" branch="False" />
+                <line number="67" hits="32" branch="False" />
+              </lines>
+            </method>
+            <method name="ChannelInactive" signature="(DotNetty.Transport.Channels.IChannelHandlerContext)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="71" hits="35" branch="False" />
+                <line number="72" hits="35" branch="False" />
+                <line number="73" hits="35" branch="False" />
+                <line number="74" hits="35" branch="False" />
+                <line number="75" hits="35" branch="False" />
+                <line number="77" hits="35" branch="False" />
+                <line number="78" hits="35" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Int32,Microsoft.Extensions.Logging.ILogger,Iso8583.Common.Metrics.IIso8583Metrics)" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="20" hits="33" branch="False" />
+                <line number="29" hits="33" branch="False" />
+                <line number="31" hits="33" branch="False" />
+                <line number="32" hits="33" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="27" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="33" hits="33" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="43" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="34" hits="33" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="39" hits="12" branch="False" />
+            <line number="44" hits="2" branch="False" />
+            <line number="46" hits="36" branch="False" />
+            <line number="50" hits="33" branch="False" />
+            <line number="52" hits="33" branch="True" condition-coverage="100% (4/4)">
+              <conditions>
+                <condition number="19" type="jump" coverage="100%" />
+                <condition number="28" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="54" hits="1" branch="False" />
+            <line number="55" hits="1" branch="False" />
+            <line number="56" hits="1" branch="False" />
+            <line number="57" hits="1" branch="False" />
+            <line number="58" hits="1" branch="False" />
+            <line number="61" hits="32" branch="False" />
+            <line number="62" hits="32" branch="False" />
+            <line number="63" hits="32" branch="False" />
+            <line number="64" hits="32" branch="False" />
+            <line number="66" hits="32" branch="False" />
+            <line number="67" hits="32" branch="False" />
+            <line number="71" hits="35" branch="False" />
+            <line number="72" hits="35" branch="False" />
+            <line number="73" hits="35" branch="False" />
+            <line number="74" hits="35" branch="False" />
+            <line number="75" hits="35" branch="False" />
+            <line number="77" hits="35" branch="False" />
+            <line number="78" hits="35" branch="False" />
+            <line number="20" hits="33" branch="False" />
+            <line number="29" hits="33" branch="False" />
+            <line number="31" hits="33" branch="False" />
+            <line number="32" hits="33" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="27" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="33" hits="33" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="43" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="34" hits="33" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Pipelines.EchoMessageListener`1" filename="Iso8583.Common/Netty/Pipelines/EchoMessageListener.cs" line-rate="1" branch-rate="0.5" complexity="3">
+          <methods>
+            <method name="CanHandleMessage" signature="(T)" line-rate="1" branch-rate="0.5" complexity="2">
+              <lines>
+                <line number="24" hits="4" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="6" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Iso.IMessageFactory`1&lt;T&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="20" hits="8" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="24" hits="4" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="6" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="20" hits="8" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Pipelines.EchoMessageListener`1/&lt;HandleMessage&gt;d__3" filename="Iso8583.Common/Netty/Pipelines/EchoMessageListener.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="34" hits="1" branch="False" />
+                <line number="35" hits="1" branch="False" />
+                <line number="36" hits="1" branch="False" />
+                <line number="37" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="34" hits="1" branch="False" />
+            <line number="35" hits="1" branch="False" />
+            <line number="36" hits="1" branch="False" />
+            <line number="37" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Pipelines.IdleEventHandler" filename="Iso8583.Common/Netty/Pipelines/IdleEventHandler.cs" line-rate="0.1818" branch-rate="0.25" complexity="13">
+          <methods>
+            <method name="UserEventTriggered" signature="(DotNetty.Transport.Channels.IChannelHandlerContext,System.Object)" line-rate="0.1" branch-rate="0.25" complexity="12">
+              <lines>
+                <line number="25" hits="2" branch="True" condition-coverage="37.5% (3/8)">
+                  <conditions>
+                    <condition number="8" type="jump" coverage="50%" />
+                    <condition number="18" type="jump" coverage="0%" />
+                    <condition number="22" type="jump" coverage="50%" />
+                    <condition number="31" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="26" hits="0" branch="False" />
+                <line number="27" hits="0" branch="False" />
+                <line number="30" hits="0" branch="False" />
+                <line number="31" hits="0" branch="False" />
+                <line number="32" hits="0" branch="False" />
+                <line number="33" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="13" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="34" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="28" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="35" hits="0" branch="False" />
+                <line number="36" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Iso.IMessageFactory`1&lt;NetCore8583.IsoMessage&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="21" hits="74" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="25" hits="2" branch="True" condition-coverage="37.5% (3/8)">
+              <conditions>
+                <condition number="8" type="jump" coverage="50%" />
+                <condition number="18" type="jump" coverage="0%" />
+                <condition number="22" type="jump" coverage="50%" />
+                <condition number="31" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="26" hits="0" branch="False" />
+            <line number="27" hits="0" branch="False" />
+            <line number="30" hits="0" branch="False" />
+            <line number="31" hits="0" branch="False" />
+            <line number="32" hits="0" branch="False" />
+            <line number="33" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="13" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="34" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="28" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="35" hits="0" branch="False" />
+            <line number="36" hits="0" branch="False" />
+            <line number="21" hits="74" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Pipelines.Iso8583ChannelInitializer`1" filename="Iso8583.Common/Netty/Pipelines/Iso8583ChannelInitializer.cs" line-rate="0.826" branch-rate="0.3666" complexity="36">
+          <methods>
+            <method name="get_MessageFactory" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="58" hits="102" branch="False" />
+              </lines>
+            </method>
+            <method name="CreateIsoMessageEncoder" signature="(TC)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="61" hits="34" branch="False" />
+              </lines>
+            </method>
+            <method name="CreateIsoMessageDecoder" signature="(Iso8583.Common.Iso.IMessageFactory`1&lt;NetCore8583.IsoMessage&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="64" hits="34" branch="False" />
+              </lines>
+            </method>
+            <method name="CreateParseExceptionHandler" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="66" hits="34" branch="False" />
+              </lines>
+            </method>
+            <method name="CreateLoggingHandler" signature="(TC)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="69" hits="34" branch="False" />
+                <line number="70" hits="34" branch="False" />
+              </lines>
+            </method>
+            <method name="CreateLengthFieldBasedFrameDecoder" signature="(TC)" line-rate="1" branch-rate="0.5" complexity="2">
+              <lines>
+                <line number="74" hits="34" branch="False" />
+                <line number="75" hits="34" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="23" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="76" hits="34" branch="False" />
+                <line number="77" hits="34" branch="False" />
+                <line number="78" hits="34" branch="False" />
+                <line number="79" hits="34" branch="False" />
+                <line number="80" hits="34" branch="False" />
+                <line number="81" hits="34" branch="False" />
+                <line number="82" hits="34" branch="False" />
+                <line number="83" hits="34" branch="False" />
+                <line number="84" hits="34" branch="False" />
+                <line number="85" hits="34" branch="False" />
+                <line number="86" hits="34" branch="False" />
+                <line number="87" hits="34" branch="False" />
+                <line number="88" hits="34" branch="False" />
+                <line number="89" hits="34" branch="False" />
+              </lines>
+            </method>
+            <method name="InitChannel" signature="(DotNetty.Transport.Channels.Sockets.ISocketChannel)" line-rate="0.6562" branch-rate="0.30760000000000004" complexity="26">
+              <lines>
+                <line number="94" hits="34" branch="False" />
+                <line number="97" hits="34" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="13" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="98" hits="17" branch="False" />
+                <line number="101" hits="34" branch="False" />
+                <line number="102" hits="34" branch="True" condition-coverage="50% (2/4)">
+                  <conditions>
+                    <condition number="51" type="jump" coverage="50%" />
+                    <condition number="62" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="104" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="73" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="106" hits="0" branch="True" condition-coverage="0% (0/6)">
+                  <conditions>
+                    <condition number="85" type="jump" coverage="0%" />
+                    <condition number="95" type="jump" coverage="0%" />
+                    <condition number="107" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="107" hits="0" branch="True" condition-coverage="0% (0/4)">
+                  <conditions>
+                    <condition number="123" type="jump" coverage="0%" />
+                    <condition number="136" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="109" hits="0" branch="False" />
+                <line number="110" hits="0" branch="False" />
+                <line number="111" hits="0" branch="False" />
+                <line number="115" hits="0" branch="False" />
+                <line number="120" hits="0" branch="False" />
+                <line number="121" hits="0" branch="False" />
+                <line number="125" hits="34" branch="False" />
+                <line number="126" hits="34" branch="False" />
+                <line number="127" hits="34" branch="False" />
+                <line number="129" hits="34" branch="False" />
+                <line number="130" hits="34" branch="False" />
+                <line number="131" hits="34" branch="False" />
+                <line number="132" hits="34" branch="False" />
+                <line number="133" hits="34" branch="False" />
+                <line number="134" hits="34" branch="False" />
+                <line number="135" hits="34" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="412" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="136" hits="34" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="449" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="137" hits="34" branch="False" />
+                <line number="138" hits="34" branch="False" />
+                <line number="139" hits="34" branch="False" />
+                <line number="142" hits="32" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="559" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="143" hits="0" branch="False" />
+                <line number="145" hits="32" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="586" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="146" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="LoadCertificate" signature="(System.String,System.String)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="151" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(TC,Iso8583.Common.IPipelineConfigurator`1&lt;TC&gt;,DotNetty.Transport.Channels.MultithreadEventLoopGroup,Iso8583.Common.Iso.IMessageFactory`1&lt;NetCore8583.IsoMessage&gt;,DotNetty.Transport.Channels.IChannelHandler,DotNetty.Transport.Channels.IChannelHandler,DotNetty.Transport.Channels.IChannelHandler,Iso8583.Common.Metrics.IIso8583Metrics)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="42" hits="41" branch="False" />
+                <line number="43" hits="41" branch="False" />
+                <line number="44" hits="41" branch="False" />
+                <line number="45" hits="41" branch="False" />
+                <line number="47" hits="41" branch="False" />
+                <line number="48" hits="41" branch="False" />
+                <line number="49" hits="41" branch="False" />
+                <line number="50" hits="41" branch="False" />
+                <line number="51" hits="41" branch="False" />
+                <line number="52" hits="41" branch="False" />
+                <line number="53" hits="41" branch="False" />
+                <line number="54" hits="41" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="63" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="55" hits="41" branch="False" />
+                <line number="56" hits="41" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="58" hits="102" branch="False" />
+            <line number="61" hits="34" branch="False" />
+            <line number="64" hits="34" branch="False" />
+            <line number="66" hits="34" branch="False" />
+            <line number="69" hits="34" branch="False" />
+            <line number="70" hits="34" branch="False" />
+            <line number="74" hits="34" branch="False" />
+            <line number="75" hits="34" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="23" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="76" hits="34" branch="False" />
+            <line number="77" hits="34" branch="False" />
+            <line number="78" hits="34" branch="False" />
+            <line number="79" hits="34" branch="False" />
+            <line number="80" hits="34" branch="False" />
+            <line number="81" hits="34" branch="False" />
+            <line number="82" hits="34" branch="False" />
+            <line number="83" hits="34" branch="False" />
+            <line number="84" hits="34" branch="False" />
+            <line number="85" hits="34" branch="False" />
+            <line number="86" hits="34" branch="False" />
+            <line number="87" hits="34" branch="False" />
+            <line number="88" hits="34" branch="False" />
+            <line number="89" hits="34" branch="False" />
+            <line number="94" hits="34" branch="False" />
+            <line number="97" hits="34" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="13" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="98" hits="17" branch="False" />
+            <line number="101" hits="34" branch="False" />
+            <line number="102" hits="34" branch="True" condition-coverage="50% (2/4)">
+              <conditions>
+                <condition number="51" type="jump" coverage="50%" />
+                <condition number="62" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="104" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="73" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="106" hits="0" branch="True" condition-coverage="0% (0/6)">
+              <conditions>
+                <condition number="85" type="jump" coverage="0%" />
+                <condition number="95" type="jump" coverage="0%" />
+                <condition number="107" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="107" hits="0" branch="True" condition-coverage="0% (0/4)">
+              <conditions>
+                <condition number="123" type="jump" coverage="0%" />
+                <condition number="136" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="109" hits="0" branch="False" />
+            <line number="110" hits="0" branch="False" />
+            <line number="111" hits="0" branch="False" />
+            <line number="115" hits="0" branch="False" />
+            <line number="120" hits="0" branch="False" />
+            <line number="121" hits="0" branch="False" />
+            <line number="125" hits="34" branch="False" />
+            <line number="126" hits="34" branch="False" />
+            <line number="127" hits="34" branch="False" />
+            <line number="129" hits="34" branch="False" />
+            <line number="130" hits="34" branch="False" />
+            <line number="131" hits="34" branch="False" />
+            <line number="132" hits="34" branch="False" />
+            <line number="133" hits="34" branch="False" />
+            <line number="134" hits="34" branch="False" />
+            <line number="135" hits="34" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="412" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="136" hits="34" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="449" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="137" hits="34" branch="False" />
+            <line number="138" hits="34" branch="False" />
+            <line number="139" hits="34" branch="False" />
+            <line number="142" hits="32" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="559" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="143" hits="0" branch="False" />
+            <line number="145" hits="32" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="586" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="146" hits="0" branch="False" />
+            <line number="151" hits="0" branch="False" />
+            <line number="42" hits="41" branch="False" />
+            <line number="43" hits="41" branch="False" />
+            <line number="44" hits="41" branch="False" />
+            <line number="45" hits="41" branch="False" />
+            <line number="47" hits="41" branch="False" />
+            <line number="48" hits="41" branch="False" />
+            <line number="49" hits="41" branch="False" />
+            <line number="50" hits="41" branch="False" />
+            <line number="51" hits="41" branch="False" />
+            <line number="52" hits="41" branch="False" />
+            <line number="53" hits="41" branch="False" />
+            <line number="54" hits="41" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="63" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="55" hits="41" branch="False" />
+            <line number="56" hits="41" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Pipelines.IsoMessageLoggingHandler" filename="Iso8583.Common/Netty/Pipelines/IsoMessageLoggingHandler.cs" line-rate="0.8775" branch-rate="0.9166" complexity="26">
+          <methods>
+            <method name="get_IsSharable" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="60" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="Format" signature="(DotNetty.Transport.Channels.IChannelHandlerContext,System.String,System.Object)" line-rate="0" branch-rate="0" complexity="2">
+              <lines>
+                <line number="72" hits="0" branch="False" />
+                <line number="73" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="11" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="74" hits="0" branch="False" />
+                <line number="75" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="FormatIsoMessage" signature="(NetCore8583.IsoMessage)" line-rate="1" branch-rate="1" complexity="14">
+              <lines>
+                <line number="86" hits="4" branch="False" />
+                <line number="87" hits="6" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="12" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="88" hits="4" branch="False" />
+                <line number="89" hits="1016" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="317" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="90" hits="504" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="94" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="92" hits="44" branch="False" />
+                <line number="93" hits="44" branch="False" />
+                <line number="95" hits="88" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="141" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="98" hits="44" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="172" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="99" hits="22" branch="False" />
+                <line number="101" hits="22" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="191" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="102" hits="22" branch="False" />
+                <line number="103" hits="2" branch="False" />
+                <line number="104" hits="20" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="221" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="105" hits="20" branch="False" />
+                <line number="106" hits="20" branch="False" />
+                <line number="107" hits="22" branch="False" />
+                <line number="109" hits="44" branch="False" />
+                <line number="110" hits="44" branch="False" />
+                <line number="113" hits="4" branch="False" />
+              </lines>
+            </method>
+            <method name="MaskPan" signature="(System.String)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="124" hits="2" branch="False" />
+                <line number="125" hits="40" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="26" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="126" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(DotNetty.Handlers.Logging.LogLevel,System.Boolean,System.Boolean,System.Int32[])" line-rate="0.8332999999999999" branch-rate="1" complexity="6">
+              <lines>
+                <line number="39" hits="44" branch="False" />
+                <line number="41" hits="44" branch="False" />
+                <line number="44" hits="11352" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="65" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="46" hits="5632" branch="False" />
+                <line number="47" hits="5632" branch="False" />
+                <line number="49" hits="44" branch="False" />
+                <line number="50" hits="0" branch="False" />
+                <line number="52" hits="0" branch="False" />
+                <line number="55" hits="44" branch="False" />
+                <line number="56" hits="44" branch="False" />
+                <line number="57" hits="44" branch="True" condition-coverage="100% (4/4)">
+                  <conditions>
+                    <condition number="160" type="jump" coverage="100%" />
+                    <condition number="167" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="58" hits="44" branch="False" />
+              </lines>
+            </method>
+            <method name=".cctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="13" hits="1" branch="False" />
+                <line number="14" hits="1" branch="False" />
+                <line number="15" hits="1" branch="False" />
+                <line number="16" hits="1" branch="False" />
+                <line number="17" hits="1" branch="False" />
+                <line number="18" hits="1" branch="False" />
+                <line number="19" hits="1" branch="False" />
+                <line number="21" hits="1" branch="False" />
+                <line number="22" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="60" hits="1" branch="False" />
+            <line number="72" hits="0" branch="False" />
+            <line number="73" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="11" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="74" hits="0" branch="False" />
+            <line number="75" hits="0" branch="False" />
+            <line number="86" hits="4" branch="False" />
+            <line number="87" hits="6" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="12" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="88" hits="4" branch="False" />
+            <line number="89" hits="1016" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="317" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="90" hits="504" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="94" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="92" hits="44" branch="False" />
+            <line number="93" hits="44" branch="False" />
+            <line number="95" hits="88" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="141" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="98" hits="44" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="172" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="99" hits="22" branch="False" />
+            <line number="101" hits="22" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="191" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="102" hits="22" branch="False" />
+            <line number="103" hits="2" branch="False" />
+            <line number="104" hits="20" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="221" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="105" hits="20" branch="False" />
+            <line number="106" hits="20" branch="False" />
+            <line number="107" hits="22" branch="False" />
+            <line number="109" hits="44" branch="False" />
+            <line number="110" hits="44" branch="False" />
+            <line number="113" hits="4" branch="False" />
+            <line number="124" hits="2" branch="False" />
+            <line number="125" hits="40" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="26" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="126" hits="2" branch="False" />
+            <line number="39" hits="44" branch="False" />
+            <line number="41" hits="44" branch="False" />
+            <line number="44" hits="11352" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="65" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="46" hits="5632" branch="False" />
+            <line number="47" hits="5632" branch="False" />
+            <line number="49" hits="44" branch="False" />
+            <line number="50" hits="0" branch="False" />
+            <line number="52" hits="0" branch="False" />
+            <line number="55" hits="44" branch="False" />
+            <line number="56" hits="44" branch="False" />
+            <line number="57" hits="44" branch="True" condition-coverage="100% (4/4)">
+              <conditions>
+                <condition number="160" type="jump" coverage="100%" />
+                <condition number="167" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="58" hits="44" branch="False" />
+            <line number="13" hits="1" branch="False" />
+            <line number="14" hits="1" branch="False" />
+            <line number="15" hits="1" branch="False" />
+            <line number="16" hits="1" branch="False" />
+            <line number="17" hits="1" branch="False" />
+            <line number="18" hits="1" branch="False" />
+            <line number="19" hits="1" branch="False" />
+            <line number="21" hits="1" branch="False" />
+            <line number="22" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Pipelines.ParseExceptionHandler" filename="Iso8583.Common/Netty/Pipelines/ParseExceptionHandler.cs" line-rate="1" branch-rate="1" complexity="8">
+          <methods>
+            <method name="get_IsSharable" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="31" hits="7" branch="False" />
+              </lines>
+            </method>
+            <method name="ExceptionCaught" signature="(DotNetty.Transport.Channels.IChannelHandlerContext,System.Exception)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="35" hits="9" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="8" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="37" hits="5" branch="False" />
+                <line number="38" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name="CreateErrorResponseMessage" signature="(NetCore8583.Extensions.ParseException)" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="48" hits="4" branch="False" />
+                <line number="49" hits="4" branch="False" />
+                <line number="52" hits="4" branch="False" />
+                <line number="53" hits="5" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="47" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="56" hits="3" branch="False" />
+                <line number="57" hits="4" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="66" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="59" hits="3" branch="False" />
+                <line number="61" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Iso.IMessageFactory`1&lt;NetCore8583.IsoMessage&gt;,System.Boolean)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="22" hits="41" branch="False" />
+                <line number="24" hits="41" branch="False" />
+                <line number="25" hits="41" branch="False" />
+                <line number="26" hits="41" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="31" hits="7" branch="False" />
+            <line number="35" hits="9" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="8" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="37" hits="5" branch="False" />
+            <line number="38" hits="5" branch="False" />
+            <line number="48" hits="4" branch="False" />
+            <line number="49" hits="4" branch="False" />
+            <line number="52" hits="4" branch="False" />
+            <line number="53" hits="5" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="47" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="56" hits="3" branch="False" />
+            <line number="57" hits="4" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="66" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="59" hits="3" branch="False" />
+            <line number="61" hits="3" branch="False" />
+            <line number="22" hits="41" branch="False" />
+            <line number="24" hits="41" branch="False" />
+            <line number="25" hits="41" branch="False" />
+            <line number="26" hits="41" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Pipelines.ReconnectOnCloseHandler" filename="Iso8583.Common/Netty/Pipelines/ReconnectOnCloseHandler.cs" line-rate="0.7878000000000001" branch-rate="0.875" complexity="10">
+          <methods>
+            <method name="ResetAttempts" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="45" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="ChannelInactive" signature="(DotNetty.Transport.Channels.IChannelHandlerContext)" line-rate="0.65" branch-rate="0.75" complexity="4">
+              <lines>
+                <line number="49" hits="2" branch="False" />
+                <line number="51" hits="2" branch="True" condition-coverage="75% (3/4)">
+                  <conditions>
+                    <condition number="14" type="jump" coverage="100%" />
+                    <condition number="28" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="53" hits="0" branch="False" />
+                <line number="54" hits="0" branch="False" />
+                <line number="57" hits="2" branch="False" />
+                <line number="58" hits="2" branch="False" />
+                <line number="60" hits="2" branch="False" />
+                <line number="61" hits="2" branch="False" />
+                <line number="64" hits="2" branch="False" />
+                <line number="65" hits="2" branch="False" />
+                <line number="66" hits="2" branch="False" />
+                <line number="67" hits="2" branch="False" />
+                <line number="68" hits="0" branch="False" />
+                <line number="69" hits="0" branch="False" />
+                <line number="70" hits="0" branch="False" />
+                <line number="71" hits="2" branch="False" />
+                <line number="72" hits="0" branch="False" />
+                <line number="73" hits="0" branch="False" />
+                <line number="74" hits="2" branch="False" />
+                <line number="75" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="CalculateDelay" signature="(System.Int32)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="83" hits="2" branch="False" />
+                <line number="84" hits="2" branch="False" />
+                <line number="87" hits="2" branch="False" />
+                <line number="88" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Func`1&lt;System.Threading.Tasks.Task&gt;,System.Int32,System.Int32,System.Int32,Microsoft.Extensions.Logging.ILogger)" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="32" hits="7" branch="False" />
+                <line number="33" hits="7" branch="False" />
+                <line number="35" hits="7" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="9" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="36" hits="6" branch="False" />
+                <line number="37" hits="6" branch="False" />
+                <line number="38" hits="6" branch="False" />
+                <line number="39" hits="6" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="54" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="40" hits="6" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="45" hits="1" branch="False" />
+            <line number="49" hits="2" branch="False" />
+            <line number="51" hits="2" branch="True" condition-coverage="75% (3/4)">
+              <conditions>
+                <condition number="14" type="jump" coverage="100%" />
+                <condition number="28" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="53" hits="0" branch="False" />
+            <line number="54" hits="0" branch="False" />
+            <line number="57" hits="2" branch="False" />
+            <line number="58" hits="2" branch="False" />
+            <line number="60" hits="2" branch="False" />
+            <line number="61" hits="2" branch="False" />
+            <line number="64" hits="2" branch="False" />
+            <line number="65" hits="2" branch="False" />
+            <line number="66" hits="2" branch="False" />
+            <line number="67" hits="2" branch="False" />
+            <line number="68" hits="0" branch="False" />
+            <line number="69" hits="0" branch="False" />
+            <line number="70" hits="0" branch="False" />
+            <line number="71" hits="2" branch="False" />
+            <line number="72" hits="0" branch="False" />
+            <line number="73" hits="0" branch="False" />
+            <line number="74" hits="2" branch="False" />
+            <line number="75" hits="2" branch="False" />
+            <line number="83" hits="2" branch="False" />
+            <line number="84" hits="2" branch="False" />
+            <line number="87" hits="2" branch="False" />
+            <line number="88" hits="2" branch="False" />
+            <line number="32" hits="7" branch="False" />
+            <line number="33" hits="7" branch="False" />
+            <line number="35" hits="7" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="9" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="36" hits="6" branch="False" />
+            <line number="37" hits="6" branch="False" />
+            <line number="38" hits="6" branch="False" />
+            <line number="39" hits="6" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="54" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="40" hits="6" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Codecs.IsoMessageDecoder" filename="Iso8583.Common/Netty/Codecs/IsoMessageDecoder.cs" line-rate="1" branch-rate="0.8332999999999999" complexity="6">
+          <methods>
+            <method name="Decode" signature="(DotNetty.Transport.Channels.IChannelHandlerContext,DotNetty.Buffers.IByteBuffer,System.Collections.Generic.List`1&lt;System.Object&gt;)" line-rate="1" branch-rate="0.75" complexity="4">
+              <lines>
+                <line number="34" hits="21" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="6" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="37" hits="19" branch="False" />
+                <line number="40" hits="19" branch="False" />
+                <line number="43" hits="19" branch="False" />
+                <line number="44" hits="18" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="45" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="46" hits="18" branch="False" />
+                <line number="47" hits="18" branch="False" />
+                <line number="48" hits="18" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Iso.IMessageFactory`1&lt;NetCore8583.IsoMessage&gt;,Iso8583.Common.Metrics.IIso8583Metrics)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="25" hits="37" branch="False" />
+                <line number="27" hits="37" branch="False" />
+                <line number="28" hits="37" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="16" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="29" hits="37" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="34" hits="21" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="6" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="37" hits="19" branch="False" />
+            <line number="40" hits="19" branch="False" />
+            <line number="43" hits="19" branch="False" />
+            <line number="44" hits="18" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="45" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="46" hits="18" branch="False" />
+            <line number="47" hits="18" branch="False" />
+            <line number="48" hits="18" branch="False" />
+            <line number="25" hits="37" branch="False" />
+            <line number="27" hits="37" branch="False" />
+            <line number="28" hits="37" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="16" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="29" hits="37" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Codecs.IsoMessageEncoder" filename="Iso8583.Common/Netty/Codecs/IsoMessageEncoder.cs" line-rate="1" branch-rate="1" complexity="13">
+          <methods>
+            <method name="Encode" signature="(DotNetty.Transport.Channels.IChannelHandlerContext,NetCore8583.IsoMessage,DotNetty.Buffers.IByteBuffer)" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="37" hits="22" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="6" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="41" hits="1" branch="False" />
+                <line number="42" hits="1" branch="False" />
+                <line number="43" hits="1" branch="False" />
+                <line number="47" hits="21" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="36" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="49" hits="20" branch="False" />
+                <line number="50" hits="20" branch="False" />
+                <line number="51" hits="20" branch="False" />
+                <line number="55" hits="1" branch="False" />
+                <line number="56" hits="1" branch="False" />
+                <line number="63" hits="22" branch="False" />
+                <line number="64" hits="22" branch="False" />
+              </lines>
+            </method>
+            <method name="SBytesToBytes" signature="(System.SByte[])" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="72" hits="22" branch="False" />
+                <line number="73" hits="22" branch="False" />
+                <line number="74" hits="22" branch="False" />
+              </lines>
+            </method>
+            <method name="WriteLengthHeaderAscii" signature="(DotNetty.Buffers.IByteBuffer,System.Int32,System.Int32)" line-rate="1" branch-rate="1" complexity="6">
+              <lines>
+                <line number="84" hits="20" branch="False" />
+                <line number="85" hits="20" branch="False" />
+                <line number="87" hits="20" branch="False" />
+                <line number="88" hits="122" branch="True" condition-coverage="100% (4/4)">
+                  <conditions>
+                    <condition number="62" type="jump" coverage="100%" />
+                    <condition number="58" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="90" hits="41" branch="False" />
+                <line number="91" hits="41" branch="False" />
+                <line number="94" hits="196" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="95" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="95" hits="78" branch="False" />
+                <line number="96" hits="20" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Int32,System.Boolean,Iso8583.Common.Metrics.IIso8583Metrics)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="27" hits="38" branch="False" />
+                <line number="28" hits="38" branch="False" />
+                <line number="30" hits="38" branch="False" />
+                <line number="31" hits="38" branch="False" />
+                <line number="32" hits="38" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="23" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="33" hits="38" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="37" hits="22" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="6" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="41" hits="1" branch="False" />
+            <line number="42" hits="1" branch="False" />
+            <line number="43" hits="1" branch="False" />
+            <line number="47" hits="21" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="36" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="49" hits="20" branch="False" />
+            <line number="50" hits="20" branch="False" />
+            <line number="51" hits="20" branch="False" />
+            <line number="55" hits="1" branch="False" />
+            <line number="56" hits="1" branch="False" />
+            <line number="63" hits="22" branch="False" />
+            <line number="64" hits="22" branch="False" />
+            <line number="72" hits="22" branch="False" />
+            <line number="73" hits="22" branch="False" />
+            <line number="74" hits="22" branch="False" />
+            <line number="84" hits="20" branch="False" />
+            <line number="85" hits="20" branch="False" />
+            <line number="87" hits="20" branch="False" />
+            <line number="88" hits="122" branch="True" condition-coverage="100% (4/4)">
+              <conditions>
+                <condition number="62" type="jump" coverage="100%" />
+                <condition number="58" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="90" hits="41" branch="False" />
+            <line number="91" hits="41" branch="False" />
+            <line number="94" hits="196" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="95" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="95" hits="78" branch="False" />
+            <line number="96" hits="20" branch="False" />
+            <line number="27" hits="38" branch="False" />
+            <line number="28" hits="38" branch="False" />
+            <line number="30" hits="38" branch="False" />
+            <line number="31" hits="38" branch="False" />
+            <line number="32" hits="38" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="23" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="33" hits="38" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Netty.Codecs.StringLengthFieldBasedFrameDecoder" filename="Iso8583.Common/Netty/Codecs/StringLengthFieldBasedFrameDecoder.cs" line-rate="0.9166" branch-rate="0.8887999999999999" complexity="19">
+          <methods>
+            <method name="Decode" signature="(DotNetty.Transport.Channels.IChannelHandlerContext,DotNetty.Buffers.IByteBuffer,System.Collections.Generic.List`1&lt;System.Object&gt;)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="48" hits="24" branch="False" />
+                <line number="49" hits="22" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="10" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="51" hits="20" branch="False" />
+                <line number="53" hits="22" branch="False" />
+              </lines>
+            </method>
+            <method name="Decode" signature="(DotNetty.Transport.Channels.IChannelHandlerContext,DotNetty.Buffers.IByteBuffer)" line-rate="0.8332999999999999" branch-rate="0.8" complexity="10">
+              <lines>
+                <line number="61" hits="24" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="19" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="63" hits="1" branch="False" />
+                <line number="67" hits="23" branch="False" />
+                <line number="68" hits="23" branch="False" />
+                <line number="71" hits="22" branch="False" />
+                <line number="74" hits="22" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="79" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="76" hits="0" branch="False" />
+                <line number="77" hits="0" branch="False" />
+                <line number="80" hits="22" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="152" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="83" hits="1" branch="False" />
+                <line number="84" hits="1" branch="False" />
+                <line number="85" hits="1" branch="False" />
+                <line number="89" hits="21" branch="False" />
+                <line number="90" hits="21" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="257" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="92" hits="1" branch="False" />
+                <line number="96" hits="20" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="268" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="98" hits="0" branch="False" />
+                <line number="99" hits="0" branch="False" />
+                <line number="102" hits="20" branch="False" />
+                <line number="105" hits="20" branch="False" />
+                <line number="106" hits="20" branch="False" />
+                <line number="107" hits="20" branch="False" />
+                <line number="108" hits="20" branch="False" />
+                <line number="110" hits="20" branch="False" />
+              </lines>
+            </method>
+            <method name="GetFrameLength" signature="(DotNetty.Buffers.IByteBuffer,System.Int32,System.Int32)" line-rate="1" branch-rate="1" complexity="6">
+              <lines>
+                <line number="119" hits="23" branch="False" />
+                <line number="120" hits="218" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="113" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="122" hits="87" branch="False" />
+                <line number="123" hits="87" branch="True" condition-coverage="100% (4/4)">
+                  <conditions>
+                    <condition number="20" type="jump" coverage="100%" />
+                    <condition number="25" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="124" hits="1" branch="False" />
+                <line number="125" hits="1" branch="False" />
+                <line number="126" hits="86" branch="False" />
+                <line number="129" hits="22" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="32" hits="41" branch="False" />
+                <line number="33" hits="41" branch="False" />
+                <line number="34" hits="41" branch="False" />
+                <line number="35" hits="41" branch="False" />
+                <line number="36" hits="41" branch="False" />
+                <line number="37" hits="41" branch="False" />
+                <line number="39" hits="41" branch="False" />
+                <line number="40" hits="41" branch="False" />
+                <line number="41" hits="41" branch="False" />
+                <line number="42" hits="41" branch="False" />
+                <line number="43" hits="41" branch="False" />
+                <line number="44" hits="41" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="48" hits="24" branch="False" />
+            <line number="49" hits="22" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="10" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="51" hits="20" branch="False" />
+            <line number="53" hits="22" branch="False" />
+            <line number="61" hits="24" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="19" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="63" hits="1" branch="False" />
+            <line number="67" hits="23" branch="False" />
+            <line number="68" hits="23" branch="False" />
+            <line number="71" hits="22" branch="False" />
+            <line number="74" hits="22" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="79" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="76" hits="0" branch="False" />
+            <line number="77" hits="0" branch="False" />
+            <line number="80" hits="22" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="152" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="83" hits="1" branch="False" />
+            <line number="84" hits="1" branch="False" />
+            <line number="85" hits="1" branch="False" />
+            <line number="89" hits="21" branch="False" />
+            <line number="90" hits="21" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="257" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="92" hits="1" branch="False" />
+            <line number="96" hits="20" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="268" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="98" hits="0" branch="False" />
+            <line number="99" hits="0" branch="False" />
+            <line number="102" hits="20" branch="False" />
+            <line number="105" hits="20" branch="False" />
+            <line number="106" hits="20" branch="False" />
+            <line number="107" hits="20" branch="False" />
+            <line number="108" hits="20" branch="False" />
+            <line number="110" hits="20" branch="False" />
+            <line number="119" hits="23" branch="False" />
+            <line number="120" hits="218" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="113" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="122" hits="87" branch="False" />
+            <line number="123" hits="87" branch="True" condition-coverage="100% (4/4)">
+              <conditions>
+                <condition number="20" type="jump" coverage="100%" />
+                <condition number="25" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="124" hits="1" branch="False" />
+            <line number="125" hits="1" branch="False" />
+            <line number="126" hits="86" branch="False" />
+            <line number="129" hits="22" branch="False" />
+            <line number="32" hits="41" branch="False" />
+            <line number="33" hits="41" branch="False" />
+            <line number="34" hits="41" branch="False" />
+            <line number="35" hits="41" branch="False" />
+            <line number="36" hits="41" branch="False" />
+            <line number="37" hits="41" branch="False" />
+            <line number="39" hits="41" branch="False" />
+            <line number="40" hits="41" branch="False" />
+            <line number="41" hits="41" branch="False" />
+            <line number="42" hits="41" branch="False" />
+            <line number="43" hits="41" branch="False" />
+            <line number="44" hits="41" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Metrics.NullIso8583Metrics" filename="Iso8583.Common/Metrics/NullIso8583Metrics.cs" line-rate="1" branch-rate="1" complexity="7">
+          <methods>
+            <method name="MessageSent" signature="(System.Int32)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="12" hits="23" branch="False" />
+              </lines>
+            </method>
+            <method name="MessageReceived" signature="(System.Int32)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="13" hits="19" branch="False" />
+              </lines>
+            </method>
+            <method name="MessageHandled" signature="(System.Int32,System.TimeSpan)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="14" hits="21" branch="False" />
+              </lines>
+            </method>
+            <method name="MessageError" signature="(System.Int32,System.Exception)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="ConnectionEstablished" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="16" hits="33" branch="False" />
+              </lines>
+            </method>
+            <method name="ConnectionLost" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="17" hits="36" branch="False" />
+              </lines>
+            </method>
+            <method name=".cctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="10" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="12" hits="23" branch="False" />
+            <line number="13" hits="19" branch="False" />
+            <line number="14" hits="21" branch="False" />
+            <line number="15" hits="2" branch="False" />
+            <line number="16" hits="33" branch="False" />
+            <line number="17" hits="36" branch="False" />
+            <line number="10" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Iso.IsoMessageFactory`1" filename="Iso8583.Common/Iso/IsoMessageFactory.cs" line-rate="0.7857" branch-rate="1" complexity="8">
+          <methods>
+            <method name="NewMessage" signature="(System.Int32)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="33" hits="21" branch="False" />
+              </lines>
+            </method>
+            <method name="NewMessage" signature="(Iso8583.Common.Iso.MessageClass,Iso8583.Common.Iso.MessageFunction,Iso8583.Common.Iso.MessageOrigin)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="38" hits="8" branch="False" />
+                <line number="39" hits="8" branch="False" />
+              </lines>
+            </method>
+            <method name="CreateResponse" signature="(T)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="43" hits="11" branch="False" />
+              </lines>
+            </method>
+            <method name="CreateResponse" signature="(T,System.Boolean)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="46" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="ParseMessage" signature="(System.Byte[],System.Int32,System.Boolean)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="52" hits="21" branch="False" />
+                <line number="53" hits="21" branch="False" />
+              </lines>
+            </method>
+            <method name="DefaultMessageFactory" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="60" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(NetCore8583.MessageFactory`1&lt;T&gt;,Iso8583.Common.Iso.Iso8583Version)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="18" hits="61" branch="False" />
+                <line number="20" hits="61" branch="False" />
+                <line number="21" hits="61" branch="False" />
+                <line number="22" hits="61" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Iso.Iso8583Version)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="28" hits="0" branch="False" />
+                <line number="30" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="33" hits="21" branch="False" />
+            <line number="38" hits="8" branch="False" />
+            <line number="39" hits="8" branch="False" />
+            <line number="43" hits="11" branch="False" />
+            <line number="46" hits="1" branch="False" />
+            <line number="52" hits="21" branch="False" />
+            <line number="53" hits="21" branch="False" />
+            <line number="60" hits="0" branch="False" />
+            <line number="18" hits="61" branch="False" />
+            <line number="20" hits="61" branch="False" />
+            <line number="21" hits="61" branch="False" />
+            <line number="22" hits="61" branch="False" />
+            <line number="28" hits="0" branch="False" />
+            <line number="30" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Common.Iso.MTI" filename="Iso8583.Common/Iso/MTI.cs" line-rate="1" branch-rate="1" complexity="2">
+          <methods>
+            <method name="Value" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="33" hits="15" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Iso.Iso8583Version,Iso8583.Common.Iso.MessageClass,Iso8583.Common.Iso.MessageFunction,Iso8583.Common.Iso.MessageOrigin)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="20" hits="15" branch="False" />
+                <line number="21" hits="15" branch="False" />
+                <line number="23" hits="15" branch="False" />
+                <line number="24" hits="15" branch="False" />
+                <line number="25" hits="15" branch="False" />
+                <line number="26" hits="15" branch="False" />
+                <line number="27" hits="15" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="33" hits="15" branch="False" />
+            <line number="20" hits="15" branch="False" />
+            <line number="21" hits="15" branch="False" />
+            <line number="23" hits="15" branch="False" />
+            <line number="24" hits="15" branch="False" />
+            <line number="25" hits="15" branch="False" />
+            <line number="26" hits="15" branch="False" />
+            <line number="27" hits="15" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+    <package name="Iso8583.Server" line-rate="0.88" branch-rate="0.9444" complexity="29">
+      <classes>
+        <class name="Iso8583.Server.Iso8583Server`1" filename="Iso8583.Server/Iso8583Server.cs" line-rate="1" branch-rate="1" complexity="9">
+          <methods>
+            <method name="get_ActiveConnectionCount" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="75" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="get_ActiveConnections" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="80" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="CreateBootstrap" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="84" hits="24" branch="False" />
+                <line number="85" hits="24" branch="False" />
+                <line number="86" hits="24" branch="False" />
+                <line number="87" hits="24" branch="False" />
+                <line number="88" hits="24" branch="False" />
+                <line number="89" hits="24" branch="False" />
+                <line number="90" hits="24" branch="False" />
+                <line number="91" hits="24" branch="False" />
+                <line number="92" hits="24" branch="False" />
+                <line number="93" hits="24" branch="False" />
+                <line number="94" hits="24" branch="False" />
+                <line number="95" hits="24" branch="False" />
+                <line number="96" hits="24" branch="False" />
+                <line number="97" hits="24" branch="False" />
+                <line number="98" hits="24" branch="False" />
+                <line number="99" hits="24" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Int32,Iso8583.Server.ServerConfiguration,Iso8583.Common.Iso.IMessageFactory`1&lt;T&gt;,Microsoft.Extensions.Logging.ILogger,Iso8583.Server.IServerConnectorConfigurator`1&lt;Iso8583.Server.ServerConfiguration&gt;,Iso8583.Common.Metrics.IIso8583Metrics)" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="43" hits="25" branch="False" />
+                <line number="44" hits="25" branch="False" />
+                <line number="46" hits="25" branch="False" />
+                <line number="47" hits="25" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="19" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="48" hits="25" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="36" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="49" hits="25" branch="False" />
+                <line number="50" hits="25" branch="False" />
+                <line number="51" hits="25" branch="False" />
+                <line number="52" hits="25" branch="False" />
+                <line number="53" hits="25" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Int32,Iso8583.Common.Iso.IMessageFactory`1&lt;T&gt;,Microsoft.Extensions.Logging.ILogger)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="61" hits="1" branch="False" />
+                <line number="62" hits="1" branch="False" />
+                <line number="64" hits="1" branch="False" />
+                <line number="65" hits="1" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="22" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="66" hits="1" branch="False" />
+                <line number="67" hits="1" branch="False" />
+                <line number="68" hits="1" branch="False" />
+                <line number="69" hits="1" branch="False" />
+                <line number="70" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="75" hits="2" branch="False" />
+            <line number="80" hits="1" branch="False" />
+            <line number="84" hits="24" branch="False" />
+            <line number="85" hits="24" branch="False" />
+            <line number="86" hits="24" branch="False" />
+            <line number="87" hits="24" branch="False" />
+            <line number="88" hits="24" branch="False" />
+            <line number="89" hits="24" branch="False" />
+            <line number="90" hits="24" branch="False" />
+            <line number="91" hits="24" branch="False" />
+            <line number="92" hits="24" branch="False" />
+            <line number="93" hits="24" branch="False" />
+            <line number="94" hits="24" branch="False" />
+            <line number="95" hits="24" branch="False" />
+            <line number="96" hits="24" branch="False" />
+            <line number="97" hits="24" branch="False" />
+            <line number="98" hits="24" branch="False" />
+            <line number="99" hits="24" branch="False" />
+            <line number="43" hits="25" branch="False" />
+            <line number="44" hits="25" branch="False" />
+            <line number="46" hits="25" branch="False" />
+            <line number="47" hits="25" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="19" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="48" hits="25" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="36" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="49" hits="25" branch="False" />
+            <line number="50" hits="25" branch="False" />
+            <line number="51" hits="25" branch="False" />
+            <line number="52" hits="25" branch="False" />
+            <line number="53" hits="25" branch="False" />
+            <line number="61" hits="1" branch="False" />
+            <line number="62" hits="1" branch="False" />
+            <line number="64" hits="1" branch="False" />
+            <line number="65" hits="1" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="22" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="66" hits="1" branch="False" />
+            <line number="67" hits="1" branch="False" />
+            <line number="68" hits="1" branch="False" />
+            <line number="69" hits="1" branch="False" />
+            <line number="70" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Server.Iso8583Server`1/&lt;DisposeAsync&gt;d__15" filename="Iso8583.Server/Iso8583Server.cs" line-rate="0.7777" branch-rate="1" complexity="4">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="0.7777" branch-rate="1" complexity="4">
+              <lines>
+                <line number="146" hits="6" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="25" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="147" hits="4" branch="False" />
+                <line number="151" hits="4" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="51" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="152" hits="2" branch="False" />
+                <line number="153" hits="4" branch="False" />
+                <line number="154" hits="0" branch="False" />
+                <line number="157" hits="0" branch="False" />
+                <line number="159" hits="4" branch="False" />
+                <line number="160" hits="5" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="146" hits="6" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="25" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="147" hits="4" branch="False" />
+            <line number="151" hits="4" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="51" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="152" hits="2" branch="False" />
+            <line number="153" hits="4" branch="False" />
+            <line number="154" hits="0" branch="False" />
+            <line number="157" hits="0" branch="False" />
+            <line number="159" hits="4" branch="False" />
+            <line number="160" hits="5" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Server.Iso8583Server`1/&lt;Shutdown&gt;d__13" filename="Iso8583.Server/Iso8583Server.cs" line-rate="0" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="122" hits="0" branch="False" />
+                <line number="123" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="122" hits="0" branch="False" />
+            <line number="123" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Server.Iso8583Server`1/&lt;Shutdown&gt;d__14" filename="Iso8583.Server/Iso8583Server.cs" line-rate="1" branch-rate="1" complexity="2">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="131" hits="24" branch="False" />
+                <line number="132" hits="24" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="58" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="134" hits="24" branch="False" />
+                <line number="135" hits="24" branch="False" />
+                <line number="136" hits="24" branch="False" />
+                <line number="139" hits="24" branch="False" />
+                <line number="140" hits="24" branch="False" />
+                <line number="141" hits="24" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="131" hits="24" branch="False" />
+            <line number="132" hits="24" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="58" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="134" hits="24" branch="False" />
+            <line number="135" hits="24" branch="False" />
+            <line number="136" hits="24" branch="False" />
+            <line number="139" hits="24" branch="False" />
+            <line number="140" hits="24" branch="False" />
+            <line number="141" hits="24" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Server.Iso8583Server`1/&lt;Start&gt;d__12" filename="Iso8583.Server/Iso8583Server.cs" line-rate="1" branch-rate="1" complexity="4">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="4">
+              <lines>
+                <line number="107" hits="25" branch="False" />
+                <line number="109" hits="24" branch="False" />
+                <line number="110" hits="24" branch="False" />
+                <line number="111" hits="24" branch="False" />
+                <line number="113" hits="24" branch="True" condition-coverage="100% (4/4)">
+                  <conditions>
+                    <condition number="159" type="jump" coverage="100%" />
+                    <condition number="167" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="114" hits="24" branch="False" />
+                <line number="115" hits="24" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="107" hits="25" branch="False" />
+            <line number="109" hits="24" branch="False" />
+            <line number="110" hits="24" branch="False" />
+            <line number="111" hits="24" branch="False" />
+            <line number="113" hits="24" branch="True" condition-coverage="100% (4/4)">
+              <conditions>
+                <condition number="159" type="jump" coverage="100%" />
+                <condition number="167" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="114" hits="24" branch="False" />
+            <line number="115" hits="24" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Server.ServerConfiguration" filename="Iso8583.Server/ServerConfiguration.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="get_MaxConnections" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="13" hits="71" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="13" hits="71" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Server.ServerConnector`2" filename="Iso8583.Server/ServerConnector.cs" line-rate="0.6666" branch-rate="0.5" complexity="6">
+          <methods>
+            <method name="get_ConnectorConfigurator" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="44" hits="73" branch="False" />
+              </lines>
+            </method>
+            <method name="GetBootstrap" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="48" hits="24" branch="False" />
+              </lines>
+            </method>
+            <method name="ConfigureBootstrap" signature="(DotNetty.Transport.Bootstrapping.ServerBootstrap)" line-rate="0.6666" branch-rate="0.5" complexity="2">
+              <lines>
+                <line number="56" hits="24" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="7" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="57" hits="24" branch="False" />
+                <line number="58" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Netty.Pipelines.CompositeIsoMessageHandler`1&lt;T&gt;,Iso8583.Common.Iso.IMessageFactory`1&lt;T&gt;,TC)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="26" hits="0" branch="False" />
+                <line number="28" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Iso8583.Common.Iso.IMessageFactory`1&lt;T&gt;,TC)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="36" hits="26" branch="False" />
+                <line number="38" hits="26" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="44" hits="73" branch="False" />
+            <line number="48" hits="24" branch="False" />
+            <line number="56" hits="24" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="7" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="57" hits="24" branch="False" />
+            <line number="58" hits="0" branch="False" />
+            <line number="26" hits="0" branch="False" />
+            <line number="28" hits="0" branch="False" />
+            <line number="36" hits="26" branch="False" />
+            <line number="38" hits="26" branch="False" />
+          </lines>
+        </class>
+        <class name="Iso8583.Server.ServerConnectorConfigurator" filename="Iso8583.Server/ServerConnectorConfigurator.cs" line-rate="0" branch-rate="1" complexity="2">
+          <methods>
+            <method name="ConfigureBootstrap" signature="(DotNetty.Transport.Bootstrapping.ServerBootstrap,Iso8583.Server.ServerConfiguration)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="14" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="ConfigurePipeline" signature="(DotNetty.Transport.Channels.IChannelPipeline,Iso8583.Server.ServerConfiguration)" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="19" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="14" hits="0" branch="False" />
+            <line number="19" hits="0" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+  </packages>
+</coverage>

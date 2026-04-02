@@ -1,3 +1,17 @@
+// Copyright 2021-2026 Arsene Tochemey Gandote
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using DotNetty.Transport.Channels;
 using Iso8583.Common.Iso;
 using Iso8583.Common.Netty.Pipelines;
@@ -21,6 +35,7 @@ namespace Iso8583.Common
       IMessageFactory<T> messageFactory,
       TC configuration)
     {
+      configuration.Validate();
       MessageHandler = messageHandler;
       MessageFactory = messageFactory;
       Configuration = configuration;
@@ -36,6 +51,7 @@ namespace Iso8583.Common
     protected Iso8583Connector(IMessageFactory<T> messageFactory,
       TC configuration)
     {
+      configuration.Validate();
       MessageHandler = new CompositeIsoMessageHandler<T>();
       MessageFactory = messageFactory;
       Configuration = configuration;
@@ -70,20 +86,19 @@ namespace Iso8583.Common
     protected MultithreadEventLoopGroup WorkerEventLoopGroup { get; private set; }
 
     /// <summary>
-    ///   creates the boss worker thread group
+    ///   creates the boss event loop group (acceptor threads for server)
     /// </summary>
-    /// <returns></returns>
     protected void CreateBossEventLoopGroup()
     {
-      WorkerEventLoopGroup = new MultithreadEventLoopGroup();
+      BossEventLoopGroup = new MultithreadEventLoopGroup();
     }
 
     /// <summary>
-    ///   creates the worker threads group
+    ///   creates the worker event loop group (I/O threads)
     /// </summary>
     protected void CreateWorkerEventLoopGroup()
     {
-      BossEventLoopGroup = new MultithreadEventLoopGroup(Configuration.WorkerThreadCount);
+      WorkerEventLoopGroup = new MultithreadEventLoopGroup(Configuration.WorkerThreadCount);
     } 
 
     /// <summary>

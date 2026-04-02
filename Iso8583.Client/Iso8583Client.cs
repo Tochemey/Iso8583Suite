@@ -1,3 +1,17 @@
+// Copyright 2021-2026 Arsene Tochemey Gandote
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
 using System.Net;
 using System.Threading;
@@ -15,30 +29,33 @@ namespace Iso8583.Client
   ///   An instance of this class will help bootstrap an iso 8583 client
   /// </summary>
   /// <typeparam name="T"></typeparam>
-  public class Iso8583Client<T> : ClientConnector<T, ClientConfiguration>, ISend where T : IsoMessage
+  public class Iso8583Client<T> : ClientConnector<T, ClientConfiguration>, ISend, IAsyncDisposable
+    where T : IsoMessage
   {
-    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
+    private readonly SemaphoreSlim _reconnectLock = new(1, 1);
+    private readonly PendingRequestManager<T> _pendingRequests = new();
 
-    /// <summary>
-    ///   server address
-    /// </summary>
     private string _host;
-
-    /// <summary>
-    ///   server port
-    /// </summary>
     private int _port;
+    private volatile bool _intentionalDisconnect;
+    private volatile bool _disposed;
+    private ReconnectOnCloseHandler _reconnectHandler;
 
     /// <summary>
     ///   creates a new instance of <see cref="Iso8583Client{T}" />
     /// </summary>
-    /// <param name="configuration"></param>
-    /// <param name="messageFactory"></param>
+    /// <param name="configuration">the client configuration</param>
+    /// <param name="messageFactory">the message factory</param>
+    /// <param name="configurator">optional pipeline/bootstrap configurator</param>
     public Iso8583Client(ClientConfiguration configuration,
-      IMessageFactory<T> messageFactory) : base(
+      IMessageFactory<T> messageFactory,
+      IClientConnectorConfigurator<ClientConfiguration> configurator = null) : base(
       messageFactory, configuration)
     {
-      CreateBossEventLoopGroup();
+      ConnectorConfigurator = configurator;
+      // Add correlation listener first so it gets first crack at responses
+      MessageHandler.AddListener(_pendingRequests);
+      CreateWorkerEventLoopGroup();
     }
 
     /// <summary>
@@ -47,46 +64,84 @@ namespace Iso8583.Client
     /// <param name="messageFactory">the message factory</param>
     public Iso8583Client(IMessageFactory<T> messageFactory) : base(messageFactory, new ClientConfiguration())
     {
-      CreateBossEventLoopGroup();
+      MessageHandler.AddListener(_pendingRequests);
+      CreateWorkerEventLoopGroup();
     }
 
     /// <inheritdoc />
     public async Task Send(IsoMessage message)
     {
-      // get the connection channel
-      var channel = GetChannel();
+      ThrowIfDisposed();
+      var channel = GetChannel()
+                    ?? throw new InvalidOperationException("Client is not connected");
 
-      // send the message when the channel is writable
-      if (channel is { IsWritable: true }) await channel.WriteAndFlushAsync(message);
+      if (!channel.IsWritable)
+        throw new InvalidOperationException("Channel is not writable (backpressure)");
+
+      await channel.WriteAndFlushAsync(message);
     }
 
     /// <inheritdoc />
     public async Task Send(IsoMessage message, int timeout)
     {
-      var cts = new CancellationTokenSource();
-      using (cts)
+      ThrowIfDisposed();
+      var channel = GetChannel()
+                    ?? throw new InvalidOperationException("Client is not connected");
+
+      if (!channel.IsWritable)
+        throw new InvalidOperationException("Channel is not writable (backpressure)");
+
+      var sendTask = channel.WriteAndFlushAsync(message);
+      var completedTask = await Task.WhenAny(sendTask, Task.Delay(timeout));
+      if (completedTask != sendTask)
+        throw new TimeoutException($"Send operation timed out after {timeout}ms");
+
+      await sendTask;
+    }
+
+    /// <inheritdoc />
+    public async Task<IsoMessage> SendAndReceive(IsoMessage message, TimeSpan timeout,
+      CancellationToken cancellationToken = default)
+    {
+      ThrowIfDisposed();
+
+      // Register the pending request before sending (so we don't miss a fast response)
+      var responseTask = _pendingRequests.RegisterPending((T)message, timeout, cancellationToken);
+
+      try
       {
-        try
-        {
-          cts.CancelAfter(TimeSpan.FromMilliseconds(timeout));
-          await Send(message);
-        }
-        catch (Exception e)
-        {
-          // TODO better logging
-          Console.WriteLine(e);
-        }
+        await Send(message);
       }
+      catch
+      {
+        // If send fails, cancel the pending registration
+        _pendingRequests.CancelAll();
+        throw;
+      }
+
+      return await responseTask;
     }
 
     private Bootstrap CreateBootstrap()
     {
+      // Create reconnect handler if auto-reconnect is enabled
+      if (Configuration.AutoReconnect)
+      {
+        _reconnectHandler = new ReconnectOnCloseHandler(
+          TryReconnect,
+          Configuration.ReconnectInterval,
+          Configuration.MaxReconnectDelay,
+          Configuration.MaxReconnectAttempts
+        );
+      }
+
       var bootstrap = new Bootstrap();
       bootstrap.Group(WorkerEventLoopGroup);
       bootstrap.Channel<TcpSocketChannel>();
       bootstrap.Handler(new Iso8583ChannelInitializer<ClientConfiguration>(
         Configuration, ConnectorConfigurator, WorkerEventLoopGroup,
-        MessageFactory as IMessageFactory<IsoMessage>, MessageHandler
+        MessageFactory as IMessageFactory<IsoMessage>, MessageHandler,
+        _reconnectHandler
       ));
 
       ConfigureBootstrap(bootstrap);
@@ -94,23 +149,34 @@ namespace Iso8583.Client
       return bootstrap;
     }
 
-
     /// <summary>
     ///   connects to the iso8583 server
     /// </summary>
-    /// <param name="host">the iso server host</param>
+    /// <param name="host">the iso server host (IP address or hostname)</param>
     /// <param name="port">the iso server port</param>
     public async Task Connect(string host, int port)
     {
-      // set the client bootstrap
-      Bootstrap = CreateBootstrap();
-      
-      // bind to socket and set the connection channel
-      var ipAddress = IPAddress.Parse(host);
-      var channel = await GetBootstrap().ConnectAsync(new IPEndPoint(ipAddress, port));
-      SetChannel(channel);
+      ThrowIfDisposed();
+      _intentionalDisconnect = false;
       _host = host;
       _port = port;
+
+      Bootstrap = CreateBootstrap();
+
+      // resolve host to IP address (supports both IP and DNS hostnames)
+      if (!IPAddress.TryParse(host, out var ipAddress))
+      {
+        var addresses = await Dns.GetHostAddressesAsync(host);
+        if (addresses.Length == 0)
+          throw new ArgumentException($"Cannot resolve hostname: {host}");
+        ipAddress = addresses[0];
+      }
+
+      var channel = await GetBootstrap().ConnectAsync(new IPEndPoint(ipAddress, port));
+      SetChannel(channel);
+
+      // Reset reconnect counter on successful connection
+      _reconnectHandler?.ResetAttempts();
     }
 
     /// <summary>
@@ -118,38 +184,66 @@ namespace Iso8583.Client
     /// </summary>
     public async Task Disconnect()
     {
+      _intentionalDisconnect = true;
+      _pendingRequests.CancelAll();
       var channel = GetChannel();
-      await channel.CloseAsync();
+      if (channel != null)
+        await channel.CloseAsync();
       await WorkerEventLoopGroup.ShutdownGracefullyAsync();
     }
 
     /// <summary>
     ///   checks whether the client is connected to the iso8583 server
     /// </summary>
-    /// <returns></returns>
     public bool IsConnected()
     {
       var channel = GetChannel();
       return channel is { IsActive: true };
     }
 
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+      if (_disposed) return;
+      _disposed = true;
+
+      try
+      {
+        await Disconnect();
+      }
+      catch
+      {
+        // Best effort cleanup
+      }
+
+      _reconnectLock.Dispose();
+      GC.SuppressFinalize(this);
+    }
+
     /// <summary>
-    ///   try reconnect back when the connection is closed
+    ///   Attempts to reconnect to the server. Called by <see cref="ReconnectOnCloseHandler"/>.
     /// </summary>
     private async Task TryReconnect()
     {
-      if (IsChannelInactive())
+      if (_intentionalDisconnect || _disposed) return;
+
+      await _reconnectLock.WaitAsync();
+      try
       {
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-          if (IsChannelInactive()) await Connect(_host, _port);
-        }
-        finally
-        {
-          _semaphoreSlim.Release();
-        }
+        if (_intentionalDisconnect || _disposed) return;
+        if (!IsChannelInactive()) return;
+
+        await Connect(_host, _port);
       }
+      finally
+      {
+        _reconnectLock.Release();
+      }
+    }
+
+    private void ThrowIfDisposed()
+    {
+      ObjectDisposedException.ThrowIf(_disposed, this);
     }
   }
 }

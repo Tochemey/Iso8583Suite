@@ -1,0 +1,14 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Iso8583.Benchmarks/Iso8583.Benchmarks.csproj" />
+  <Project Path="Iso8583.Client/Iso8583.Client.csproj" />
+  <Project Path="Iso8583.Common/Iso8583.Common.csproj" />
+  <Project Path="Iso8583.Server/Iso8583.Server.csproj" />
+  <Project Path="Iso8583.Tests/Iso8583.Tests.csproj" />
+  <Project Path="SampleClient/SampleClient.csproj" />
+  <Project Path="SampleServer/SampleServer.csproj" />
+</Solution>

@@ -1,0 +1,54 @@
+Summary
+  Generated on: 03/04/2026 - 00:47:04
+  Coverage date: 03/04/2026 - 00:46:57
+  Parser: Cobertura
+  Assemblies: 3
+  Classes: 28
+  Files: 28
+  Line coverage: 86.1%
+  Covered lines: 671
+  Uncovered lines: 108
+  Coverable lines: 779
+  Total lines: 2401
+  Branch coverage: 74.4% (192 of 258)
+  Covered branches: 192
+  Total branches: 258
+  Method coverage: 90.1% (155 of 172)
+  Full method coverage: 80.8% (139 of 172)
+  Covered methods: 155
+  Fully covered methods: 139
+  Total methods: 172
+
+Iso8583.Client                                                       80%
+  Iso8583.Client.ClientConfiguration                               94.7%
+  Iso8583.Client.ClientConnector<T1, T2>                           78.5%
+  Iso8583.Client.ClientConnectorConfigurator                          0%
+  Iso8583.Client.Iso8583Client<T>                                  70.7%
+  Iso8583.Client.PendingRequestManager<T>                           100%
+
+Iso8583.Common                                                     87.9%
+  Iso8583.Common.AtomicReference<T>                                 100%
+  Iso8583.Common.ConnectorConfiguration                             100%
+  Iso8583.Common.Iso.IsoMessageFactory<T>                          78.5%
+  Iso8583.Common.Iso.MTI                                            100%
+  Iso8583.Common.Iso8583Connector<T1, T2>                          62.1%
+  Iso8583.Common.Iso8583Fields                                       90%
+  Iso8583.Common.Metrics.NullIso8583Metrics                         100%
+  Iso8583.Common.Netty.Codecs.IsoMessageDecoder                     100%
+  Iso8583.Common.Netty.Codecs.IsoMessageEncoder                     100%
+  Iso8583.Common.Netty.Codecs.StringLengthFieldBasedFrameDecoder   91.6%
+  Iso8583.Common.Netty.Pipelines.CompositeIsoMessageHandler<T>     91.4%
+  Iso8583.Common.Netty.Pipelines.ConnectionTracker                  100%
+  Iso8583.Common.Netty.Pipelines.EchoMessageListener<T>             100%
+  Iso8583.Common.Netty.Pipelines.IdleEventHandler                  18.1%
+  Iso8583.Common.Netty.Pipelines.Iso8583ChannelInitializer<T>      82.6%
+  Iso8583.Common.Netty.Pipelines.IsoMessageLoggingHandler          87.7%
+  Iso8583.Common.Netty.Pipelines.ParseExceptionHandler              100%
+  Iso8583.Common.Netty.Pipelines.ReconnectOnCloseHandler           78.7%
+  Iso8583.Common.SslConfiguration                                   100%
+
+Iso8583.Server                                                       88%
+  Iso8583.Server.Iso8583Server<T>                                  93.6%
+  Iso8583.Server.ServerConfiguration                                100%
+  Iso8583.Server.ServerConnector<T1, T2>                           66.6%
+  Iso8583.Server.ServerConnectorConfigurator                          0%

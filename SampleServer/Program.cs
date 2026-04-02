@@ -1,4 +1,18 @@
-﻿using System;
+// Copyright 2021-2026 Arsene Tochemey Gandote
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,11 +20,11 @@ using DotNetty.Transport.Channels;
 using Iso8583.Common;
 using Iso8583.Common.Iso;
 using Iso8583.Server;
+using Microsoft.Extensions.Logging;
 using NetCore8583;
 using NetCore8583.Parse;
-using Serilog;
-using Serilog.Core;
-using Serilog.Events;
+using NLog.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace SampleServer
 {
@@ -18,58 +32,61 @@ namespace SampleServer
   {
     private static IsoMessage _receivedMessage;
 
-    private static readonly Logger _logger = new LoggerConfiguration().MinimumLevel.Debug()
-      .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
-      .Enrich.FromLogContext()
-      .WriteTo.Console().CreateLogger();
+    private static readonly ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
+      builder.AddNLog());
+
+    private static readonly ILogger _logger = _loggerFactory.CreateLogger<Program>();
 
     private static async Task Main(string[] args)
     {
       try
       {
         const int isoServerPort = 9000;
-        // create a message factory
+        // create a message factory and load parse/template definitions from n8583.xml
         var mfact = ConfigParser.CreateDefault();
+        ConfigParser.ConfigureFromClasspathConfig(mfact, "n8583.xml");
         mfact.UseBinaryMessages = false;
         mfact.Encoding = Encoding.ASCII;
-      
+
         // let us create a message factory
-        var messageFactory = new IsoMessageFactory<IsoMessage>(mfact,Iso8583Version.V1987);
+        var messageFactory = new IsoMessageFactory<IsoMessage>(mfact, Iso8583Version.V1987);
 
         // let us configure the server
         var serverConfig = new ServerConfiguration
         {
           LogSensitiveData = true,
           ReplyOnError = true,
-          AddLoggingHandler = true
+          AddLoggingHandler = true,
+          EncodeFrameLengthAsString = true,
+          FrameLengthFieldLength = 4
         };
 
-        // let us create the iso server providing port to bind to, ServerConfiguration, and MessageFactory
-        var server = new Iso8583Server<IsoMessage>(isoServerPort, serverConfig, messageFactory, _logger);
+        // create the iso server providing port to bind to, ServerConfiguration, and MessageFactory
+        var serverLogger = _loggerFactory.CreateLogger<Iso8583Server<IsoMessage>>();
+        var server = new Iso8583Server<IsoMessage>(isoServerPort, serverConfig, messageFactory, serverLogger);
 
         // let us add some custom listener
         server.AddMessageListener(new CustomListener(messageFactory));
 
-        // starts server 
+        // starts server
         await server.Start();
 
         // check the server has started
         if (server.IsStarted())
-          _logger.Information("server started ready to handle requests");
+        {
+          _logger.LogInformation("server started ready to handle requests");
           // let us wait for request to come
           while (_receivedMessage == null)
             Thread.Sleep(100);
+        }
 
         // stop the server
         await server.Shutdown();
       }
       catch (Exception e)
       {
-        Console.WriteLine(e);
+        _logger.LogError(e, "Server error");
       }
-
-      // close the program on a key pressed
-      Console.ReadKey();
     }
 
     private class CustomListener : IIsoMessageListener<IsoMessage>
@@ -80,14 +97,8 @@ namespace SampleServer
 
       public bool CanHandleMessage(IsoMessage isoMessage) => (int)isoMessage.Type == 0x1100;
 
-      public bool HandleMessage(IChannelHandlerContext context, IsoMessage isoMessage)
+      public async Task<bool> HandleMessage(IChannelHandlerContext context, IsoMessage isoMessage)
       {
-        var t = isoMessage.Type.ToString("X4");
-        // TODO remove this line when debugging is done
-        Console.WriteLine($"{this.GetType()} handling message type {t}");
-        
-        // cache the received message
-        _receivedMessage = isoMessage;
         var response = _messageFactory.CreateResponse(isoMessage);
         var field2 = isoMessage.GetField(2);
         var pan = field2.Value as string;
@@ -97,8 +108,10 @@ namespace SampleServer
         response.SetField(39, new IsoValue(IsoType.NUMERIC, "000", 3));
         if (pan != null && pan.StartsWith("5")) // MasterCard
           response.SetField(15, new IsoValue(IsoType.DATE6, new DateTime()));
-        // just for sample purpose
-        context.WriteAndFlushAsync(response).RunSynchronously();
+
+        await context.WriteAndFlushAsync(response);
+        // signal that we've handled the message (after response is sent)
+        _receivedMessage = isoMessage;
         return false;
       }
     }
