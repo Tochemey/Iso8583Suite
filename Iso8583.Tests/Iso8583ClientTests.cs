@@ -31,7 +31,7 @@ public class Iso8583ClientTests : IAsyncLifetime
 {
     private Iso8583Server<IsoMessage> _server = null!;
     private IsoMessageFactory<IsoMessage> _factory = null!;
-    private static readonly int Port = new Random().Next(30000, 40000);
+    private static readonly int Port = TestPorts.Next();
 
     public async Task InitializeAsync()
     {

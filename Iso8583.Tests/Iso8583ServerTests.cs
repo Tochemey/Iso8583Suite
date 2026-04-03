@@ -27,7 +27,6 @@ namespace Iso8583.Tests;
 public class Iso8583ServerTests
 {
     private readonly IsoMessageFactory<IsoMessage> _factory;
-    private static readonly int Port = new Random().Next(40000, 50000);
 
     public Iso8583ServerTests()
     {
@@ -41,7 +40,7 @@ public class Iso8583ServerTests
     [Fact]
     public async Task Start_And_Shutdown_Succeeds()
     {
-        var server = new Iso8583Server<IsoMessage>(Port, new ServerConfiguration(), _factory);
+        var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
         await server.Start();
         Assert.True(server.IsStarted());
         await server.Shutdown(TimeSpan.FromSeconds(1));
@@ -50,7 +49,7 @@ public class Iso8583ServerTests
     [Fact]
     public async Task Shutdown_WithGracePeriod_Completes()
     {
-        var server = new Iso8583Server<IsoMessage>(Port + 1, new ServerConfiguration(), _factory);
+        var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
         await server.Start();
         await server.Shutdown(TimeSpan.FromMilliseconds(100));
     }
@@ -58,7 +57,7 @@ public class Iso8583ServerTests
     [Fact]
     public async Task DisposeAsync_WhenStarted_ShutsDown()
     {
-        var server = new Iso8583Server<IsoMessage>(Port + 2, new ServerConfiguration(), _factory);
+        var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
         await server.Start();
         Assert.True(server.IsStarted());
         await server.DisposeAsync();
@@ -67,14 +66,14 @@ public class Iso8583ServerTests
     [Fact]
     public async Task DisposeAsync_WhenNotStarted_DoesNotThrow()
     {
-        var server = new Iso8583Server<IsoMessage>(Port + 3, new ServerConfiguration(), _factory);
+        var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
         await server.DisposeAsync();
     }
 
     [Fact]
     public async Task DisposeAsync_MultipleCalls_Safe()
     {
-        var server = new Iso8583Server<IsoMessage>(Port + 4, new ServerConfiguration(), _factory);
+        var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
         await server.Start();
         await server.DisposeAsync();
         await server.DisposeAsync(); // second call safe
@@ -83,7 +82,7 @@ public class Iso8583ServerTests
     [Fact]
     public async Task Start_AfterDispose_ThrowsObjectDisposed()
     {
-        var server = new Iso8583Server<IsoMessage>(Port + 5, new ServerConfiguration(), _factory);
+        var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
         await server.DisposeAsync();
         await Assert.ThrowsAsync<ObjectDisposedException>(async () => await server.Start());
     }
@@ -91,7 +90,7 @@ public class Iso8583ServerTests
     [Fact]
     public async Task ActiveConnectionCount_NoClients_IsZero()
     {
-        var server = new Iso8583Server<IsoMessage>(Port + 6, new ServerConfiguration(), _factory);
+        var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
         await server.Start();
         Assert.Equal(0, server.ActiveConnectionCount);
         Assert.NotNull(server.ActiveConnections);
@@ -102,7 +101,7 @@ public class Iso8583ServerTests
     public async Task Constructor_WithMetrics_DoesNotThrow()
     {
         var server = new Iso8583Server<IsoMessage>(
-            Port + 7, new ServerConfiguration(), _factory,
+            TestPorts.Next(), new ServerConfiguration(), _factory,
             metrics: NullIso8583Metrics.Instance);
         await server.Start();
         await server.Shutdown(TimeSpan.FromSeconds(1));
@@ -111,7 +110,7 @@ public class Iso8583ServerTests
     [Fact]
     public async Task Constructor_MinimalParams_UsesDefaults()
     {
-        var server = new Iso8583Server<IsoMessage>(Port + 8, _factory);
+        var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), _factory);
         await server.Start();
         Assert.True(server.IsStarted());
         await server.Shutdown(TimeSpan.FromSeconds(1));

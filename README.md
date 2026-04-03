@@ -1,6 +1,7 @@
 # Iso8583Suite
 
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Tochemey/Iso8583Suite/ci.yml)](https://github.com/Tochemey/Iso8583Suite/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/Tochemey/Iso8583Suite/branch/main/graph/badge.svg?token=y6tAbZa8VK)](https://codecov.io/gh/Tochemey/Iso8583Suite)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 A high-performance .NET TCP client and server library for [ISO 8583](https://en.wikipedia.org/wiki/ISO_8583) financial messaging, built on [NetCore8583](https://github.com/Tochemey/NetCore8583) and [SpanNetty](https://github.com/cuteant/SpanNetty).
