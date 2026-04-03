@@ -66,12 +66,12 @@ var messageFactory = new IsoMessageFactory<IsoMessage>(mfact, Iso8583Version.V19
 
 The Message Type Indicator is composed of four parts:
 
-| Position      | Enum              | Values                                                                                                                                                                                                                  |
-|---------------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 1 -- Version  | `Iso8583Version`  | `V1987` (0x0000), `V1993` (0x1000), `V2003` (0x2000), `NATIONAL` (0x8000), `PRIVATE` (0x9000)                                                                                                                           |
-| 2 -- Class    | `MessageClass`    | `AUTHORIZATION` (0x0100), `FINANCIAL` (0x0200), `FILE_ACTIONS` (0x0300), `REVERSAL_CHARGEBACK` (0x0400), `RECONCILIATION` (0x0500), `ADMINISTRATIVE` (0x0600), `FEE_COLLECTION` (0x0700), `NETWORK_MANAGEMENT` (0x0800) |
-| 3 -- Function | `MessageFunction` | `REQUEST` (0x0000), `REQUEST_RESPONSE` (0x0010), `ADVICE` (0x0020), `ADVICE_RESPONSE` (0x0030), `NOTIFICATION` (0x0040), `NOTIFICATION_ACK` (0x0050), `INSTRUCTION` (0x0060), `INSTRUCTION_ACK` (0x0070)                |
-| 4 -- Origin   | `MessageOrigin`   | `ACQUIRER` (0x0000), `ACQUIRER_REPEAT` (0x0001), `ISSUER` (0x0002), `ISSUER_REPEAT` (0x0003), `OTHER` (0x0004), `OTHER_REPEAT` (0x0005)                                                                                 |
+| Digit | Meaning          | Enum              | Values                                                                                                                                                                                                                  |
+|-------|------------------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1st   | ISO version      | `Iso8583Version`  | `V1987` (0x0000), `V1993` (0x1000), `V2003` (0x2000), `NATIONAL` (0x8000), `PRIVATE` (0x9000)                                                                                                                           |
+| 2nd   | Message class    | `MessageClass`    | `AUTHORIZATION` (0x0100), `FINANCIAL` (0x0200), `FILE_ACTIONS` (0x0300), `REVERSAL_CHARGEBACK` (0x0400), `RECONCILIATION` (0x0500), `ADMINISTRATIVE` (0x0600), `FEE_COLLECTION` (0x0700), `NETWORK_MANAGEMENT` (0x0800) |
+| 3rd   | Message function | `MessageFunction` | `REQUEST` (0x0000), `REQUEST_RESPONSE` (0x0010), `ADVICE` (0x0020), `ADVICE_RESPONSE` (0x0030), `NOTIFICATION` (0x0040), `NOTIFICATION_ACK` (0x0050), `INSTRUCTION` (0x0060), `INSTRUCTION_ACK` (0x0070)                |
+| 4th   | Message origin   | `MessageOrigin`   | `ACQUIRER` (0x0000), `ACQUIRER_REPEAT` (0x0001), `ISSUER` (0x0002), `ISSUER_REPEAT` (0x0003), `OTHER` (0x0004), `OTHER_REPEAT` (0x0005)                                                                                 |
 
 ```csharp
 // These are equivalent:
@@ -272,7 +272,7 @@ Both configurations call `Validate()` at construction time and throw `ArgumentEx
 - `MaxFrameLength` must be > 0
 - `IdleTimeout` must be >= 0
 - `WorkerThreadCount` must be >= 1
-- `FrameLengthFieldLength` must be 0--4
+- `FrameLengthFieldLength` must be 0-4
 - `FrameLengthFieldOffset` must be >= 0
 - `ReconnectInterval` must be > 0
 - `MaxReconnectDelay` must be > 0
