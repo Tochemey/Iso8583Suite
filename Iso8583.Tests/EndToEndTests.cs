@@ -139,8 +139,12 @@ public class EndToEndTests : IAsyncLifetime
     }
 
     [Fact]
-    public void Server_ActiveConnectionCount_IsOne()
+    public async Task Server_ActiveConnectionCount_IsOne()
     {
+        // Allow time for ChannelActive to fire on the server pipeline
+        for (var i = 0; i < 50 && _server.ActiveConnectionCount == 0; i++)
+            await Task.Delay(100);
+
         Assert.Equal(1, _server.ActiveConnectionCount);
     }
 
