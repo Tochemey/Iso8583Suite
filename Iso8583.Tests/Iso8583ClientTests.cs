@@ -50,6 +50,9 @@ public class Iso8583ClientTests : IAsyncLifetime
         _server = new Iso8583Server<IsoMessage>(Port, config, _factory);
         _server.AddMessageListener(new EchoBackListener(_factory));
         await _server.Start();
+
+        // Allow the server accept loop to fully start (needed on macOS CI)
+        await Task.Delay(200);
     }
 
     public async Task DisposeAsync()

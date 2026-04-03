@@ -52,6 +52,9 @@ public class EndToEndTests : IAsyncLifetime
         _server.AddMessageListener(new EchoBackListener(_factory));
         await _server.Start();
 
+        // Allow the server accept loop to fully start (needed on macOS CI)
+        await Task.Delay(200);
+
         var clientConfig = new ClientConfiguration
         {
             EncodeFrameLengthAsString = true,
