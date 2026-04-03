@@ -12,16 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Iso8583.Tests;
 
 /// <summary>
 ///   Allocates unique TCP ports for tests to avoid collisions across parallel test runs.
+///   Binds to port 0 so the OS assigns a guaranteed-free ephemeral port, avoiding
+///   cross-process collisions when multiple TFMs run simultaneously.
 /// </summary>
 internal static class TestPorts
 {
-    private static int _next = 30000;
-
-    public static int Next() => Interlocked.Increment(ref _next);
+    public static int Next()
+    {
+        var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+        return port;
+    }
 }

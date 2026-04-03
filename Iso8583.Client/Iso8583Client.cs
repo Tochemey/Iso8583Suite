@@ -75,8 +75,8 @@ namespace Iso8583.Client
       var channel = GetChannel()
                     ?? throw new InvalidOperationException("Client is not connected");
 
-      if (!channel.IsWritable)
-        throw new InvalidOperationException("Channel is not writable (backpressure)");
+      if (!channel.IsActive)
+        throw new InvalidOperationException("Channel is not active");
 
       await channel.WriteAndFlushAsync(message);
     }
@@ -88,8 +88,8 @@ namespace Iso8583.Client
       var channel = GetChannel()
                     ?? throw new InvalidOperationException("Client is not connected");
 
-      if (!channel.IsWritable)
-        throw new InvalidOperationException("Channel is not writable (backpressure)");
+      if (!channel.IsActive)
+        throw new InvalidOperationException("Channel is not active");
 
       var sendTask = channel.WriteAndFlushAsync(message);
       var completedTask = await Task.WhenAny(sendTask, Task.Delay(timeout));
@@ -104,6 +104,7 @@ namespace Iso8583.Client
       CancellationToken cancellationToken = default)
     {
       ThrowIfDisposed();
+      cancellationToken.ThrowIfCancellationRequested();
 
       // Register the pending request before sending (so we don't miss a fast response)
       var responseTask = _pendingRequests.RegisterPending((T)message, timeout, cancellationToken);
@@ -111,6 +112,11 @@ namespace Iso8583.Client
       try
       {
         await Send(message);
+      }
+      catch (Exception) when (cancellationToken.IsCancellationRequested)
+      {
+        _pendingRequests.CancelAll();
+        throw new OperationCanceledException(cancellationToken);
       }
       catch
       {
@@ -188,8 +194,24 @@ namespace Iso8583.Client
       _pendingRequests.CancelAll();
       var channel = GetChannel();
       if (channel != null)
-        await channel.CloseAsync();
-      await WorkerEventLoopGroup.ShutdownGracefullyAsync();
+      {
+        try { await channel.CloseAsync(); }
+        catch { /* best effort */ }
+      }
+
+      // Use a 1-second quiet period so the event loop stays alive long
+      // enough for any in-flight socket I/O completion callbacks that
+      // arrive after CloseAsync returns; this prevents an unhandled
+      // RejectedExecutionException on thread-pool threads.
+      try
+      {
+        await WorkerEventLoopGroup.ShutdownGracefullyAsync(
+          TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5));
+      }
+      catch
+      {
+        // Suppress event loop shutdown errors
+      }
     }
 
     /// <summary>
@@ -207,14 +229,8 @@ namespace Iso8583.Client
       if (_disposed) return;
       _disposed = true;
 
-      try
-      {
-        await Disconnect();
-      }
-      catch
-      {
-        // Best effort cleanup
-      }
+      try { await Disconnect(); }
+      catch { /* best effort */ }
 
       _reconnectLock.Dispose();
       GC.SuppressFinalize(this);
