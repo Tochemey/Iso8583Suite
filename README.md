@@ -3,12 +3,24 @@
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Tochemey/Iso8583Suite/ci.yml)](https://github.com/Tochemey/Iso8583Suite/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/Tochemey/Iso8583Suite/branch/main/graph/badge.svg?token=y6tAbZa8VK)](https://codecov.io/gh/Tochemey/Iso8583Suite)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Iso8583.Common NuGet](https://img.shields.io/nuget/v/Iso8583.Common?label=Iso8583.Common)](https://www.nuget.org/packages/Iso8583.Common)
+[![Iso8583.Client NuGet](https://img.shields.io/nuget/v/Iso8583.Client?label=Iso8583.Client)](https://www.nuget.org/packages/Iso8583.Client)
+[![Iso8583.Server NuGet](https://img.shields.io/nuget/v/Iso8583.Server?label=Iso8583.Server)](https://www.nuget.org/packages/Iso8583.Server)
 
 A high-performance .NET TCP client and server library for [ISO 8583](https://en.wikipedia.org/wiki/ISO_8583) financial messaging, built on [NetCore8583](https://github.com/Tochemey/NetCore8583) and [SpanNetty](https://github.com/cuteant/SpanNetty). ISO 8583 is the standard used by payment networks worldwide to exchange transaction data between point-of-sale terminals, ATMs, acquirers, and card issuers.
 
 Iso8583Suite handles the low-level networking -- framing, TLS, reconnection, idle detection, and request/response correlation -- so you can focus on your business logic through a simple message handler interface.
 
 Targets **.NET 8**, **.NET 9**, and **.NET 10**.
+
+## Installation
+
+Install the packages via NuGet:
+
+```shell
+dotnet add package Iso8583.Client --version 0.1.0
+dotnet add package Iso8583.Server --version 0.1.0
+```
 
 ## Features
 
