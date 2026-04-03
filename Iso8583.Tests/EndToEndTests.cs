@@ -32,7 +32,7 @@ public class EndToEndTests : IAsyncLifetime
     private Iso8583Server<IsoMessage> _server = null!;
     private Iso8583Client<IsoMessage> _client = null!;
     private IsoMessageFactory<IsoMessage> _factory = null!;
-    private static readonly int Port = TestPorts.Next();
+    private readonly int Port = TestPorts.Next();
 
     public async Task InitializeAsync()
     {
