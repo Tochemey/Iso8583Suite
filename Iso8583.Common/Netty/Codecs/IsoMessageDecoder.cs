@@ -34,7 +34,7 @@ namespace Iso8583.Common.Netty.Codecs
     /// <summary>
     ///   creates a new instance of the decoder given the iso message factory
     /// </summary>
-    /// <param name="messageFactory"></param>
+    /// <param name="messageFactory">The message factory used to parse raw bytes into ISO 8583 messages.</param>
     /// <param name="metrics">optional metrics provider</param>
     public IsoMessageDecoder(IMessageFactory<IsoMessage> messageFactory, IIso8583Metrics metrics = null)
     {
@@ -42,6 +42,11 @@ namespace Iso8583.Common.Netty.Codecs
       _metrics = metrics ?? NullIso8583Metrics.Instance;
     }
 
+    /// <summary>
+    ///   Reads available bytes from <paramref name="input"/>, parses them into an <see cref="IsoMessage"/>,
+    ///   records a <see cref="IIso8583Metrics.MessageReceived"/> metric, and adds the result to <paramref name="output"/>.
+    ///   Throws <see cref="NetCore8583.Extensions.ParseException"/> if the bytes cannot be parsed.
+    /// </summary>
     protected override void Decode(IChannelHandlerContext context, IByteBuffer input, List<object> output)
     {
       // return when the byte buffer cannot be read

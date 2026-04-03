@@ -35,8 +35,11 @@ namespace Iso8583.Common.Netty.Codecs
     /// <summary>
     ///   creates a new instance of the encoder
     /// </summary>
-    /// <param name="lengthHeaderLength"></param>
-    /// <param name="encodeLengthHeaderAsString"></param>
+    /// <param name="lengthHeaderLength">Number of bytes used for the length header (0 to omit the header).</param>
+    /// <param name="encodeLengthHeaderAsString">
+    ///   When <c>true</c>, the length header is written as ASCII digits (e.g. "0152").
+    ///   When <c>false</c>, the length is written as a binary integer by the underlying NetCore8583 writer.
+    /// </param>
     /// <param name="metrics">optional metrics provider</param>
     public IsoMessageEncoder(int lengthHeaderLength, bool encodeLengthHeaderAsString,
       IIso8583Metrics metrics = null)
@@ -46,6 +49,10 @@ namespace Iso8583.Common.Netty.Codecs
       _metrics = metrics ?? NullIso8583Metrics.Instance;
     }
 
+    /// <summary>
+    ///   Serializes an <see cref="IsoMessage"/> into the outbound <paramref name="output"/> buffer,
+    ///   prepending a length header when configured, and records a <see cref="IIso8583Metrics.MessageSent"/> metric.
+    /// </summary>
     protected override void Encode(IChannelHandlerContext context, IsoMessage message, IByteBuffer output)
     {
       switch (_lengthHeaderLength)

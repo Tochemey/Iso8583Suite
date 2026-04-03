@@ -58,6 +58,10 @@ namespace Iso8583.Common.Netty.Pipelines
     /// </summary>
     public void ResetAttempts() => _attempt = 0;
 
+    /// <summary>
+    ///   Schedules a reconnection attempt with exponential backoff when the channel becomes inactive.
+    ///   Stops retrying after <see cref="_maxAttempts"/> (unless set to 0 for unlimited).
+    /// </summary>
     public override void ChannelInactive(IChannelHandlerContext context)
     {
       base.ChannelInactive(context);

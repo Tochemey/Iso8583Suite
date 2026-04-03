@@ -26,25 +26,7 @@ namespace Iso8583.Common
     private IChannel _channel;
 
     /// <summary>
-    ///   creates a new instance of Iso8583ServerConnector
-    /// </summary>
-    /// <param name="messageHandler">the message handler</param>
-    /// <param name="messageFactory">the message factory</param>
-    /// <param name="configuration">the configuration</param>
-    protected Iso8583Connector(CompositeIsoMessageHandler<T> messageHandler,
-      IMessageFactory<T> messageFactory,
-      TC configuration)
-    {
-      configuration.Validate();
-      MessageHandler = messageHandler;
-      MessageFactory = messageFactory;
-      Configuration = configuration;
-      if (configuration.AddEchoMessageListener)
-        MessageHandler.AddListener(new EchoMessageListener<T>(messageFactory));
-    }
-
-    /// <summary>
-    ///   auxiliary constructor to create a new of Iso8583ServerConnector
+    ///   Creates a new instance of <see cref="Iso8583Connector{T, TC}"/>.
     /// </summary>
     /// <param name="messageFactory">the message factory</param>
     /// <param name="configuration">the configuration</param>

@@ -44,6 +44,10 @@ namespace Iso8583.Common.Netty.Pipelines
     /// </summary>
     public override bool IsSharable => true;
 
+    /// <summary>
+    ///   If the exception is a <see cref="NetCore8583.Extensions.ParseException"/>, sends an administrative
+    ///   error response (function code 650) to the remote peer before propagating the exception.
+    /// </summary>
     public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
     {
       if (exception is ParseException cause) context.WriteAndFlushAsync(CreateErrorResponseMessage(cause));

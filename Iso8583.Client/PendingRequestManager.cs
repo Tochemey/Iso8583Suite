@@ -124,6 +124,10 @@ namespace Iso8583.Client
       return $"{requestType:X4}:{stan}";
     }
 
+    /// <summary>
+    ///   Extracts the STAN (System Trace Audit Number) from field 11 of the message.
+    ///   Throws if field 11 is not present.
+    /// </summary>
     private static string GetStan(T message)
     {
       var field11 = message.GetField(11);

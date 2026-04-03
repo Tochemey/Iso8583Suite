@@ -20,10 +20,17 @@ using NetCore8583;
 
 namespace Iso8583.Common.Netty.Pipelines
 {
+  /// <summary>
+  ///   Channel handler that logs ISO 8583 messages with human-readable field names.
+  ///   Sensitive fields (PAN, track data) are masked unless <c>printSensitiveData</c> is enabled.
+  /// </summary>
   public class IsoMessageLoggingHandler : LoggingHandler
   {
     private const char MaskChar = '*';
 
+    /// <summary>
+    ///   Default set of ISO 8583 fields that are masked in log output: PAN extended (34), track 2 (35), track 3 (36), track 1 (45).
+    /// </summary>
     public static readonly int[] DefaultMaskedFields =
     {
       34, // PAN extended
@@ -71,6 +78,7 @@ namespace Iso8583.Common.Netty.Pipelines
       _maskedFields = maskedFields is { Length: > 0 } ? maskedFields : DefaultMaskedFields;
     }
 
+    /// <inheritdoc />
     public override bool IsSharable => true;
 
     /// <summary>

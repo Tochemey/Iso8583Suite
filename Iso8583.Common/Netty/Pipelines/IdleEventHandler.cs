@@ -31,9 +31,13 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <summary>
     ///   creates a new instance of <see cref="IdleEventHandler" />
     /// </summary>
-    /// <param name="messageFactory"></param>
+    /// <param name="messageFactory">The message factory used to create network management echo requests.</param>
     public IdleEventHandler(IMessageFactory<IsoMessage> messageFactory) => _messageFactory = messageFactory;
 
+    /// <summary>
+    ///   When a reader-idle or all-idle event is detected, sends a network management echo request (0x0800)
+    ///   to keep the connection alive.
+    /// </summary>
     public override void UserEventTriggered(IChannelHandlerContext context, object evt)
     {
       if (evt is not IdleStateEvent { State: IdleState.ReaderIdle or IdleState.AllIdle }) return;

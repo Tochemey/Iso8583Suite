@@ -19,10 +19,19 @@ using System.Linq;
 
 namespace Iso8583.Common
 {
+  /// <summary>
+  ///   Provides a lazily-loaded, read-only mapping of ISO 8583 field numbers to their human-readable descriptions.
+  ///   Field definitions are loaded from an <c>iso8583Fields.ini</c> file located in the application base directory.
+  ///   Used by the logging handler to include field names in diagnostic output.
+  /// </summary>
   public static class Iso8583Fields
   {
     private static readonly Lazy<Dictionary<string, string>> LazyFields = new(LoadFields);
 
+    /// <summary>
+    ///   Gets the dictionary mapping ISO 8583 field numbers (as strings) to their descriptions.
+    ///   Returns an empty dictionary if the <c>iso8583Fields.ini</c> file is not found.
+    /// </summary>
     public static Dictionary<string, string> Fields => LazyFields.Value;
 
     private static Dictionary<string, string> LoadFields()

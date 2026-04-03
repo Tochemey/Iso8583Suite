@@ -57,8 +57,13 @@ namespace Iso8583.Common.Netty.Pipelines
     /// </summary>
     public IReadOnlyCollection<IChannel> ActiveChannels => _activeChannels.Keys as IReadOnlyCollection<IChannel>;
 
+    /// <inheritdoc />
     public override bool IsSharable => true;
 
+    /// <summary>
+    ///   Increments the connection count when a new channel becomes active.
+    ///   If the maximum connection limit is exceeded, the channel is closed immediately.
+    /// </summary>
     public override void ChannelActive(IChannelHandlerContext context)
     {
       var count = Interlocked.Increment(ref _connectionCount);
@@ -80,6 +85,9 @@ namespace Iso8583.Common.Netty.Pipelines
       base.ChannelActive(context);
     }
 
+    /// <summary>
+    ///   Decrements the connection count and removes the channel from the active set when it becomes inactive.
+    /// </summary>
     public override void ChannelInactive(IChannelHandlerContext context)
     {
       _activeChannels.TryRemove(context.Channel, out _);

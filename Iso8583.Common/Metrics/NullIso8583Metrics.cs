@@ -21,13 +21,22 @@ namespace Iso8583.Common.Metrics
   /// </summary>
   public sealed class NullIso8583Metrics : IIso8583Metrics
   {
+    /// <summary>
+    ///   Shared singleton instance. Use this instead of creating new instances.
+    /// </summary>
     public static readonly NullIso8583Metrics Instance = new();
 
+    /// <inheritdoc />
     public void MessageSent(int mti) { }
+    /// <inheritdoc />
     public void MessageReceived(int mti) { }
+    /// <inheritdoc />
     public void MessageHandled(int mti, TimeSpan duration) { }
+    /// <inheritdoc />
     public void MessageError(int mti, Exception exception) { }
+    /// <inheritdoc />
     public void ConnectionEstablished() { }
+    /// <inheritdoc />
     public void ConnectionLost() { }
   }
 }

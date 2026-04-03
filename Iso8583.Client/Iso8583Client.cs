@@ -29,7 +29,7 @@ namespace Iso8583.Client
   ///   An instance of this class will help bootstrap an iso 8583 client
   /// </summary>
   /// <typeparam name="T"></typeparam>
-  public class Iso8583Client<T> : ClientConnector<T, ClientConfiguration>, ISend, IAsyncDisposable
+  public class Iso8583Client<T> : ClientConnector<T, ClientConfiguration>, IAsyncDisposable
     where T : IsoMessage
   {
     private readonly SemaphoreSlim _reconnectLock = new(1, 1);
@@ -68,7 +68,11 @@ namespace Iso8583.Client
       CreateWorkerEventLoopGroup();
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///   Sends an ISO 8583 message to the server (fire-and-forget).
+    /// </summary>
+    /// <param name="message">The ISO message to send.</param>
+    /// <exception cref="InvalidOperationException">Thrown when the client is not connected or the channel is inactive.</exception>
     public async Task Send(IsoMessage message)
     {
       ThrowIfDisposed();
@@ -81,7 +85,13 @@ namespace Iso8583.Client
       await channel.WriteAndFlushAsync(message);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///   Sends an ISO 8583 message to the server with a write timeout.
+    /// </summary>
+    /// <param name="message">The ISO message to send.</param>
+    /// <param name="timeout">Maximum time in milliseconds to wait for the write to complete.</param>
+    /// <exception cref="TimeoutException">Thrown when the send operation exceeds the timeout.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the client is not connected or the channel is inactive.</exception>
     public async Task Send(IsoMessage message, int timeout)
     {
       ThrowIfDisposed();
@@ -99,7 +109,16 @@ namespace Iso8583.Client
       await sendTask;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///   Sends an ISO 8583 message and waits for the correlated response.
+    ///   Correlation uses field 11 (STAN) and the message type.
+    /// </summary>
+    /// <param name="message">The ISO request message to send.</param>
+    /// <param name="timeout">Maximum time to wait for a response.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>The correlated response message.</returns>
+    /// <exception cref="TimeoutException">Thrown when no response arrives within the timeout.</exception>
+    /// <exception cref="OperationCanceledException">Thrown when the cancellation token is triggered.</exception>
     public async Task<IsoMessage> SendAndReceive(IsoMessage message, TimeSpan timeout,
       CancellationToken cancellationToken = default)
     {
@@ -128,6 +147,10 @@ namespace Iso8583.Client
       return await responseTask;
     }
 
+    /// <summary>
+    ///   Creates and configures a new SpanNetty <see cref="Bootstrap"/> with the channel initializer,
+    ///   reconnection handler, and TCP socket options.
+    /// </summary>
     private Bootstrap CreateBootstrap()
     {
       // Create reconnect handler if auto-reconnect is enabled
@@ -257,6 +280,9 @@ namespace Iso8583.Client
       }
     }
 
+    /// <summary>
+    ///   Throws <see cref="ObjectDisposedException"/> if the client has been disposed.
+    /// </summary>
     private void ThrowIfDisposed()
     {
       ObjectDisposedException.ThrowIf(_disposed, this);

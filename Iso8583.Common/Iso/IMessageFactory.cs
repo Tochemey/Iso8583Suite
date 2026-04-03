@@ -14,6 +14,12 @@
 
 namespace Iso8583.Common.Iso
 {
+  /// <summary>
+  ///   Abstracts the creation and parsing of ISO 8583 messages.
+  ///   Implementations wrap the underlying NetCore8583 <see cref="NetCore8583.MessageFactory{T}"/>
+  ///   and provide convenience methods for constructing requests, responses, and parsing raw bytes.
+  /// </summary>
+  /// <typeparam name="T">The ISO message type (typically <see cref="NetCore8583.IsoMessage"/>).</typeparam>
   public interface IMessageFactory<T>
   {
     /// <summary>

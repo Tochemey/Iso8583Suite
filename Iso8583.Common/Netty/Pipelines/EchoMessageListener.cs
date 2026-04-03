@@ -30,7 +30,7 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <summary>
     ///   creates a new instance of the EchoMessageListener
     /// </summary>
-    /// <param name="messageFactory"></param>
+    /// <param name="messageFactory">The message factory used to create echo response messages.</param>
     public EchoMessageListener(IMessageFactory<T> messageFactory) => _messageFactory = messageFactory;
 
     /// <inheritdoc />

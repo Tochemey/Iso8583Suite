@@ -46,8 +46,8 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <summary>
     ///   create a new instance of <see cref="CompositeIsoMessageHandler{T}" />
     /// </summary>
-    /// <param name="failOnError"></param>
-    /// <param name="logger"></param>
+    /// <param name="failOnError">When <c>true</c>, exceptions from listeners propagate up the pipeline. When <c>false</c>, they are logged and swallowed.</param>
+    /// <param name="logger">Logger for diagnostic output.</param>
     /// <param name="metrics">optional metrics provider</param>
     public CompositeIsoMessageHandler(bool failOnError, ILogger logger, IIso8583Metrics metrics = null)
     {
@@ -63,6 +63,10 @@ namespace Iso8583.Common.Netty.Pipelines
     {
     }
 
+    /// <summary>
+    ///   Called when a message is read from the channel. Casts to <typeparamref name="T"/> and dispatches
+    ///   to the registered listener chain asynchronously.
+    /// </summary>
     public override void ChannelRead(IChannelHandlerContext context, object message)
     {
       if (message is not T isoMessage)
@@ -82,8 +86,14 @@ namespace Iso8583.Common.Netty.Pipelines
       }, context, TaskContinuationOptions.OnlyOnFaulted);
     }
 
+    /// <summary>
+    ///   Flushes the channel after all pending reads in the current batch have been processed.
+    /// </summary>
     public override void ChannelReadComplete(IChannelHandlerContext context) => context.Flush();
 
+    /// <summary>
+    ///   Logs the exception and closes the channel.
+    /// </summary>
     public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
     {
       _logger.LogError(exception, "Exception caught in channel pipeline");

@@ -69,20 +69,40 @@ namespace Iso8583.Common.Netty.Pipelines
       _isClient = reconnectHandler != null;
     }
 
+    /// <summary>
+    ///   The message factory used by the pipeline to create decoders and echo/error handlers.
+    /// </summary>
     protected IMessageFactory<IsoMessage> MessageFactory { get; }
 
+    /// <summary>
+    ///   Creates the encoder that serializes <see cref="IsoMessage"/> instances into wire bytes.
+    /// </summary>
     private IsoMessageEncoder CreateIsoMessageEncoder(TC configuration) =>
       new(configuration.FrameLengthFieldLength, configuration.EncodeFrameLengthAsString, _metrics);
 
+    /// <summary>
+    ///   Creates the decoder that parses wire bytes into <see cref="IsoMessage"/> instances.
+    /// </summary>
     private IsoMessageDecoder CreateIsoMessageDecoder(IMessageFactory<IsoMessage> messageFactory) =>
       new(messageFactory, _metrics);
 
+    /// <summary>
+    ///   Creates a handler that sends an administrative error response when a parse exception occurs.
+    /// </summary>
     private IChannelHandler CreateParseExceptionHandler() => new ParseExceptionHandler(MessageFactory, true);
 
+    /// <summary>
+    ///   Creates the ISO message logging handler with the configured sensitivity and field description settings.
+    /// </summary>
     private static IChannelHandler CreateLoggingHandler(TC configuration) =>
       new IsoMessageLoggingHandler(LogLevel.DEBUG, configuration.LogSensitiveData,
         configuration.LogFieldDescription, configuration.SensitiveDataFields);
 
+    /// <summary>
+    ///   Creates the frame decoder that extracts individual ISO 8583 message frames from the TCP byte stream.
+    ///   Uses <see cref="StringLengthFieldBasedFrameDecoder"/> when the length header is ASCII-encoded,
+    ///   or <see cref="LengthFieldBasedFrameDecoder"/> for binary length headers.
+    /// </summary>
     private static IChannelHandler CreateLengthFieldBasedFrameDecoder(TC configuration)
     {
       var lengthFieldLength = configuration.FrameLengthFieldLength;
@@ -103,6 +123,10 @@ namespace Iso8583.Common.Netty.Pipelines
         );
     }
 
+    /// <summary>
+    ///   Builds the full channel pipeline: TLS (optional), frame decoder, ISO codec, logging,
+    ///   error handling, idle detection, message handler, and reconnection (client only).
+    /// </summary>
     protected override void InitChannel(ISocketChannel channel)
     {
       var pipeline = channel.Pipeline;
@@ -159,6 +183,10 @@ namespace Iso8583.Common.Netty.Pipelines
       _configurator?.ConfigurePipeline(pipeline, _configuration);
     }
 
+    /// <summary>
+    ///   Loads a PKCS#12 certificate from the given file path. Uses the platform-appropriate loader
+    ///   (<c>X509CertificateLoader</c> on .NET 9+, constructor on older runtimes).
+    /// </summary>
     private static X509Certificate2 LoadCertificate(string path, string password)
     {
 #if NET9_0_OR_GREATER

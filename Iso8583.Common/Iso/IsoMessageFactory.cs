@@ -19,6 +19,12 @@ using NetCore8583.Parse;
 
 namespace Iso8583.Common.Iso
 {
+  /// <summary>
+  ///   Default implementation of <see cref="IMessageFactory{T}"/> that wraps the NetCore8583
+  ///   <see cref="MessageFactory{T}"/> and adds MTI construction from ISO 8583 version,
+  ///   message class, function, and origin enums.
+  /// </summary>
+  /// <typeparam name="T">The ISO message type (typically <see cref="IsoMessage"/>).</typeparam>
   public class IsoMessageFactory<T> : IMessageFactory<T> where T : IsoMessage
   {
     private readonly Iso8583Version _isoVersion;

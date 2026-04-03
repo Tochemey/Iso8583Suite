@@ -57,6 +57,10 @@ namespace Iso8583.Common.Netty.Codecs
       _initialBytesToStrip = initialBytesToStrip;
     }
 
+    /// <summary>
+    ///   Reads the ASCII length header, waits until enough bytes are available for the full frame,
+    ///   then extracts and adds the frame to <paramref name="output"/>.
+    /// </summary>
     protected override void Decode(IChannelHandlerContext context, IByteBuffer input, List<object> output)
     {
       var decoded = Decode(context, input);
@@ -67,7 +71,7 @@ namespace Iso8583.Common.Netty.Codecs
     }
 
     /// <summary>
-    ///   Decodes a frame from the input buffer.
+    ///   Decodes a single frame from the input buffer, or returns <c>null</c> if not enough data is available yet.
     /// </summary>
     private object Decode(IChannelHandlerContext context, IByteBuffer input)
     {

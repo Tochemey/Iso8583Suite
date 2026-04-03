@@ -15,11 +15,16 @@
 using DotNetty.Transport.Bootstrapping;
 using Iso8583.Common;
 using Iso8583.Common.Iso;
-using Iso8583.Common.Netty.Pipelines;
 using NetCore8583;
 
 namespace Iso8583.Server
 {
+  /// <summary>
+  ///   Base class for ISO 8583 TCP servers. Sets up the SpanNetty <see cref="ServerBootstrap"/>
+  ///   and delegates further customization to an optional <see cref="IServerConnectorConfigurator{T}"/>.
+  /// </summary>
+  /// <typeparam name="T">The ISO message type.</typeparam>
+  /// <typeparam name="TC">The server configuration type.</typeparam>
   public abstract class ServerConnector<T, TC> : Iso8583Connector<T, TC>
     where T : IsoMessage
     where TC : ConnectorConfiguration
@@ -30,19 +35,7 @@ namespace Iso8583.Server
     protected ServerBootstrap Bootstrap;
 
     /// <summary>
-    ///   creates a new instance of Iso8583ServerConnector
-    /// </summary>
-    /// <param name="messageHandler">the message handler</param>
-    /// <param name="messageFactory">the message factory</param>
-    /// <param name="configuration">the configuration</param>
-    protected ServerConnector(CompositeIsoMessageHandler<T> messageHandler,
-      IMessageFactory<T> messageFactory,
-      TC configuration) : base(messageHandler, messageFactory, configuration)
-    {
-    }
-
-    /// <summary>
-    ///   auxiliary constructor to create a new of Iso8583ServerConnector
+    ///   Creates a new instance of <see cref="ServerConnector{T, TC}"/>.
     /// </summary>
     /// <param name="messageFactory">the message factory</param>
     /// <param name="configuration">the configuration</param>
@@ -57,8 +50,15 @@ namespace Iso8583.Server
     /// </summary>
     protected IServerConnectorConfigurator<TC> ConnectorConfigurator { get; set; }
 
+    /// <summary>
+    ///   Creates and configures the <see cref="ServerBootstrap"/>. Implemented by subclasses
+    ///   to wire up the channel initializer and server-specific options.
+    /// </summary>
     protected abstract ServerBootstrap CreateBootstrap();
-    
+
+    /// <summary>
+    ///   Returns the configured <see cref="ServerBootstrap"/> instance.
+    /// </summary>
     protected ServerBootstrap GetBootstrap() => Bootstrap;
 
     /// <summary>

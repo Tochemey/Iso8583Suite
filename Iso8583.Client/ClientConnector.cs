@@ -16,11 +16,17 @@ using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using Iso8583.Common;
 using Iso8583.Common.Iso;
-using Iso8583.Common.Netty.Pipelines;
 using NetCore8583;
 
 namespace Iso8583.Client
 {
+  /// <summary>
+  ///   Base class for ISO 8583 TCP clients. Sets up the SpanNetty <see cref="Bootstrap"/>
+  ///   with TCP options (nodelay, keepalive, reuse-addr) and delegates further customization
+  ///   to an optional <see cref="IClientConnectorConfigurator{T}"/>.
+  /// </summary>
+  /// <typeparam name="T">The ISO message type.</typeparam>
+  /// <typeparam name="TC">The client configuration type.</typeparam>
   public abstract class ClientConnector<T, TC> : Iso8583Connector<T, TC>
     where T : IsoMessage
     where TC : ConnectorConfiguration
@@ -31,19 +37,7 @@ namespace Iso8583.Client
     protected Bootstrap Bootstrap;
 
     /// <summary>
-    ///   creates a new instance of Iso8583ServerConnector
-    /// </summary>
-    /// <param name="messageHandler">the message handler</param>
-    /// <param name="messageFactory">the message factory</param>
-    /// <param name="configuration">the configuration</param>
-    protected ClientConnector(CompositeIsoMessageHandler<T> messageHandler,
-      IMessageFactory<T> messageFactory,
-      TC configuration) : base(messageHandler, messageFactory, configuration)
-    {
-    }
-
-    /// <summary>
-    ///   auxiliary constructor to create a new of Iso8583ServerConnector
+    ///   Creates a new instance of <see cref="ClientConnector{T, TC}"/>.
     /// </summary>
     /// <param name="messageFactory">the message factory</param>
     /// <param name="configuration">the configuration</param>
@@ -58,6 +52,9 @@ namespace Iso8583.Client
     protected IClientConnectorConfigurator<TC> ConnectorConfigurator { get; set; }
     
 
+    /// <summary>
+    ///   Returns the configured <see cref="Bootstrap"/> instance.
+    /// </summary>
     protected Bootstrap GetBootstrap() => Bootstrap;
     
     /// <summary>

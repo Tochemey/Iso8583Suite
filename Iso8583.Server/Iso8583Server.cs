@@ -93,6 +93,10 @@ namespace Iso8583.Server
     /// </summary>
     public IReadOnlyCollection<IChannel> ActiveConnections => _connectionTracker.ActiveChannels;
 
+    /// <summary>
+    ///   Creates and configures the SpanNetty <see cref="ServerBootstrap"/> with child channel options
+    ///   (keepalive, nodelay, linger), the ISO 8583 channel initializer, connection tracker, and metrics.
+    /// </summary>
     protected override ServerBootstrap CreateBootstrap()
     {
       var boostrap = new ServerBootstrap();
