@@ -174,6 +174,10 @@ namespace Iso8583.Common.Netty.Pipelines
       if (_configuration.ReplyOnError) pipeline.AddLast(_workerGroup, "replyOnError", parseExceptionHandler);
       pipeline.AddLast("idleState", new IdleStateHandler(0, 0, _configuration.IdleTimeout));
       pipeline.AddLast("idleEventHandler", new IdleEventHandler(MessageFactory));
+      // Validation is always installed. When no validator is configured it is a pass-through;
+      // when a validator is attached, invalid messages fail outbound writes and fire exception
+      // events on inbound reads so existing error handlers can react.
+      pipeline.AddLast("messageValidation", new MessageValidationHandler(_configuration.MessageValidator));
       pipeline.AddLast(_workerGroup, "messageHandler", _channelHandler);
 
       // Add reconnect handler for client connections

@@ -328,6 +328,90 @@ server.AddMessageListener(new AuthorizationHandler(messageFactory)); // handles 
 server.AddMessageListener(new ReversalHandler(messageFactory));     // handles 0x0400
 ```
 
+## Message Validation
+
+Declarative per-field validation catches malformed messages before they reach the wire. The validation handler is **always installed** in both client and server pipelines; attach a `MessageValidator` via `ConnectorConfiguration.MessageValidator` to activate it. When no validator is configured, the handler is a transparent pass-through.
+
+### Built-in Validators
+
+All built-in validators are `IsoType`-aware — they read the `IsoValue.Type` (and `IsoValue.Length` where applicable) and derive their behavior from the NetCore8583 field definition rather than from hand-wired length or format arguments.
+
+| Validator | Applicable IsoTypes | Checks |
+|-----------|--------------------|--------|
+| `LengthValidator` | All | Value length matches the fixed length implied by the IsoType (DATE4/DATE6/DATE10/DATE12/DATE14/DATE_EXP/TIME/AMOUNT), or the declared `IsoValue.Length` (NUMERIC, ALPHA, BINARY), or is within the protocol max for LLVAR (99) / LLLVAR (999) / LLLLVAR (9999) / LLBIN / LLLBIN / LLLLBIN |
+| `NumericValidator` | NUMERIC, AMOUNT | Every character is an ASCII digit |
+| `DateValidator` | DATE4, DATE6, DATE10, DATE12, DATE14, DATE_EXP, TIME | Value parses under the format implied by the IsoType (`MMdd`, `yyMMdd`, `MMddHHmmss`, `yyMMddHHmmss`, `yyyyMMddHHmmss`, `yyMM`, `HHmmss`). `DateTime` values are accepted as-is |
+| `LuhnValidator` | NUMERIC, LLVAR, LLLVAR, LLLLVAR | Digits-only Luhn mod-10 checksum (PAN validation) |
+| `CurrencyCodeValidator` | NUMERIC | 3-digit ISO 4217 numeric code (optionally against a custom allow-list) |
+| `RegexValidator` | NUMERIC, ALPHA, LLVAR, LLLVAR, LLLLVAR | String representation matches the configured regex |
+
+### Registering Rules
+
+Use the fluent `ForField(n)` API. Multiple rules per field are supported and run in registration order — all rules execute, so a single `Validate` call collects every failure at once.
+
+```csharp
+using Iso8583.Common.Validation;
+using Iso8583.Common.Validation.Validators;
+
+var validator = new MessageValidator();
+validator
+    .ForField(2).Required().AddRule(new LuhnValidator()).AddRule(new LengthValidator())
+    .ForField(4).Required().AddRule(new NumericValidator()).AddRule(new LengthValidator())
+    .ForField(7).AddRule(new DateValidator())
+    .ForField(11).AddRule(new NumericValidator()).AddRule(new LengthValidator())
+    .ForField(49).AddRule(new CurrencyCodeValidator());
+
+var config = new ClientConfiguration
+{
+    // ... other settings ...
+    MessageValidator = validator
+};
+```
+
+Fields marked with `.Required()` produce a failure when absent from the message. Fields with rules but no `.Required()` are skipped when absent.
+
+### Pipeline Integration
+
+Once attached to the configuration, the `MessageValidationHandler` sits between `IdleEventHandler` and the application message handler:
+
+- **Outbound writes** — A failing validation completes the write task with a `MessageValidationException` synchronously. The invalid bytes never reach the encoder or the wire, so the caller sees the failure on `Send` / `SendAndReceive`.
+- **Inbound reads** — A failing validation fires an exception event on the pipeline and drops the invalid message. When the server is configured with `ReplyOnError = true`, existing error handlers react and may send an administrative error response.
+
+### Programmatic Validation
+
+You can also validate a message ad hoc without going through the pipeline:
+
+```csharp
+var report = validator.Validate(message);
+if (!report.IsValid)
+{
+    foreach (var error in report.Errors)
+        Console.WriteLine($"Field {error.FieldNumber} ({error.ValidatorName}): {error.ErrorMessage}");
+}
+```
+
+`ValidationReport.ErrorsForField(int)` returns only the errors for a specific field. `ValidationReport.Valid` is a shared empty report.
+
+### Custom Validators
+
+Implement `IFieldValidator` to plug in your own rule. The validator receives the field number and the `IsoValue`, giving access to both the value and its `IsoType` / declared `Length`:
+
+```csharp
+public sealed class TerminalIdValidator : IFieldValidator
+{
+    public ValidationResult Validate(int fieldNumber, IsoValue value)
+    {
+        if (value == null || value.Type != IsoType.ALPHA)
+            return ValidationResult.Failure(fieldNumber, "expected ALPHA field", nameof(TerminalIdValidator));
+
+        var str = value.Value?.ToString() ?? string.Empty;
+        return str.StartsWith("TRM")
+            ? ValidationResult.Success(fieldNumber, nameof(TerminalIdValidator))
+            : ValidationResult.Failure(fieldNumber, $"Terminal id '{str}' must start with TRM", nameof(TerminalIdValidator));
+    }
+}
+```
+
 ## Configuration
 
 ### Base Configuration (Client and Server)
