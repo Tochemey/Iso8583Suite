@@ -24,6 +24,7 @@ using Xunit;
 
 namespace Iso8583.Tests;
 
+[Collection(nameof(TcpServerCollection))]
 public class Iso8583ServerTests
 {
     private readonly IsoMessageFactory<IsoMessage> _factory;

@@ -35,6 +35,11 @@ namespace Iso8583.Client
     private readonly SemaphoreSlim _reconnectLock = new(1, 1);
     private readonly PendingRequestManager<T> _pendingRequests = new();
 
+    /// <summary>
+    ///   Gets the number of currently pending (in-flight) requests.
+    /// </summary>
+    internal int PendingCount => _pendingRequests.PendingCount;
+
     private string _host;
     private int _port;
     private volatile bool _intentionalDisconnect;

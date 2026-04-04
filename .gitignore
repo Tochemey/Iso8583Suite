@@ -8,3 +8,4 @@ riderModule.iml
 .vscode/
 BenchmarkDotNet.Artifacts/
 TestResults/
+.spec/

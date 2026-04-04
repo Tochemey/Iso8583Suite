@@ -31,6 +31,7 @@ dotnet add package Iso8583.Server --version 0.1.0
 
 - Async TCP server and client with non-blocking I/O
 - Request/response correlation via `SendAndReceive` (STAN-based matching with timeout)
+- Connection pooling with pluggable load balancing (round-robin, least-connections)
 - Auto-reconnection with exponential backoff and jitter
 - TLS/SSL with mutual TLS support
 - Composable message handler chain (copy-on-write, lock-free reads)
@@ -200,6 +201,94 @@ await client.Send(request);
 // Fire-and-forget with write timeout
 await client.Send(request, timeout: 5000);
 ```
+
+## Connection Pooling
+
+For high-throughput workloads, `PooledIso8583Client<T>` maintains a pool of persistent connections to a single endpoint and distributes requests across them using a pluggable load-balancing strategy. It exposes the same `Send` / `SendAndReceive` API as `Iso8583Client<T>`, making it a drop-in replacement.
+
+### PooledIso8583Client&lt;T&gt; Methods
+
+| Method                                                                       | Returns            | Description                                                                                  |
+|------------------------------------------------------------------------------|--------------------|----------------------------------------------------------------------------------------------|
+| `Connect(string host, int port)`                                             | `Task`             | Connect all pooled connections to the server in parallel                                     |
+| `Send(IsoMessage message)`                                                   | `Task`             | Fire-and-forget send on a load-balanced connection                                           |
+| `Send(IsoMessage message, int timeout)`                                      | `Task`             | Send with a write timeout on a load-balanced connection                                      |
+| `SendAndReceive(IsoMessage message, TimeSpan timeout, CancellationToken ct)` | `Task<IsoMessage>` | Send and wait for the correlated response on a load-balanced connection                     |
+| `Disconnect()`                                                               | `Task`             | Gracefully disconnect all pooled connections and stop health checks                          |
+| `AddMessageListener(IIsoMessageListener<T>)`                                 | `void`             | Register a listener on every connection in the pool (and on replacements from health checks) |
+| `RemoveMessageListener(IIsoMessageListener<T>)`                              | `void`             | Remove a previously registered listener from every connection                                |
+| `DisposeAsync()`                                                             | `ValueTask`        | Dispose all connections and release pool resources. Idempotent                               |
+
+### PooledIso8583Client&lt;T&gt; Properties
+
+| Property                | Type  | Description                                                |
+|-------------------------|-------|------------------------------------------------------------|
+| `PoolSize`              | `int` | Total number of connections in the pool                    |
+| `ActiveConnectionCount` | `int` | Current number of connections reporting as healthy/active  |
+
+### PooledClientConfiguration
+
+| Property              | Type                  | Default | Description                                                                                       |
+|-----------------------|-----------------------|---------|---------------------------------------------------------------------------------------------------|
+| `PoolSize`            | `int`                 | `4`     | Number of persistent connections to maintain. Must be > 0                                         |
+| `HealthCheckInterval` | `TimeSpan`            | `10s`   | How often to check each connection and replace any that have become inactive                     |
+| `ClientConfiguration` | `ClientConfiguration` | `new()` | The base configuration applied to every pooled connection (frame encoding, TLS, reconnect, etc.) |
+
+### Load Balancers
+
+Pass any implementation of `ILoadBalancer` as the third constructor argument. Defaults to `RoundRobinLoadBalancer` when omitted.
+
+| Balancer                       | Selection strategy                                                                                                                         |
+|--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `RoundRobinLoadBalancer`       | Cycles through active connections atomically via `Interlocked.Increment`. Lock-free, predictable distribution                              |
+| `LeastConnectionsLoadBalancer` | Picks the connection with the fewest in-flight requests. Best for workloads with variable response times. Requires a pending-count source |
+
+### Usage
+
+```csharp
+var config = new PooledClientConfiguration
+{
+    PoolSize = 8,
+    HealthCheckInterval = TimeSpan.FromSeconds(15),
+    ClientConfiguration = new ClientConfiguration
+    {
+        EncodeFrameLengthAsString = true,
+        FrameLengthFieldLength = 4,
+        AutoReconnect = true,
+        ReconnectInterval = 500
+    }
+};
+
+// Default round-robin
+await using var pool = new PooledIso8583Client<IsoMessage>(config, messageFactory);
+await pool.Connect("payment-gateway.internal", 9000);
+
+var request = messageFactory.NewMessage(0x1100);
+request.SetField(11, new IsoValue(IsoType.ALPHA, "100001", 6));
+request.SetField(2, new IsoValue(IsoType.LLVAR, "5164123785712481", 16));
+request.SetField(4, new IsoValue(IsoType.NUMERIC, "000000000100", 12));
+
+var response = await pool.SendAndReceive(request, TimeSpan.FromSeconds(10));
+```
+
+Using a least-connections balancer (resolves to the pool via a captured reference so the balancer can query per-connection pending counts):
+
+```csharp
+PooledIso8583Client<IsoMessage> pool = null!;
+pool = new PooledIso8583Client<IsoMessage>(
+    config,
+    messageFactory,
+    new LeastConnectionsLoadBalancer(idx => pool.GetPendingCount(idx)));
+
+await pool.Connect("payment-gateway.internal", 9000);
+```
+
+### Behavior
+
+- **Health checks.** Every `HealthCheckInterval`, the pool scans all connections and replaces any that have become inactive with a fresh `Iso8583Client<T>` that reconnects to the same endpoint. Recovery is best-effort and retries on the next cycle on failure.
+- **Listener propagation.** Listeners added via `AddMessageListener` are applied to every existing connection and to any connection created during health-check recovery, so you never miss messages on a replaced connection.
+- **Correlation.** Each pooled connection has its own `PendingRequestManager`, so STAN-based correlation works per connection. `SendAndReceive` picks a connection via the load balancer and waits for the response on that same connection.
+- **Failure when no connections are available.** If the load balancer is asked to select from an empty set of active connections, it throws `InvalidOperationException`. Combine with `AutoReconnect = true` on the underlying `ClientConfiguration` for fastest recovery.
 
 ## Message Handlers
 

@@ -64,6 +64,14 @@ namespace Iso8583.Common.Netty.Pipelines
     }
 
     /// <summary>
+    ///   This handler is safe to share across channels: listeners are stored in a copy-on-write array,
+    ///   and all other state is either readonly or per-invocation (passed via <see cref="IChannelHandlerContext"/>).
+    ///   Marking it sharable is required for the server, which installs a single instance on every
+    ///   child connection's pipeline.
+    /// </summary>
+    public override bool IsSharable => true;
+
+    /// <summary>
     ///   Called when a message is read from the channel. Casts to <typeparamref name="T"/> and dispatches
     ///   to the registered listener chain asynchronously.
     /// </summary>
