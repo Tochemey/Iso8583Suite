@@ -63,20 +63,8 @@
   </text>
 
   <!-- Tagline -->
-  <text x="150" y="95" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#94a3b8" letter-spacing="0.3">High-Performance ISO 8583 Client &amp; Server for .NET</text>
+  <text x="150" y="95" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#94a3b8" letter-spacing="0.3">.NET High Performance ISO 8583 Client &amp; Server</text>
 
   <!-- Accent line under tagline -->
   <rect x="150" y="105" width="60" height="2" rx="1" fill="url(#accent)" opacity="0.6"/>
-
-  <!-- Bottom tech pills -->
-  <g font-family="ui-monospace, 'SF Mono', 'Cascadia Code', 'Fira Code', Menlo, monospace" font-size="10">
-    <rect x="150" y="115" width="38" height="20" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
-    <text x="169" y="129" text-anchor="middle" fill="#38bdf8">TCP</text>
-
-    <rect x="196" y="115" width="36" height="20" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
-    <text x="214" y="129" text-anchor="middle" fill="#818cf8">TLS</text>
-
-    <rect x="240" y="115" width="64" height="20" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
-    <text x="272" y="129" text-anchor="middle" fill="#c084fc">NetCore</text>
-  </g>
 </svg>

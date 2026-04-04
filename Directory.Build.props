@@ -1,0 +1,25 @@
+<Project>
+
+    <PropertyGroup>
+        <Authors>Arsene Tochemey Gandote</Authors>
+        <Copyright>Copyright 2021-2026 Arsene Tochemey Gandote</Copyright>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageProjectUrl>https://github.com/Tochemey/Iso8583Suite</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Tochemey/Iso8583Suite</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>iso8583;iso-8583;financial;payment;tcp;netty;client;server;pos;atm;acquirer;issuer</PackageTags>
+        <PackageReleaseNotes>https://github.com/Tochemey/Iso8583Suite/blob/main/CHANGELOG.md</PackageReleaseNotes>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)assets/icon.png" Pack="true" PackagePath="/"/>
+        <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="/"/>
+    </ItemGroup>
+
+</Project>

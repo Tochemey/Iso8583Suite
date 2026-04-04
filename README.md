@@ -1,8 +1,8 @@
-<p align="center">
-  <img src="assets/logo.svg" alt="Iso8583Suite Logo" width="720"/>
-</p>
+<h2 align="center">
+  <img src="assets/logo.svg" alt="Iso8583Suite Logo" width="800"/>
+</h2>
 
-<p align="center">
+<p>
   <a href="https://github.com/Tochemey/Iso8583Suite/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Tochemey/Iso8583Suite/ci.yml" alt="Build Status"/></a>
   <a href="https://codecov.io/gh/Tochemey/Iso8583Suite"><img src="https://codecov.io/gh/Tochemey/Iso8583Suite/branch/main/graph/badge.svg?token=y6tAbZa8VK" alt="codecov"/></a>
   <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"/></a>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+    <linearGradient id="icon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="128" height="128" rx="24" fill="url(#bg)"/>
+  <rect width="128" height="128" rx="24" fill="none" stroke="url(#accent)" stroke-width="1" opacity="0.3"/>
+
+  <!-- Network icon centered -->
+  <g transform="translate(20, 34)">
+    <!-- Left node (client) -->
+    <rect x="0" y="12" width="28" height="28" rx="6" fill="none" stroke="url(#icon)" stroke-width="2.5"/>
+    <rect x="6" y="19" width="16" height="4" rx="1" fill="#38bdf8" opacity="0.7"/>
+    <rect x="6" y="26" width="10" height="4" rx="1" fill="#38bdf8" opacity="0.5"/>
+    <rect x="6" y="33" width="13" height="4" rx="1" fill="#38bdf8" opacity="0.35"/>
+
+    <!-- Connection lines -->
+    <line x1="28" y1="26" x2="60" y2="14" stroke="url(#icon)" stroke-width="2" opacity="0.7"/>
+    <line x1="28" y1="26" x2="60" y2="38" stroke="url(#icon)" stroke-width="2" opacity="0.7"/>
+    <line x1="28" y1="26" x2="60" y2="26" stroke="url(#icon)" stroke-width="2" opacity="0.9"/>
+
+    <!-- Right node (server) -->
+    <rect x="60" y="0" width="28" height="52" rx="6" fill="none" stroke="url(#icon)" stroke-width="2.5"/>
+    <circle cx="74" cy="11" r="4" fill="#818cf8" opacity="0.7"/>
+    <circle cx="74" cy="23" r="4" fill="#38bdf8" opacity="0.6"/>
+    <circle cx="74" cy="35" r="4" fill="#c084fc" opacity="0.55"/>
+    <circle cx="74" cy="47" r="4" fill="#818cf8" opacity="0.4"/>
+  </g>
+
+  <!-- "8583" text at bottom -->
+  <text x="64" y="114" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="url(#accent)" letter-spacing="1">8583</text>
+</svg>
