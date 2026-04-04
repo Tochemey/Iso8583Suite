@@ -27,6 +27,7 @@ using Xunit;
 
 namespace Iso8583.Tests;
 
+[Collection(nameof(TcpServerCollection))]
 public class EndToEndTests : IAsyncLifetime
 {
     private Iso8583Server<IsoMessage> _server = null!;

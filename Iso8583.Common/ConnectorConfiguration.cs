@@ -14,6 +14,7 @@
 
 using System;
 using Iso8583.Common.Netty.Pipelines;
+using Iso8583.Common.Validation;
 
 namespace Iso8583.Common
 {
@@ -144,6 +145,15 @@ namespace Iso8583.Common
     ///   SSL/TLS configuration. Null or Enabled=false means no TLS.
     /// </summary>
     public SslConfiguration Ssl { get; set; }
+
+    /// <summary>
+    ///   Optional message validator applied to every inbound and outbound <see cref="NetCore8583.IsoMessage"/>.
+    ///   When <c>null</c> (default), the validation handler is still installed in the pipeline but
+    ///   acts as a pass-through. When set, any message that fails validation causes a
+    ///   <see cref="MessageValidationException"/> to be raised on the pipeline: outbound writes fail
+    ///   synchronously, inbound messages fire an exception event that existing error handlers can react to.
+    /// </summary>
+    public MessageValidator MessageValidator { get; set; }
 
     /// <summary>
     ///   Validates the configuration and throws <see cref="ArgumentException"/> for invalid values.

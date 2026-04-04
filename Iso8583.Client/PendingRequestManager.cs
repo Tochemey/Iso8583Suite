@@ -32,6 +32,11 @@ namespace Iso8583.Client
     private readonly ConcurrentDictionary<string, TaskCompletionSource<T>> _pending = new();
 
     /// <summary>
+    ///   Gets the number of currently pending (in-flight) requests.
+    /// </summary>
+    internal int PendingCount => _pending.Count;
+
+    /// <summary>
     ///   Registers a pending request and returns a task that completes when the matching response arrives.
     /// </summary>
     /// <param name="request">the outbound request message</param>

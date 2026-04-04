@@ -31,6 +31,7 @@ dotnet add package Iso8583.Server --version 0.1.0
 
 - Async TCP server and client with non-blocking I/O
 - Request/response correlation via `SendAndReceive` (STAN-based matching with timeout)
+- Connection pooling with pluggable load balancing (round-robin, least-connections)
 - Auto-reconnection with exponential backoff and jitter
 - TLS/SSL with mutual TLS support
 - Composable message handler chain (copy-on-write, lock-free reads)
@@ -201,6 +202,94 @@ await client.Send(request);
 await client.Send(request, timeout: 5000);
 ```
 
+## Connection Pooling
+
+For high-throughput workloads, `PooledIso8583Client<T>` maintains a pool of persistent connections to a single endpoint and distributes requests across them using a pluggable load-balancing strategy. It exposes the same `Send` / `SendAndReceive` API as `Iso8583Client<T>`, making it a drop-in replacement.
+
+### PooledIso8583Client&lt;T&gt; Methods
+
+| Method                                                                       | Returns            | Description                                                                                  |
+|------------------------------------------------------------------------------|--------------------|----------------------------------------------------------------------------------------------|
+| `Connect(string host, int port)`                                             | `Task`             | Connect all pooled connections to the server in parallel                                     |
+| `Send(IsoMessage message)`                                                   | `Task`             | Fire-and-forget send on a load-balanced connection                                           |
+| `Send(IsoMessage message, int timeout)`                                      | `Task`             | Send with a write timeout on a load-balanced connection                                      |
+| `SendAndReceive(IsoMessage message, TimeSpan timeout, CancellationToken ct)` | `Task<IsoMessage>` | Send and wait for the correlated response on a load-balanced connection                     |
+| `Disconnect()`                                                               | `Task`             | Gracefully disconnect all pooled connections and stop health checks                          |
+| `AddMessageListener(IIsoMessageListener<T>)`                                 | `void`             | Register a listener on every connection in the pool (and on replacements from health checks) |
+| `RemoveMessageListener(IIsoMessageListener<T>)`                              | `void`             | Remove a previously registered listener from every connection                                |
+| `DisposeAsync()`                                                             | `ValueTask`        | Dispose all connections and release pool resources. Idempotent                               |
+
+### PooledIso8583Client&lt;T&gt; Properties
+
+| Property                | Type  | Description                                                |
+|-------------------------|-------|------------------------------------------------------------|
+| `PoolSize`              | `int` | Total number of connections in the pool                    |
+| `ActiveConnectionCount` | `int` | Current number of connections reporting as healthy/active  |
+
+### PooledClientConfiguration
+
+| Property              | Type                  | Default | Description                                                                                       |
+|-----------------------|-----------------------|---------|---------------------------------------------------------------------------------------------------|
+| `PoolSize`            | `int`                 | `4`     | Number of persistent connections to maintain. Must be > 0                                         |
+| `HealthCheckInterval` | `TimeSpan`            | `10s`   | How often to check each connection and replace any that have become inactive                     |
+| `ClientConfiguration` | `ClientConfiguration` | `new()` | The base configuration applied to every pooled connection (frame encoding, TLS, reconnect, etc.) |
+
+### Load Balancers
+
+Pass any implementation of `ILoadBalancer` as the third constructor argument. Defaults to `RoundRobinLoadBalancer` when omitted.
+
+| Balancer                       | Selection strategy                                                                                                                         |
+|--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `RoundRobinLoadBalancer`       | Cycles through active connections atomically via `Interlocked.Increment`. Lock-free, predictable distribution                              |
+| `LeastConnectionsLoadBalancer` | Picks the connection with the fewest in-flight requests. Best for workloads with variable response times. Requires a pending-count source |
+
+### Usage
+
+```csharp
+var config = new PooledClientConfiguration
+{
+    PoolSize = 8,
+    HealthCheckInterval = TimeSpan.FromSeconds(15),
+    ClientConfiguration = new ClientConfiguration
+    {
+        EncodeFrameLengthAsString = true,
+        FrameLengthFieldLength = 4,
+        AutoReconnect = true,
+        ReconnectInterval = 500
+    }
+};
+
+// Default round-robin
+await using var pool = new PooledIso8583Client<IsoMessage>(config, messageFactory);
+await pool.Connect("payment-gateway.internal", 9000);
+
+var request = messageFactory.NewMessage(0x1100);
+request.SetField(11, new IsoValue(IsoType.ALPHA, "100001", 6));
+request.SetField(2, new IsoValue(IsoType.LLVAR, "5164123785712481", 16));
+request.SetField(4, new IsoValue(IsoType.NUMERIC, "000000000100", 12));
+
+var response = await pool.SendAndReceive(request, TimeSpan.FromSeconds(10));
+```
+
+Using a least-connections balancer (resolves to the pool via a captured reference so the balancer can query per-connection pending counts):
+
+```csharp
+PooledIso8583Client<IsoMessage> pool = null!;
+pool = new PooledIso8583Client<IsoMessage>(
+    config,
+    messageFactory,
+    new LeastConnectionsLoadBalancer(idx => pool.GetPendingCount(idx)));
+
+await pool.Connect("payment-gateway.internal", 9000);
+```
+
+### Behavior
+
+- **Health checks.** Every `HealthCheckInterval`, the pool scans all connections and replaces any that have become inactive with a fresh `Iso8583Client<T>` that reconnects to the same endpoint. Recovery is best-effort and retries on the next cycle on failure.
+- **Listener propagation.** Listeners added via `AddMessageListener` are applied to every existing connection and to any connection created during health-check recovery, so you never miss messages on a replaced connection.
+- **Correlation.** Each pooled connection has its own `PendingRequestManager`, so STAN-based correlation works per connection. `SendAndReceive` picks a connection via the load balancer and waits for the response on that same connection.
+- **Failure when no connections are available.** If the load balancer is asked to select from an empty set of active connections, it throws `InvalidOperationException`. Combine with `AutoReconnect = true` on the underlying `ClientConfiguration` for fastest recovery.
+
 ## Message Handlers
 
 Implement `IIsoMessageListener<T>` to handle incoming messages. Handlers form a chain: return `false` from `HandleMessage` to stop the chain, `true` to pass the message to the next handler.
@@ -237,6 +326,90 @@ Multiple handlers can be registered. The handler chain processes them in registr
 server.AddMessageListener(new EchoHandler(messageFactory));       // handles 0x0800
 server.AddMessageListener(new AuthorizationHandler(messageFactory)); // handles 0x1100
 server.AddMessageListener(new ReversalHandler(messageFactory));     // handles 0x0400
+```
+
+## Message Validation
+
+Declarative per-field validation catches malformed messages before they reach the wire. The validation handler is **always installed** in both client and server pipelines; attach a `MessageValidator` via `ConnectorConfiguration.MessageValidator` to activate it. When no validator is configured, the handler is a transparent pass-through.
+
+### Built-in Validators
+
+All built-in validators are `IsoType`-aware — they read the `IsoValue.Type` (and `IsoValue.Length` where applicable) and derive their behavior from the NetCore8583 field definition rather than from hand-wired length or format arguments.
+
+| Validator | Applicable IsoTypes | Checks |
+|-----------|--------------------|--------|
+| `LengthValidator` | All | Value length matches the fixed length implied by the IsoType (DATE4/DATE6/DATE10/DATE12/DATE14/DATE_EXP/TIME/AMOUNT), or the declared `IsoValue.Length` (NUMERIC, ALPHA, BINARY), or is within the protocol max for LLVAR (99) / LLLVAR (999) / LLLLVAR (9999) / LLBIN / LLLBIN / LLLLBIN |
+| `NumericValidator` | NUMERIC, AMOUNT | Every character is an ASCII digit |
+| `DateValidator` | DATE4, DATE6, DATE10, DATE12, DATE14, DATE_EXP, TIME | Value parses under the format implied by the IsoType (`MMdd`, `yyMMdd`, `MMddHHmmss`, `yyMMddHHmmss`, `yyyyMMddHHmmss`, `yyMM`, `HHmmss`). `DateTime` values are accepted as-is |
+| `LuhnValidator` | NUMERIC, LLVAR, LLLVAR, LLLLVAR | Digits-only Luhn mod-10 checksum (PAN validation) |
+| `CurrencyCodeValidator` | NUMERIC | 3-digit ISO 4217 numeric code (optionally against a custom allow-list) |
+| `RegexValidator` | NUMERIC, ALPHA, LLVAR, LLLVAR, LLLLVAR | String representation matches the configured regex |
+
+### Registering Rules
+
+Use the fluent `ForField(n)` API. Multiple rules per field are supported and run in registration order — all rules execute, so a single `Validate` call collects every failure at once.
+
+```csharp
+using Iso8583.Common.Validation;
+using Iso8583.Common.Validation.Validators;
+
+var validator = new MessageValidator();
+validator
+    .ForField(2).Required().AddRule(new LuhnValidator()).AddRule(new LengthValidator())
+    .ForField(4).Required().AddRule(new NumericValidator()).AddRule(new LengthValidator())
+    .ForField(7).AddRule(new DateValidator())
+    .ForField(11).AddRule(new NumericValidator()).AddRule(new LengthValidator())
+    .ForField(49).AddRule(new CurrencyCodeValidator());
+
+var config = new ClientConfiguration
+{
+    // ... other settings ...
+    MessageValidator = validator
+};
+```
+
+Fields marked with `.Required()` produce a failure when absent from the message. Fields with rules but no `.Required()` are skipped when absent.
+
+### Pipeline Integration
+
+Once attached to the configuration, the `MessageValidationHandler` sits between `IdleEventHandler` and the application message handler:
+
+- **Outbound writes** — A failing validation completes the write task with a `MessageValidationException` synchronously. The invalid bytes never reach the encoder or the wire, so the caller sees the failure on `Send` / `SendAndReceive`.
+- **Inbound reads** — A failing validation fires an exception event on the pipeline and drops the invalid message. When the server is configured with `ReplyOnError = true`, existing error handlers react and may send an administrative error response.
+
+### Programmatic Validation
+
+You can also validate a message ad hoc without going through the pipeline:
+
+```csharp
+var report = validator.Validate(message);
+if (!report.IsValid)
+{
+    foreach (var error in report.Errors)
+        Console.WriteLine($"Field {error.FieldNumber} ({error.ValidatorName}): {error.ErrorMessage}");
+}
+```
+
+`ValidationReport.ErrorsForField(int)` returns only the errors for a specific field. `ValidationReport.Valid` is a shared empty report.
+
+### Custom Validators
+
+Implement `IFieldValidator` to plug in your own rule. The validator receives the field number and the `IsoValue`, giving access to both the value and its `IsoType` / declared `Length`:
+
+```csharp
+public sealed class TerminalIdValidator : IFieldValidator
+{
+    public ValidationResult Validate(int fieldNumber, IsoValue value)
+    {
+        if (value == null || value.Type != IsoType.ALPHA)
+            return ValidationResult.Failure(fieldNumber, "expected ALPHA field", nameof(TerminalIdValidator));
+
+        var str = value.Value?.ToString() ?? string.Empty;
+        return str.StartsWith("TRM")
+            ? ValidationResult.Success(fieldNumber, nameof(TerminalIdValidator))
+            : ValidationResult.Failure(fieldNumber, $"Terminal id '{str}' must start with TRM", nameof(TerminalIdValidator));
+    }
+}
 ```
 
 ## Configuration
