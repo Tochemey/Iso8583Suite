@@ -14,48 +14,77 @@
 
 A high-performance .NET TCP client and server library for [ISO 8583](https://en.wikipedia.org/wiki/ISO_8583) financial messaging, built on [NetCore8583](https://github.com/Tochemey/NetCore8583) and [SpanNetty](https://github.com/cuteant/SpanNetty). ISO 8583 is the standard used by payment networks worldwide to exchange transaction data between point-of-sale terminals, ATMs, acquirers, and card issuers.
 
-Iso8583Suite handles the low-level networking -- framing, TLS, reconnection, idle detection, and request/response correlation -- so you can focus on your business logic through a simple message handler interface.
+Iso8583Suite handles the low-level networking — framing, TLS, reconnection, idle detection, and request/response correlation — so you can focus on your business logic through a simple message handler interface.
 
 Targets **.NET 8**, **.NET 9**, and **.NET 10**.
 
-## Installation
+## Table of Contents
 
-Install the packages via NuGet:
-
-```shell
-dotnet add package Iso8583.Client --version 0.1.0
-dotnet add package Iso8583.Server --version 0.1.0
-```
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Message Factory](#message-factory)
+- [Server](#server)
+- [Client](#client)
+- [Connection Pooling](#connection-pooling)
+- [Message Handlers](#message-handlers)
+- [Message Validation](#message-validation)
+- [Configuration](#configuration)
+- [TLS/SSL](#tlsssl)
+- [Metrics](#metrics)
+- [Pipeline Customization](#pipeline-customization)
+- [Logging](#logging)
+- [Samples](#samples)
+- [Benchmarks](#benchmarks)
+- [Building and Testing](#building-and-testing)
+- [Contributing](#contributing)
 
 ## Features
 
-- Async TCP server and client with non-blocking I/O
-- Request/response correlation via `SendAndReceive` (STAN-based matching with timeout)
-- Connection pooling with pluggable load balancing (round-robin, least-connections)
-- Auto-reconnection with exponential backoff and jitter
-- TLS/SSL with mutual TLS support
-- Composable message handler chain (copy-on-write, lock-free reads)
-- Connection tracking and max connection enforcement
-- Metrics interface for Prometheus, OpenTelemetry, etc.
-- Sensitive data masking (PAN, track data) in logs
-- Idle detection with automatic echo keepalive
-- Graceful shutdown with configurable drain period
-- `IAsyncDisposable` on both client and server
-- Configuration validation at startup
+| Category         | Capability                                                                     |
+|------------------|--------------------------------------------------------------------------------|
+| Networking       | Async TCP server and client with non-blocking I/O                              |
+| Correlation      | Request/response matching via STAN (field 11) with timeout                     |
+| Scaling          | Connection pooling with pluggable load balancing (round-robin, least-conn)    |
+| Resilience       | Auto-reconnection with exponential backoff and jitter                          |
+| Security         | TLS/SSL with mutual TLS support                                                |
+| Extensibility    | Composable message handler chain (copy-on-write, lock-free reads)              |
+| Observability    | Metrics interface for Prometheus, OpenTelemetry, etc.                          |
+| Safety           | Sensitive data masking (PAN, track data) in logs                               |
+| Keepalive        | Idle detection with automatic echo keepalive                                   |
+| Lifecycle        | Graceful shutdown with configurable drain period, `IAsyncDisposable`           |
+| Validation       | Declarative per-field validation, startup configuration validation             |
 
-## Samples
+## Installation
 
-For working end-to-end examples, run the [SampleServer](SampleServer) and [SampleClient](SampleClient) projects:
-
-```bash
-# Terminal 1
-dotnet run --project SampleServer
-
-# Terminal 2
-dotnet run --project SampleClient
+```shell
+dotnet add package Iso8583.Client
+dotnet add package Iso8583.Server
 ```
 
-The client sends an authorization request (0x1100) and the server responds with 0x1110 (approved).
+## Quick Start
+
+```csharp
+// Shared: build the message factory once at startup
+var mfact = ConfigParser.CreateDefault();
+ConfigParser.ConfigureFromClasspathConfig(mfact, "n8583.xml");
+mfact.UseBinaryMessages = false;
+mfact.Encoding = Encoding.ASCII;
+var messageFactory = new IsoMessageFactory<IsoMessage>(mfact, Iso8583Version.V1987);
+
+// Server
+await using var server = new Iso8583Server<IsoMessage>(9000, messageFactory, logger);
+server.AddMessageListener(new AuthorizationHandler(messageFactory));
+await server.Start();
+
+// Client
+await using var client = new Iso8583Client<IsoMessage>(messageFactory);
+await client.Connect("127.0.0.1", 9000);
+
+var request = messageFactory.NewMessage(0x1100);
+request.SetField(11, new IsoValue(IsoType.ALPHA, "100001", 6));
+var response = await client.SendAndReceive(request, TimeSpan.FromSeconds(10));
+```
 
 ## Message Factory
 
@@ -70,15 +99,13 @@ mfact.Encoding = Encoding.ASCII;
 var messageFactory = new IsoMessageFactory<IsoMessage>(mfact, Iso8583Version.V1987);
 ```
 
-### IMessageFactory&lt;T&gt; Methods
+### Methods
 
-| Method                                                                | Returns | Description                                                                |
-|-----------------------------------------------------------------------|---------|----------------------------------------------------------------------------|
-| `NewMessage(int type)`                                                | `T`     | Create a message with a raw MTI value (e.g. `0x1100`)                      |
-| `NewMessage(MessageClass, MessageFunction, MessageOrigin)`            | `T`     | Create a message with enum-based MTI construction                          |
-| `CreateResponse(T request)`                                           | `T`     | Create a response (MTI = request MTI + `0x0010`). Does **not** copy fields |
-| `CreateResponse(T request, bool copyAllFields)`                       | `T`     | Create a response, optionally copying all fields from the request          |
-| `ParseMessage(byte[] buf, int isoHeaderLength, bool binaryIsoHeader)` | `T`     | Parse raw bytes into an ISO message. Throws `ParseException` on failure    |
+| Method            | Description                                                                             |
+|-------------------|-----------------------------------------------------------------------------------------|
+| `NewMessage`      | Creates a new ISO message from a raw MTI or enum-based components                       |
+| `CreateResponse`  | Creates a response message (MTI = request MTI + `0x0010`), optionally copying fields    |
+| `ParseMessage`    | Parses raw bytes into an ISO message                                                    |
 
 ### MTI Construction
 
@@ -99,33 +126,25 @@ var msg2 = messageFactory.NewMessage(MessageClass.FINANCIAL, MessageFunction.REQ
 
 ## Server
 
-### Iso8583Server&lt;T&gt; Methods
+### Methods
 
-| Method                                          | Returns     | Description                                                             |
-|-------------------------------------------------|-------------|-------------------------------------------------------------------------|
-| `Start()`                                       | `Task`      | Bind to the configured port and begin accepting connections             |
-| `Shutdown()`                                    | `Task`      | Graceful shutdown with a default 15-second drain period                 |
-| `Shutdown(TimeSpan gracePeriod)`                | `Task`      | Graceful shutdown with a custom drain period for in-flight requests     |
-| `AddMessageListener(IIsoMessageListener<T>)`    | `void`      | Register a message handler. Listeners are invoked in registration order |
-| `RemoveMessageListener(IIsoMessageListener<T>)` | `void`      | Remove a previously registered message handler                          |
-| `IsStarted()`                                   | `bool`      | `true` if the server channel is open and active                         |
-| `DisposeAsync()`                                | `ValueTask` | Shuts down with a 5-second grace period. Idempotent, suppresses errors  |
+| Method                  | Description                                                       |
+|-------------------------|-------------------------------------------------------------------|
+| `Start`                 | Binds to the configured port and begins accepting connections     |
+| `Shutdown`              | Gracefully shuts down with a configurable drain period            |
+| `AddMessageListener`    | Registers a message handler in the chain                          |
+| `RemoveMessageListener` | Removes a previously registered message handler                   |
+| `IsStarted`             | Indicates whether the server channel is open and active           |
+| `DisposeAsync`          | Disposes the server. Idempotent, suppresses errors                |
 
-### Iso8583Server&lt;T&gt; Properties
+### Properties
 
-| Property                | Type                            | Description                          |
-|-------------------------|---------------------------------|--------------------------------------|
-| `ActiveConnectionCount` | `int`                           | Current number of connected clients  |
-| `ActiveConnections`     | `IReadOnlyCollection<IChannel>` | All currently active client channels |
+| Property                | Description                           |
+|-------------------------|---------------------------------------|
+| `ActiveConnectionCount` | Current number of connected clients   |
+| `ActiveConnections`     | All currently active client channels  |
 
-### Iso8583Server&lt;T&gt; Constructors
-
-| Constructor                                                                                                                                                                                                     | Description                                                                   |
-|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| `Iso8583Server(int port, ServerConfiguration config, IMessageFactory<T> factory, ILogger logger = null, IServerConnectorConfigurator<ServerConfiguration> configurator = null, IIso8583Metrics metrics = null)` | Full constructor with all options                                             |
-| `Iso8583Server(int port, IMessageFactory<T> factory, ILogger logger = null)`                                                                                                                                    | Minimal constructor using default `ServerConfiguration` (max 100 connections) |
-
-### Server Usage
+### Usage
 
 ```csharp
 var config = new ServerConfiguration
@@ -140,7 +159,6 @@ await using var server = new Iso8583Server<IsoMessage>(9000, config, messageFact
 server.AddMessageListener(new AuthorizationHandler(messageFactory));
 await server.Start();
 
-// Inspect connections
 Console.WriteLine($"Active clients: {server.ActiveConnectionCount}");
 
 // Graceful shutdown with custom drain
@@ -149,29 +167,21 @@ await server.Shutdown(TimeSpan.FromSeconds(30));
 
 ## Client
 
-### Iso8583Client&lt;T&gt; Methods
+### Methods
 
-| Method                                                                       | Returns            | Description                                                                                                                                                                                               |
-|------------------------------------------------------------------------------|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `Connect(string host, int port)`                                             | `Task`             | Connect to the server. Supports IP addresses and DNS hostnames. Resets the reconnect counter on success                                                                                                   |
-| `Send(IsoMessage message)`                                                   | `Task`             | Fire-and-forget send. Throws `InvalidOperationException` if not connected                                                                                                                                 |
-| `Send(IsoMessage message, int timeout)`                                      | `Task`             | Send with a write timeout in milliseconds. Throws `TimeoutException` if the write does not complete in time                                                                                               |
-| `SendAndReceive(IsoMessage message, TimeSpan timeout, CancellationToken ct)` | `Task<IsoMessage>` | Send a request and wait for the correlated response. Correlation uses field 11 (STAN) and message type (response MTI = request MTI + `0x0010`). Throws `TimeoutException` or `OperationCanceledException` |
-| `Disconnect()`                                                               | `Task`             | Gracefully disconnect. Cancels all pending requests and shuts down the event loop                                                                                                                         |
-| `IsConnected()`                                                              | `bool`             | `true` if the channel is active                                                                                                                                                                           |
-| `AddMessageListener(IIsoMessageListener<T>)`                                 | `void`             | Register a handler for incoming messages (e.g. unsolicited server notifications)                                                                                                                          |
-| `RemoveMessageListener(IIsoMessageListener<T>)`                              | `void`             | Remove a previously registered handler                                                                                                                                                                    |
-| `IsStarted()`                                                                | `bool`             | `true` if the channel is open                                                                                                                                                                             |
-| `DisposeAsync()`                                                             | `ValueTask`        | Disconnect and release all resources. Idempotent                                                                                                                                                          |
+| Method                  | Description                                                                   |
+|-------------------------|-------------------------------------------------------------------------------|
+| `Connect`               | Connects to the server. Supports IP addresses and DNS hostnames               |
+| `Send`                  | Fire-and-forget send, with an optional write timeout                          |
+| `SendAndReceive`        | Sends a request and waits for the correlated response (STAN + MTI matching)  |
+| `Disconnect`            | Gracefully disconnects and cancels all pending requests                       |
+| `IsConnected`           | Indicates whether the channel is currently active                             |
+| `AddMessageListener`    | Registers a handler for incoming messages (e.g. unsolicited notifications)    |
+| `RemoveMessageListener` | Removes a previously registered handler                                       |
+| `IsStarted`             | Indicates whether the channel is open                                         |
+| `DisposeAsync`          | Disconnects and releases all resources. Idempotent                            |
 
-### Iso8583Client&lt;T&gt; Constructors
-
-| Constructor                                                                                                                                    | Description                                                          |
-|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
-| `Iso8583Client(ClientConfiguration config, IMessageFactory<T> factory, IClientConnectorConfigurator<ClientConfiguration> configurator = null)` | Full constructor with configuration and optional pipeline customizer |
-| `Iso8583Client(IMessageFactory<T> factory)`                                                                                                    | Minimal constructor using default `ClientConfiguration`              |
-
-### Client Usage
+### Usage
 
 ```csharp
 var config = new ClientConfiguration
@@ -206,41 +216,40 @@ await client.Send(request, timeout: 5000);
 
 For high-throughput workloads, `PooledIso8583Client<T>` maintains a pool of persistent connections to a single endpoint and distributes requests across them using a pluggable load-balancing strategy. It exposes the same `Send` / `SendAndReceive` API as `Iso8583Client<T>`, making it a drop-in replacement.
 
-### PooledIso8583Client&lt;T&gt; Methods
+### Methods
 
-| Method                                                                       | Returns            | Description                                                                                  |
-|------------------------------------------------------------------------------|--------------------|----------------------------------------------------------------------------------------------|
-| `Connect(string host, int port)`                                             | `Task`             | Connect all pooled connections to the server in parallel                                     |
-| `Send(IsoMessage message)`                                                   | `Task`             | Fire-and-forget send on a load-balanced connection                                           |
-| `Send(IsoMessage message, int timeout)`                                      | `Task`             | Send with a write timeout on a load-balanced connection                                      |
-| `SendAndReceive(IsoMessage message, TimeSpan timeout, CancellationToken ct)` | `Task<IsoMessage>` | Send and wait for the correlated response on a load-balanced connection                     |
-| `Disconnect()`                                                               | `Task`             | Gracefully disconnect all pooled connections and stop health checks                          |
-| `AddMessageListener(IIsoMessageListener<T>)`                                 | `void`             | Register a listener on every connection in the pool (and on replacements from health checks) |
-| `RemoveMessageListener(IIsoMessageListener<T>)`                              | `void`             | Remove a previously registered listener from every connection                                |
-| `DisposeAsync()`                                                             | `ValueTask`        | Dispose all connections and release pool resources. Idempotent                               |
+| Method                  | Description                                                              |
+|-------------------------|--------------------------------------------------------------------------|
+| `Connect`               | Connects all pooled connections to the server in parallel                |
+| `Send`                  | Fire-and-forget send on a load-balanced connection                       |
+| `SendAndReceive`        | Load-balanced send that waits for the correlated response                |
+| `Disconnect`            | Gracefully disconnects all pooled connections and stops health checks    |
+| `AddMessageListener`    | Registers a listener on every connection in the pool (and replacements)  |
+| `RemoveMessageListener` | Removes a previously registered listener from every connection           |
+| `DisposeAsync`          | Disposes all connections and releases pool resources. Idempotent         |
 
-### PooledIso8583Client&lt;T&gt; Properties
+### Properties
 
-| Property                | Type  | Description                                                |
-|-------------------------|-------|------------------------------------------------------------|
-| `PoolSize`              | `int` | Total number of connections in the pool                    |
-| `ActiveConnectionCount` | `int` | Current number of connections reporting as healthy/active  |
+| Property                | Description                                               |
+|-------------------------|-----------------------------------------------------------|
+| `PoolSize`              | Total number of connections in the pool                   |
+| `ActiveConnectionCount` | Current number of connections reporting as healthy/active |
 
 ### PooledClientConfiguration
 
-| Property              | Type                  | Default | Description                                                                                       |
-|-----------------------|-----------------------|---------|---------------------------------------------------------------------------------------------------|
-| `PoolSize`            | `int`                 | `4`     | Number of persistent connections to maintain. Must be > 0                                         |
+| Property              | Type                  | Default | Description                                                                                      |
+|-----------------------|-----------------------|---------|--------------------------------------------------------------------------------------------------|
+| `PoolSize`            | `int`                 | `4`     | Number of persistent connections to maintain. Must be > 0                                        |
 | `HealthCheckInterval` | `TimeSpan`            | `10s`   | How often to check each connection and replace any that have become inactive                     |
-| `ClientConfiguration` | `ClientConfiguration` | `new()` | The base configuration applied to every pooled connection (frame encoding, TLS, reconnect, etc.) |
+| `ClientConfiguration` | `ClientConfiguration` | `new()` | Base configuration applied to every pooled connection (frame encoding, TLS, reconnect, etc.)     |
 
 ### Load Balancers
 
 Pass any implementation of `ILoadBalancer` as the third constructor argument. Defaults to `RoundRobinLoadBalancer` when omitted.
 
-| Balancer                       | Selection strategy                                                                                                                         |
-|--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| `RoundRobinLoadBalancer`       | Cycles through active connections atomically via `Interlocked.Increment`. Lock-free, predictable distribution                              |
+| Balancer                       | Selection strategy                                                                                                                        |
+|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| `RoundRobinLoadBalancer`       | Cycles through active connections atomically via `Interlocked.Increment`. Lock-free, predictable distribution                             |
 | `LeastConnectionsLoadBalancer` | Picks the connection with the fewest in-flight requests. Best for workloads with variable response times. Requires a pending-count source |
 
 ### Usage
@@ -285,19 +294,23 @@ await pool.Connect("payment-gateway.internal", 9000);
 
 ### Behavior
 
-- **Health checks.** Every `HealthCheckInterval`, the pool scans all connections and replaces any that have become inactive with a fresh `Iso8583Client<T>` that reconnects to the same endpoint. Recovery is best-effort and retries on the next cycle on failure.
-- **Listener propagation.** Listeners added via `AddMessageListener` are applied to every existing connection and to any connection created during health-check recovery, so you never miss messages on a replaced connection.
-- **Correlation.** Each pooled connection has its own `PendingRequestManager`, so STAN-based correlation works per connection. `SendAndReceive` picks a connection via the load balancer and waits for the response on that same connection.
-- **Failure when no connections are available.** If the load balancer is asked to select from an empty set of active connections, it throws `InvalidOperationException`. Combine with `AutoReconnect = true` on the underlying `ClientConfiguration` for fastest recovery.
+| Aspect                     | Behavior                                                                                                                                                                                               |
+|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Health checks              | Every `HealthCheckInterval`, the pool scans all connections and replaces any that have become inactive. Recovery is best-effort and retries on the next cycle on failure.                              |
+| Listener propagation       | Listeners added via `AddMessageListener` are applied to every connection, including any created during health-check recovery, so you never miss messages on a replaced connection.                    |
+| Correlation                | Each pooled connection has its own `PendingRequestManager`, so STAN-based correlation works per connection. `SendAndReceive` picks a connection via the load balancer and waits on that same one.     |
+| Empty pool                 | If the load balancer is asked to select from an empty set of active connections, it throws `InvalidOperationException`. Combine with `AutoReconnect = true` for fastest recovery.                      |
 
 ## Message Handlers
 
 Implement `IIsoMessageListener<T>` to handle incoming messages. Handlers form a chain: return `false` from `HandleMessage` to stop the chain, `true` to pass the message to the next handler.
 
-| Method                                                 | Returns      | Description                                                                   |
-|--------------------------------------------------------|--------------|-------------------------------------------------------------------------------|
-| `CanHandleMessage(T message)`                          | `bool`       | Return `true` if this handler should process the message (e.g. filter by MTI) |
-| `HandleMessage(IChannelHandlerContext ctx, T message)` | `Task<bool>` | Process the message. Return `false` to stop the chain, `true` to continue     |
+### Methods
+
+| Method             | Description                                                                    |
+|--------------------|--------------------------------------------------------------------------------|
+| `CanHandleMessage` | Returns whether this handler should process the message (e.g. filter by MTI)   |
+| `HandleMessage`    | Processes the message. Return `false` to stop the chain, `true` to continue    |
 
 ```csharp
 public class AuthorizationHandler : IIsoMessageListener<IsoMessage>
@@ -323,9 +336,9 @@ public class AuthorizationHandler : IIsoMessageListener<IsoMessage>
 Multiple handlers can be registered. The handler chain processes them in registration order:
 
 ```csharp
-server.AddMessageListener(new EchoHandler(messageFactory));       // handles 0x0800
+server.AddMessageListener(new EchoHandler(messageFactory));          // handles 0x0800
 server.AddMessageListener(new AuthorizationHandler(messageFactory)); // handles 0x1100
-server.AddMessageListener(new ReversalHandler(messageFactory));     // handles 0x0400
+server.AddMessageListener(new ReversalHandler(messageFactory));      // handles 0x0400
 ```
 
 ## Message Validation
@@ -336,14 +349,14 @@ Declarative per-field validation catches malformed messages before they reach th
 
 All built-in validators are `IsoType`-aware — they read the `IsoValue.Type` (and `IsoValue.Length` where applicable) and derive their behavior from the NetCore8583 field definition rather than from hand-wired length or format arguments.
 
-| Validator | Applicable IsoTypes | Checks |
-|-----------|--------------------|--------|
-| `LengthValidator` | All | Value length matches the fixed length implied by the IsoType (DATE4/DATE6/DATE10/DATE12/DATE14/DATE_EXP/TIME/AMOUNT), or the declared `IsoValue.Length` (NUMERIC, ALPHA, BINARY), or is within the protocol max for LLVAR (99) / LLLVAR (999) / LLLLVAR (9999) / LLBIN / LLLBIN / LLLLBIN |
-| `NumericValidator` | NUMERIC, AMOUNT | Every character is an ASCII digit |
-| `DateValidator` | DATE4, DATE6, DATE10, DATE12, DATE14, DATE_EXP, TIME | Value parses under the format implied by the IsoType (`MMdd`, `yyMMdd`, `MMddHHmmss`, `yyMMddHHmmss`, `yyyyMMddHHmmss`, `yyMM`, `HHmmss`). `DateTime` values are accepted as-is |
-| `LuhnValidator` | NUMERIC, LLVAR, LLLVAR, LLLLVAR | Digits-only Luhn mod-10 checksum (PAN validation) |
-| `CurrencyCodeValidator` | NUMERIC | 3-digit ISO 4217 numeric code (optionally against a custom allow-list) |
-| `RegexValidator` | NUMERIC, ALPHA, LLVAR, LLLVAR, LLLLVAR | String representation matches the configured regex |
+| Validator               | Applicable IsoTypes                                  | Checks                                                                                                                                                                                                                                                                                    |
+|-------------------------|------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `LengthValidator`       | All                                                  | Value length matches the fixed length implied by the IsoType (DATE4/DATE6/DATE10/DATE12/DATE14/DATE_EXP/TIME/AMOUNT), or the declared `IsoValue.Length` (NUMERIC, ALPHA, BINARY), or is within the protocol max for LLVAR (99) / LLLVAR (999) / LLLLVAR (9999) / LLBIN / LLLBIN / LLLLBIN |
+| `NumericValidator`      | NUMERIC, AMOUNT                                      | Every character is an ASCII digit                                                                                                                                                                                                                                                         |
+| `DateValidator`         | DATE4, DATE6, DATE10, DATE12, DATE14, DATE_EXP, TIME | Value parses under the format implied by the IsoType (`MMdd`, `yyMMdd`, `MMddHHmmss`, `yyMMddHHmmss`, `yyyyMMddHHmmss`, `yyMM`, `HHmmss`). `DateTime` values are accepted as-is                                                                                                           |
+| `LuhnValidator`         | NUMERIC, LLVAR, LLLVAR, LLLLVAR                      | Digits-only Luhn mod-10 checksum (PAN validation)                                                                                                                                                                                                                                         |
+| `CurrencyCodeValidator` | NUMERIC                                              | 3-digit ISO 4217 numeric code (optionally against a custom allow-list)                                                                                                                                                                                                                    |
+| `RegexValidator`        | NUMERIC, ALPHA, LLVAR, LLLVAR, LLLLVAR               | String representation matches the configured regex                                                                                                                                                                                                                                        |
 
 ### Registering Rules
 
@@ -374,8 +387,10 @@ Fields marked with `.Required()` produce a failure when absent from the message.
 
 Once attached to the configuration, the `MessageValidationHandler` sits between `IdleEventHandler` and the application message handler:
 
-- **Outbound writes** — A failing validation completes the write task with a `MessageValidationException` synchronously. The invalid bytes never reach the encoder or the wire, so the caller sees the failure on `Send` / `SendAndReceive`.
-- **Inbound reads** — A failing validation fires an exception event on the pipeline and drops the invalid message. When the server is configured with `ReplyOnError = true`, existing error handlers react and may send an administrative error response.
+| Direction         | Behavior on failure                                                                                                                                                                                                            |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Outbound writes   | Completes the write task with a `MessageValidationException` synchronously. The invalid bytes never reach the encoder or the wire, so the caller sees the failure on `Send` / `SendAndReceive`                                |
+| Inbound reads     | Fires an exception event on the pipeline and drops the invalid message. When the server is configured with `ReplyOnError = true`, existing error handlers react and may send an administrative error response                 |
 
 ### Programmatic Validation
 
@@ -421,7 +436,7 @@ All properties below are defined on `ConnectorConfiguration` and apply to both `
 | Property                    | Type               | Default         | Description                                                                                  |
 |-----------------------------|--------------------|-----------------|----------------------------------------------------------------------------------------------|
 | `EncodeFrameLengthAsString` | `bool`             | `false`         | `true` = ASCII length header (e.g. `"0152"`), `false` = binary                               |
-| `FrameLengthFieldLength`    | `int`              | `2`             | Size of the frame length header in bytes. Valid range: 0--4. Set to 0 to omit the header     |
+| `FrameLengthFieldLength`    | `int`              | `2`             | Size of the frame length header in bytes. Valid range: 0–4. Set to 0 to omit the header      |
 | `FrameLengthFieldOffset`    | `int`              | `0`             | Byte offset of the length field from the start of the frame                                  |
 | `FrameLengthFieldAdjust`    | `int`              | `0`             | Compensation value added to the length field (e.g. if the length includes the header itself) |
 | `MaxFrameLength`            | `int`              | `8192`          | Maximum message size in bytes. Messages exceeding this are rejected                          |
@@ -446,7 +461,7 @@ All properties below are defined on `ConnectorConfiguration` and apply to both `
 | `MaxReconnectDelay`    | `int`  | `30000` | Maximum backoff delay in milliseconds                                           |
 | `MaxReconnectAttempts` | `int`  | `10`    | Maximum retry count. `0` = unlimited                                            |
 
-**Reconnection backoff formula:** `delay = min(ReconnectInterval * 2^attempt, MaxReconnectDelay) + random jitter (0--25%)`
+**Reconnection backoff formula:** `delay = min(ReconnectInterval * 2^attempt, MaxReconnectDelay) + random jitter (0–25%)`
 
 ### Server Configuration
 
@@ -459,20 +474,23 @@ All properties below are defined on `ConnectorConfiguration` and apply to both `
 ### Configuration Validation
 
 Both configurations call `Validate()` at construction time and throw `ArgumentException` for invalid values:
-- `MaxFrameLength` must be > 0
-- `IdleTimeout` must be >= 0
-- `WorkerThreadCount` must be >= 1
-- `FrameLengthFieldLength` must be 0-4
-- `FrameLengthFieldOffset` must be >= 0
-- `ReconnectInterval` must be > 0
-- `MaxReconnectDelay` must be > 0
-- `MaxReconnectAttempts` must be >= 0
+
+| Rule                                   |
+|----------------------------------------|
+| `MaxFrameLength` must be > 0           |
+| `IdleTimeout` must be >= 0             |
+| `WorkerThreadCount` must be >= 1       |
+| `FrameLengthFieldLength` must be 0–4   |
+| `FrameLengthFieldOffset` must be >= 0  |
+| `ReconnectInterval` must be > 0        |
+| `MaxReconnectDelay` must be > 0        |
+| `MaxReconnectAttempts` must be >= 0    |
 
 ## TLS/SSL
 
 TLS is configured via the `SslConfiguration` class, set on the `Ssl` property of either client or server configuration.
 
-### SslConfiguration Properties
+### Properties
 
 | Property              | Type     | Default | Description                                                                                                                                 |
 |-----------------------|----------|---------|---------------------------------------------------------------------------------------------------------------------------------------------|
@@ -546,20 +564,20 @@ var config = new ClientConfiguration
 
 Implement `IIso8583Metrics` to integrate with your observability stack (Prometheus, OpenTelemetry, Application Insights, etc.). Pass the implementation to the server constructor. When no metrics provider is supplied, `NullIso8583Metrics` (a no-op singleton) is used automatically.
 
-### IIso8583Metrics Methods
+### Methods
 
-| Method                                       | Parameters                            | Called When                                                    |
-|----------------------------------------------|---------------------------------------|----------------------------------------------------------------|
-| `MessageSent(int mti)`                       | MTI of the outbound message           | A message is encoded and written to the wire (encoder)         |
-| `MessageReceived(int mti)`                   | MTI of the inbound message            | A message is received and decoded from the wire (decoder)      |
-| `MessageHandled(int mti, TimeSpan duration)` | MTI + time spent in the handler chain | A message handler chain completes successfully                 |
-| `MessageError(int mti, Exception exception)` | MTI (0 if unknown) + the exception    | An error occurs during message handling                        |
-| `ConnectionEstablished()`                    | --                                    | A new connection is opened (client connects or server accepts) |
-| `ConnectionLost()`                           | --                                    | A connection is closed                                         |
+| Method                  | Called when                                                    |
+|-------------------------|----------------------------------------------------------------|
+| `MessageSent`           | A message is encoded and written to the wire                   |
+| `MessageReceived`       | A message is received and decoded from the wire                |
+| `MessageHandled`        | A message handler chain completes successfully                 |
+| `MessageError`          | An error occurs during message handling                        |
+| `ConnectionEstablished` | A new connection is opened (client connects or server accepts) |
+| `ConnectionLost`        | A connection is closed                                         |
 
 ### Integration Points
 
-| Component                    | Metrics Calls                                                     |
+| Component                    | Metrics calls                                                     |
 |------------------------------|-------------------------------------------------------------------|
 | `IsoMessageEncoder`          | `MessageSent` after encoding each message                         |
 | `IsoMessageDecoder`          | `MessageReceived` after decoding each message                     |
@@ -595,7 +613,7 @@ Both client and server accept an optional pipeline configurator to add custom Do
 
 ### Built-in Pipeline Order
 
-| Order | Handler                                                                                | Added When                         |
+| Order | Handler                                                                                | Added when                         |
 |-------|----------------------------------------------------------------------------------------|------------------------------------|
 | 1     | `ConnectionTracker`                                                                    | Server only                        |
 | 2     | `TlsHandler`                                                                           | `Ssl.Enabled = true`               |
@@ -618,13 +636,11 @@ public class MyServerConfigurator : IServerConnectorConfigurator<ServerConfigura
 {
     public void ConfigureBootstrap(ServerBootstrap bootstrap, ServerConfiguration config)
     {
-        // Customize server bootstrap options
         bootstrap.ChildOption(ChannelOption.SoSndbuf, 65536);
     }
 
     public void ConfigurePipeline(IChannelPipeline pipeline, ServerConfiguration config)
     {
-        // Add custom handlers after built-in pipeline
         pipeline.AddLast("myHandler", new MyCustomHandler());
     }
 }
@@ -641,13 +657,11 @@ public class MyClientConfigurator : IClientConnectorConfigurator<ClientConfigura
 {
     public void ConfigureBootstrap(Bootstrap bootstrap, ClientConfiguration config)
     {
-        // Customize client bootstrap options
         bootstrap.Option(ChannelOption.SoSndbuf, 65536);
     }
 
     public void ConfigurePipeline(IChannelPipeline pipeline, ClientConfiguration config)
     {
-        // Add custom handlers after built-in pipeline
         pipeline.AddLast("myHandler", new MyCustomHandler());
     }
 }
@@ -657,7 +671,7 @@ var client = new Iso8583Client<IsoMessage>(config, messageFactory, configurator:
 
 ## Logging
 
-The library depends on `ILogger` from `Microsoft.Extensions.Logging` -- bring your own provider (NLog, Serilog, console, etc.).
+The library depends on `ILogger` from `Microsoft.Extensions.Logging` — bring your own provider (NLog, Serilog, console, etc.).
 
 ### Sensitive Data Masking
 
@@ -680,19 +694,19 @@ var config = new ServerConfiguration
 };
 ```
 
-## Building
+## Samples
+
+For working end-to-end examples, run the [SampleServer](SampleServer) and [SampleClient](SampleClient) projects:
 
 ```bash
-dotnet build Iso8583Suite.slnx
+# Terminal 1
+dotnet run --project SampleServer
+
+# Terminal 2
+dotnet run --project SampleClient
 ```
 
-## Testing
-
-```bash
-dotnet test Iso8583Suite.slnx
-```
-
-149 tests, 90% method coverage.
+The client sends an authorization request (0x1100) and the server responds with 0x1110 (approved).
 
 ## Benchmarks
 
@@ -711,6 +725,18 @@ Results on Apple M1, .NET 10:
 | Encode message to wire       |     ~112,000/s |  3.69 KB |
 | Request/response correlation |     ~510,000/s |  1.18 KB |
 | Frame length parse (4-byte)  | ~143,000,000/s |      0 B |
+
+## Building and Testing
+
+```bash
+# Build
+dotnet build Iso8583Suite.slnx
+
+# Test
+dotnet test Iso8583Suite.slnx
+```
+
+149 tests, 90% method coverage.
 
 ## Contributing
 
