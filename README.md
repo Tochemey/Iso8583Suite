@@ -1,11 +1,16 @@
-# Iso8583Suite
+<p align="center">
+  <img src="assets/logo.svg" alt="Iso8583Suite Logo" width="720"/>
+</p>
 
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Tochemey/Iso8583Suite/ci.yml)](https://github.com/Tochemey/Iso8583Suite/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/Tochemey/Iso8583Suite/branch/main/graph/badge.svg?token=y6tAbZa8VK)](https://codecov.io/gh/Tochemey/Iso8583Suite)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Iso8583.Common NuGet](https://img.shields.io/nuget/v/Iso8583.Common?label=Iso8583.Common)](https://www.nuget.org/packages/Iso8583.Common)
-[![Iso8583.Client NuGet](https://img.shields.io/nuget/v/Iso8583.Client?label=Iso8583.Client)](https://www.nuget.org/packages/Iso8583.Client)
-[![Iso8583.Server NuGet](https://img.shields.io/nuget/v/Iso8583.Server?label=Iso8583.Server)](https://www.nuget.org/packages/Iso8583.Server)
+<p align="center">
+  <a href="https://github.com/Tochemey/Iso8583Suite/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Tochemey/Iso8583Suite/ci.yml" alt="Build Status"/></a>
+  <a href="https://codecov.io/gh/Tochemey/Iso8583Suite"><img src="https://codecov.io/gh/Tochemey/Iso8583Suite/branch/main/graph/badge.svg?token=y6tAbZa8VK" alt="codecov"/></a>
+  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"/></a>
+  <a href="https://www.nuget.org/packages/Iso8583.Client"><img src="https://img.shields.io/nuget/v/Iso8583.Client?label=Iso8583.Client" alt="Iso8583.Client NuGet"/></a>
+  <a href="https://www.nuget.org/packages/Iso8583.Server"><img src="https://img.shields.io/nuget/v/Iso8583.Server?label=Iso8583.Server" alt="Iso8583.Server NuGet"/></a>
+  <a href="https://www.nuget.org/packages/Iso8583.Client"><img src="https://img.shields.io/nuget/dt/Iso8583.Client?label=Iso8583.Client%20downloads" alt="Iso8583.Client Downloads"/></a>
+  <a href="https://www.nuget.org/packages/Iso8583.Server"><img src="https://img.shields.io/nuget/dt/Iso8583.Server?label=Iso8583.Server%20downloads" alt="Iso8583.Server Downloads"/></a>
+</p>
 
 A high-performance .NET TCP client and server library for [ISO 8583](https://en.wikipedia.org/wiki/ISO_8583) financial messaging, built on [NetCore8583](https://github.com/Tochemey/NetCore8583) and [SpanNetty](https://github.com/cuteant/SpanNetty). ISO 8583 is the standard used by payment networks worldwide to exchange transaction data between point-of-sale terminals, ATMs, acquirers, and card issuers.
 

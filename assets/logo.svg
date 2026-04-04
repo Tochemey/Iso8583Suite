@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 150" width="720" height="150">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+    <linearGradient id="icon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="720" height="150" rx="16" fill="url(#bg)"/>
+
+  <!-- Subtle border -->
+  <rect width="720" height="150" rx="16" fill="none" stroke="url(#accent)" stroke-width="1" opacity="0.3"/>
+
+  <!-- Network icon: two nodes with connecting lines representing client/server -->
+  <g transform="translate(40, 38)" filter="url(#glow)">
+    <!-- Left node (client) -->
+    <rect x="0" y="16" width="28" height="28" rx="6" fill="none" stroke="url(#icon)" stroke-width="2"/>
+    <rect x="6" y="22" width="16" height="4" rx="1" fill="#38bdf8" opacity="0.6"/>
+    <rect x="6" y="29" width="10" height="4" rx="1" fill="#38bdf8" opacity="0.4"/>
+    <rect x="6" y="36" width="13" height="4" rx="1" fill="#38bdf8" opacity="0.3"/>
+
+    <!-- Connection lines -->
+    <line x1="28" y1="30" x2="44" y2="20" stroke="url(#icon)" stroke-width="1.5" opacity="0.7"/>
+    <line x1="28" y1="30" x2="44" y2="40" stroke="url(#icon)" stroke-width="1.5" opacity="0.7"/>
+    <line x1="28" y1="30" x2="44" y2="30" stroke="url(#icon)" stroke-width="1.5" opacity="0.9"/>
+
+    <!-- Data dots on lines -->
+    <circle cx="36" cy="25" r="1.5" fill="#818cf8">
+      <animate attributeName="cx" values="30;42;30" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="36" cy="35" r="1.5" fill="#38bdf8">
+      <animate attributeName="cx" values="42;30;42" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Right node (server) -->
+    <rect x="44" y="6" width="28" height="48" rx="6" fill="none" stroke="url(#icon)" stroke-width="2"/>
+    <circle cx="58" cy="16" r="3" fill="#818cf8" opacity="0.7"/>
+    <circle cx="58" cy="26" r="3" fill="#38bdf8" opacity="0.6"/>
+    <circle cx="58" cy="36" r="3" fill="#c084fc" opacity="0.5"/>
+    <circle cx="58" cy="46" r="3" fill="#818cf8" opacity="0.4"/>
+  </g>
+
+  <!-- Title: single text element to avoid positioning issues -->
+  <text x="150" y="68" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="36" fill="#f8fafc" letter-spacing="-0.5">
+    <tspan font-weight="700">Iso8583</tspan><tspan font-weight="300" fill="#38bdf8">Suite</tspan>
+  </text>
+
+  <!-- Tagline -->
+  <text x="150" y="95" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#94a3b8" letter-spacing="0.3">High-Performance ISO 8583 Client &amp; Server for .NET</text>
+
+  <!-- Accent line under tagline -->
+  <rect x="150" y="105" width="60" height="2" rx="1" fill="url(#accent)" opacity="0.6"/>
+
+  <!-- Bottom tech pills -->
+  <g font-family="ui-monospace, 'SF Mono', 'Cascadia Code', 'Fira Code', Menlo, monospace" font-size="10">
+    <rect x="150" y="115" width="38" height="20" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="169" y="129" text-anchor="middle" fill="#38bdf8">TCP</text>
+
+    <rect x="196" y="115" width="36" height="20" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="214" y="129" text-anchor="middle" fill="#818cf8">TLS</text>
+
+    <rect x="240" y="115" width="64" height="20" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="272" y="129" text-anchor="middle" fill="#c084fc">NetCore</text>
+  </g>
+</svg>
