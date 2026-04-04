@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
         <LangVersion>14</LangVersion>
+        <Description>Shared types, configuration, and message factory for ISO 8583 financial messaging in .NET. Used by Iso8583.Client and Iso8583.Server.</Description>
     </PropertyGroup>
 
     <ItemGroup>
