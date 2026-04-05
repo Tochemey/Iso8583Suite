@@ -118,8 +118,8 @@ public class TlsMutualAuthTests : IAsyncLifetime
 
     // ---------------- Server TLS only ----------------
 
-    [Fact(Skip = "DotNetty TlsHandler hangs during handshake on macOS — " +
-                 "see Diagnostic_RawSslStream test for cert/TLS validation")]
+    [FactSkipOnMacOS("DotNetty TlsHandler hangs during handshake on macOS — " +
+                     "see Diagnostic_RawSslStream test for cert/TLS validation")]
     public async Task ServerTls_ClientAcceptsUntrustedCert_CanSendAndReceive()
     {
         var port = TestPorts.Next();
@@ -174,8 +174,8 @@ public class TlsMutualAuthTests : IAsyncLifetime
 
     // ---------------- Mutual TLS ----------------
 
-    [Fact(Skip = "DotNetty TlsHandler hangs during handshake on macOS — " +
-                 "see Diagnostic_RawSslStream test for cert/TLS validation")]
+    [FactSkipOnMacOS("DotNetty TlsHandler hangs during handshake on macOS — " +
+                     "see Diagnostic_RawSslStream test for cert/TLS validation")]
     public async Task MutualTls_BothSidesPresentCertificate_CanSendAndReceive()
     {
         var port = TestPorts.Next();

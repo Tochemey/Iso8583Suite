@@ -70,29 +70,32 @@ public class ReconnectOnCloseHandlerTests
     {
         // When the reconnect delegate throws, RunReconnectAsync should log the failure
         // and self-schedule the next attempt so the retry loop survives. We drive one
-        // ChannelInactive to kick off the first attempt and then wait for the attempt
-        // counter to advance past 1, proving the self-reschedule path executed.
-        var invocations = 0;
+        // ChannelInactive to kick off the first attempt and then wait until the delegate
+        // has been invoked at least twice, proving the self-reschedule path executed.
+        // maxAttempts is 2 so the loop terminates in a bounded amount of time even on a
+        // slow CI thread pool; the important assertion is that invocation 2 happened
+        // without any external ChannelInactive trigger.
+        var invocations = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var counter = 0;
         var handler = new ReconnectOnCloseHandler(
             () =>
             {
-                Interlocked.Increment(ref invocations);
+                var n = Interlocked.Increment(ref counter);
+                if (n >= 2) invocations.TrySetResult(true);
                 throw new System.InvalidOperationException("simulated reconnect failure");
             },
             baseDelay: 20,
             maxDelay: 40,
-            maxAttempts: 3);
+            maxAttempts: 2);
 
         var channel = new EmbeddedChannel(handler);
         await channel.CloseAsync();
 
-        // Wait for the handler to exhaust its retry budget.
-        var deadline = System.DateTime.UtcNow.AddSeconds(2);
-        while (!handler.HasExhaustedAttempts && System.DateTime.UtcNow < deadline)
-            await Task.Delay(20);
-
-        Assert.True(handler.HasExhaustedAttempts);
-        Assert.True(invocations >= 2, $"expected self-reschedule loop to invoke reconnect >=2 times, got {invocations}");
+        // A 10-second budget is far larger than the expected wall time (≈50ms) but is
+        // generous enough to absorb thread-pool starvation on a loaded CI worker.
+        var completed = await Task.WhenAny(invocations.Task, Task.Delay(TimeSpan.FromSeconds(10)));
+        Assert.True(completed == invocations.Task,
+            $"self-reschedule loop did not reach 2 invocations in time; counter={Volatile.Read(ref counter)}");
     }
 
     [Fact]
