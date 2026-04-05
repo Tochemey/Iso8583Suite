@@ -349,14 +349,40 @@ Declarative per-field validation catches malformed messages before they reach th
 
 All built-in validators are `IsoType`-aware — they read the `IsoValue.Type` (and `IsoValue.Length` where applicable) and derive their behavior from the NetCore8583 field definition rather than from hand-wired length or format arguments.
 
-| Validator               | Applicable IsoTypes                                  | Checks                                                                                                                                                                                                                                                                                    |
-|-------------------------|------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `LengthValidator`       | All                                                  | Value length matches the fixed length implied by the IsoType (DATE4/DATE6/DATE10/DATE12/DATE14/DATE_EXP/TIME/AMOUNT), or the declared `IsoValue.Length` (NUMERIC, ALPHA, BINARY), or is within the protocol max for LLVAR (99) / LLLVAR (999) / LLLLVAR (9999) / LLBIN / LLLBIN / LLLLBIN |
-| `NumericValidator`      | NUMERIC, AMOUNT                                      | Every character is an ASCII digit                                                                                                                                                                                                                                                         |
-| `DateValidator`         | DATE4, DATE6, DATE10, DATE12, DATE14, DATE_EXP, TIME | Value parses under the format implied by the IsoType (`MMdd`, `yyMMdd`, `MMddHHmmss`, `yyMMddHHmmss`, `yyyyMMddHHmmss`, `yyMM`, `HHmmss`). `DateTime` values are accepted as-is                                                                                                           |
-| `LuhnValidator`         | NUMERIC, LLVAR, LLLVAR, LLLLVAR                      | Digits-only Luhn mod-10 checksum (PAN validation)                                                                                                                                                                                                                                         |
-| `CurrencyCodeValidator` | NUMERIC                                              | 3-digit ISO 4217 numeric code (optionally against a custom allow-list)                                                                                                                                                                                                                    |
-| `RegexValidator`        | NUMERIC, ALPHA, LLVAR, LLLVAR, LLLLVAR               | String representation matches the configured regex                                                                                                                                                                                                                                        |
+| Validator               | Purpose                                                                 |
+|-------------------------|-------------------------------------------------------------------------|
+| `LengthValidator`       | Enforces fixed, declared, or protocol-max lengths per `IsoType`         |
+| `NumericValidator`      | Ensures the value contains only ASCII digits                            |
+| `DateValidator`         | Parses the value against the date/time format implied by the `IsoType`  |
+| `LuhnValidator`         | Applies the Luhn mod-10 checksum for PAN validation                     |
+| `CurrencyCodeValidator` | Checks against the ISO 4217 numeric code set (or a custom allow-list)   |
+| `RegexValidator`        | Matches the value against a configured regular expression               |
+
+<details>
+<summary><b>Validator details — applicable IsoTypes and rules</b></summary>
+
+**`LengthValidator`** — applies to all IsoTypes.
+Value length must match:
+- the fixed length implied by the IsoType for `DATE4` / `DATE6` / `DATE10` / `DATE12` / `DATE14` / `DATE_EXP` / `TIME` / `AMOUNT`,
+- the declared `IsoValue.Length` for `NUMERIC` / `ALPHA` / `BINARY`,
+- the protocol max for `LLVAR` (99) / `LLLVAR` (999) / `LLLLVAR` (9999) and their binary counterparts (`LLBIN` / `LLLBIN` / `LLLLBIN`).
+
+**`NumericValidator`** — applies to `NUMERIC`, `AMOUNT`.
+Every character must be an ASCII digit.
+
+**`DateValidator`** — applies to `DATE4`, `DATE6`, `DATE10`, `DATE12`, `DATE14`, `DATE_EXP`, `TIME`.
+The value must parse under the format implied by the IsoType (`MMdd`, `yyMMdd`, `MMddHHmmss`, `yyMMddHHmmss`, `yyyyMMddHHmmss`, `yyMM`, `HHmmss`). `DateTime` values are accepted as-is.
+
+**`LuhnValidator`** — applies to `NUMERIC`, `LLVAR`, `LLLVAR`, `LLLLVAR`.
+Digits-only Luhn mod-10 checksum for PAN validation.
+
+**`CurrencyCodeValidator`** — applies to `NUMERIC`.
+Must be a 3-digit ISO 4217 numeric code. Accepts an optional custom allow-list via the constructor.
+
+**`RegexValidator`** — applies to `NUMERIC`, `ALPHA`, `LLVAR`, `LLLVAR`, `LLLLVAR`.
+String representation must match the configured regex.
+
+</details>
 
 ### Registering Rules
 
