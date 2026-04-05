@@ -53,7 +53,7 @@ public class PendingRequestManagerTests
     public async Task RegisterAndComplete_MatchesResponseToRequest()
     {
         var request = CreateRequest(0x0200, "100001");
-        var responseTask = _manager.RegisterPending(request, TimeSpan.FromSeconds(5));
+        var (_, responseTask) = _manager.RegisterPending(request, TimeSpan.FromSeconds(5));
 
         var response = CreateResponse(0x0210, "100001");
         Assert.True(_manager.CanHandleMessage(response));
@@ -81,8 +81,8 @@ public class PendingRequestManagerTests
     public async Task RegisterPending_Timeout_ThrowsTimeoutException()
     {
         var request = CreateRequest(0x0200, "100002");
-        await Assert.ThrowsAsync<TimeoutException>(async () =>
-            await _manager.RegisterPending(request, TimeSpan.FromMilliseconds(50)));
+        var (_, task) = _manager.RegisterPending(request, TimeSpan.FromMilliseconds(50));
+        await Assert.ThrowsAsync<TimeoutException>(async () => await task);
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class PendingRequestManagerTests
     {
         var cts = new CancellationTokenSource();
         var request = CreateRequest(0x0200, "100003");
-        var task = _manager.RegisterPending(request, TimeSpan.FromSeconds(10), cts.Token);
+        var (_, task) = _manager.RegisterPending(request, TimeSpan.FromSeconds(10), cts.Token);
 
         cts.Cancel();
         await Assert.ThrowsAsync<TaskCanceledException>(async () => await task);
@@ -103,7 +103,7 @@ public class PendingRequestManagerTests
         _ = _manager.RegisterPending(request, TimeSpan.FromSeconds(5));
 
         Assert.Throws<InvalidOperationException>(() =>
-            _manager.RegisterPending(request, TimeSpan.FromSeconds(5)).GetAwaiter().GetResult());
+            _manager.RegisterPending(request, TimeSpan.FromSeconds(5)));
 
         _manager.CancelAll();
     }
@@ -113,8 +113,8 @@ public class PendingRequestManagerTests
     {
         var request1 = CreateRequest(0x0200, "100005");
         var request2 = CreateRequest(0x0200, "100006");
-        var task1 = _manager.RegisterPending(request1, TimeSpan.FromSeconds(30));
-        var task2 = _manager.RegisterPending(request2, TimeSpan.FromSeconds(30));
+        var (_, task1) = _manager.RegisterPending(request1, TimeSpan.FromSeconds(30));
+        var (_, task2) = _manager.RegisterPending(request2, TimeSpan.FromSeconds(30));
 
         _manager.CancelAll();
 
@@ -135,19 +135,41 @@ public class PendingRequestManagerTests
     public async Task HandleMessage_MatchedResponse_ReturnsFalse()
     {
         var request = CreateRequest(0x0200, "100007");
-        _ = _manager.RegisterPending(request, TimeSpan.FromSeconds(5));
+        var (_, _) = _manager.RegisterPending(request, TimeSpan.FromSeconds(5));
 
         var response = CreateResponse(0x0210, "100007");
         var result = await _manager.HandleMessage(null!, response);
-        Assert.False(result); // stop chain
+        Assert.False(result);
     }
 
     [Fact]
     public void RegisterPending_NoStan_ThrowsInvalidOperationException()
     {
         var msg = _mfact.NewMessage(0x0200);
-        // No field 11 set
         Assert.ThrowsAny<Exception>(() =>
-            _manager.RegisterPending(msg, TimeSpan.FromSeconds(5)).GetAwaiter().GetResult());
+            _manager.RegisterPending(msg, TimeSpan.FromSeconds(5)));
+    }
+
+    [Fact]
+    public async Task Cancel_ByKey_CancelsOnlyThatRequest()
+    {
+        var r1 = CreateRequest(0x0200, "200001");
+        var r2 = CreateRequest(0x0200, "200002");
+        var (key1, task1) = _manager.RegisterPending(r1, TimeSpan.FromSeconds(30));
+        var (_, task2) = _manager.RegisterPending(r2, TimeSpan.FromSeconds(30));
+
+        _manager.Cancel(key1);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => task1);
+        Assert.False(task2.IsCompleted);
+
+        _manager.CancelAll();
+    }
+
+    [Fact]
+    public void Cancel_UnknownKey_IsNoOp()
+    {
+        _manager.Cancel("unknown:key"); // should not throw
+        Assert.Equal(0, _manager.PendingCount);
     }
 }

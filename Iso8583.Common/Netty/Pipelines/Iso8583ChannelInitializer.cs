@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Security.Cryptography.X509Certificates;
 using DotNetty.Codecs;
-using DotNetty.Handlers.Logging;
 using DotNetty.Handlers.Timeout;
 using DotNetty.Handlers.Tls;
 using DotNetty.Transport.Channels;
@@ -50,12 +50,16 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <param name="workerGroup">the worker group</param>
     /// <param name="messageFactory">the message factory</param>
     /// <param name="channelHandler">the channel handler</param>
+    /// <param name="isClient">
+    ///   True when this initializer is used on the client side, false on the server side.
+    ///   Controls TLS handler type (client vs server) and client-only pipeline handlers.
+    /// </param>
     /// <param name="reconnectHandler">optional reconnect handler for client connections</param>
     /// <param name="connectionTracker">optional connection tracker for server connections</param>
     /// <param name="metrics">optional metrics provider</param>
     public Iso8583ChannelInitializer(TC configuration, IPipelineConfigurator<TC> configurator,
       MultithreadEventLoopGroup workerGroup, IMessageFactory<IsoMessage> messageFactory,
-      IChannelHandler channelHandler, IChannelHandler reconnectHandler = null,
+      IChannelHandler channelHandler, bool isClient, IChannelHandler reconnectHandler = null,
       IChannelHandler connectionTracker = null, IIso8583Metrics metrics = null)
     {
       _configuration = configuration;
@@ -66,7 +70,7 @@ namespace Iso8583.Common.Netty.Pipelines
       _reconnectHandler = reconnectHandler;
       _connectionTracker = connectionTracker;
       _metrics = metrics ?? NullIso8583Metrics.Instance;
-      _isClient = reconnectHandler != null;
+      _isClient = isClient;
     }
 
     /// <summary>
@@ -95,7 +99,7 @@ namespace Iso8583.Common.Netty.Pipelines
     ///   Creates the ISO message logging handler with the configured sensitivity and field description settings.
     /// </summary>
     private static IChannelHandler CreateLoggingHandler(TC configuration) =>
-      new IsoMessageLoggingHandler(LogLevel.DEBUG, configuration.LogSensitiveData,
+      new IsoMessageLoggingHandler(configuration.LogLevel, configuration.LogSensitiveData,
         configuration.LogFieldDescription, configuration.SensitiveDataFields);
 
     /// <summary>
@@ -136,29 +140,8 @@ namespace Iso8583.Common.Netty.Pipelines
         pipeline.AddLast("connectionTracker", _connectionTracker);
 
       // Add TLS handler if SSL is configured
-      var ssl = _configuration.Ssl;
-      if (ssl is { Enabled: true })
-      {
-        if (_isClient)
-        {
-          var targetHost = ssl.TargetHost ?? channel.RemoteAddress?.ToString() ?? "localhost";
-          if (ssl.MutualTls && !string.IsNullOrEmpty(ssl.CertificatePath))
-          {
-            var clientCert = LoadCertificate(ssl.CertificatePath, ssl.CertificatePassword);
-            var clientSettings = new ClientTlsSettings(targetHost, [clientCert]);
-            pipeline.AddLast("tls", new TlsHandler(clientSettings));
-          }
-          else
-          {
-            pipeline.AddLast("tls", new TlsHandler(new ClientTlsSettings(targetHost)));
-          }
-        }
-        else
-        {
-          var serverCert = LoadCertificate(ssl.CertificatePath, ssl.CertificatePassword);
-          pipeline.AddLast("tls", new TlsHandler(new ServerTlsSettings(serverCert, ssl.MutualTls)));
-        }
-      }
+      TryAddTlsHandler(pipeline, _configuration.Ssl, _isClient,
+        _isClient ? channel.RemoteAddress?.ToString() : null);
 
       var isoMessageEncoder = CreateIsoMessageEncoder(_configuration);
       var loggingHandler = CreateLoggingHandler(_configuration);
@@ -178,6 +161,14 @@ namespace Iso8583.Common.Netty.Pipelines
       // when a validator is attached, invalid messages fail outbound writes and fire exception
       // events on inbound reads so existing error handlers can react.
       pipeline.AddLast("messageValidation", new MessageValidationHandler(_configuration.MessageValidator));
+      if (_configuration.EnableAuditLog)
+      {
+        var auditLogger = _configuration.AuditLogger
+                          ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
+        pipeline.AddLast("auditLog",
+          new Iso8583AuditLogHandler(auditLogger, _configuration.AuditLogIncludeFields,
+            _configuration.SensitiveDataFields));
+      }
       pipeline.AddLast(_workerGroup, "messageHandler", _channelHandler);
 
       // Add reconnect handler for client connections
@@ -188,10 +179,66 @@ namespace Iso8583.Common.Netty.Pipelines
     }
 
     /// <summary>
+    ///   Installs a <see cref="TlsHandler"/> at the head of the given pipeline when SSL is
+    ///   enabled. Extracted from <see cref="InitChannel"/> so the TLS wiring can be exercised
+    ///   by unit tests with an <c>EmbeddedChannel</c> pipeline without requiring a real
+    ///   TCP handshake.
+    /// </summary>
+    internal static void TryAddTlsHandler(IChannelPipeline pipeline, SslConfiguration ssl, bool isClient,
+      string clientRemoteAddress)
+    {
+      if (ssl is not { Enabled: true }) return;
+
+      if (isClient)
+      {
+        var targetHost = ssl.TargetHost ?? clientRemoteAddress ?? "localhost";
+        ClientTlsSettings clientSettings;
+        var clientCert = ResolveCertificate(ssl);
+        if (ssl.MutualTls && clientCert != null)
+        {
+          clientSettings = new ClientTlsSettings(targetHost, [clientCert]);
+        }
+        else
+        {
+          clientSettings = new ClientTlsSettings(targetHost);
+        }
+
+        if (ssl.AllowUntrustedCertificates)
+        {
+          clientSettings.AllowUnstrustedCertificate = true;
+          clientSettings.AllowNameMismatchCertificate = true;
+          clientSettings.AllowCertificateChainErrors = true;
+        }
+
+        pipeline.AddLast("tls", new TlsHandler(clientSettings));
+      }
+      else
+      {
+        var serverCert = ResolveCertificate(ssl)
+                         ?? throw new InvalidOperationException(
+                           "Server SSL is enabled but no certificate is configured. " +
+                           "Set SslConfiguration.Certificate or SslConfiguration.CertificatePath.");
+        pipeline.AddLast("tls", new TlsHandler(new ServerTlsSettings(serverCert, ssl.MutualTls)));
+      }
+    }
+
+    /// <summary>
+    ///   Resolves the certificate from an <see cref="SslConfiguration"/>, preferring an
+    ///   already-loaded <see cref="SslConfiguration.Certificate"/> instance when present and
+    ///   falling back to loading from <see cref="SslConfiguration.CertificatePath"/>.
+    /// </summary>
+    internal static X509Certificate2 ResolveCertificate(SslConfiguration ssl)
+    {
+      if (ssl.Certificate != null) return ssl.Certificate;
+      if (string.IsNullOrEmpty(ssl.CertificatePath)) return null;
+      return LoadCertificate(ssl.CertificatePath, ssl.CertificatePassword);
+    }
+
+    /// <summary>
     ///   Loads a PKCS#12 certificate from the given file path. Uses the platform-appropriate loader
     ///   (<c>X509CertificateLoader</c> on .NET 9+, constructor on older runtimes).
     /// </summary>
-    private static X509Certificate2 LoadCertificate(string path, string password)
+    internal static X509Certificate2 LoadCertificate(string path, string password)
     {
 #if NET9_0_OR_GREATER
       return X509CertificateLoader.LoadPkcs12FromFile(path, password);

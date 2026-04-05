@@ -35,6 +35,17 @@
         <field num="70" type="NUMERIC" length="3">301</field>
     </template>
 
+    <!-- reversal advice request template -->
+    <template type="0420">
+        <field num="3" type="NUMERIC" length="6">000000</field>
+        <field num="49" type="ALPHA" length="3">840</field>
+    </template>
+
+    <!-- reversal advice response template -->
+    <template type="0430">
+        <field num="39" type="NUMERIC" length="2">00</field>
+    </template>
+
     <!-- ISO 8583 Authorization Request Message Template -->
     <parse type="1100">
         <field num="2" type="LLVAR"/>
@@ -168,5 +179,29 @@
         <field num="11" type="NUMERIC" length="6"/>
         <field num="39" type="ALPHA" length="2"/>
         <field num="70" type="NUMERIC" length="3"/>
+    </parse>
+
+    <!-- reversal advice request -->
+    <parse type="0420">
+        <field num="3" type="NUMERIC" length="6"/>
+        <field num="4" type="AMOUNT"/>
+        <field num="7" type="DATE10"/>
+        <field num="11" type="NUMERIC" length="6"/>
+        <field num="37" type="NUMERIC" length="12"/>
+        <field num="41" type="ALPHA" length="16"/>
+        <field num="49" type="ALPHA" length="3"/>
+        <field num="90" type="ALPHA" length="42"/>
+    </parse>
+
+    <!-- reversal advice response -->
+    <parse type="0430">
+        <field num="3" type="NUMERIC" length="6"/>
+        <field num="4" type="AMOUNT"/>
+        <field num="7" type="DATE10"/>
+        <field num="11" type="NUMERIC" length="6"/>
+        <field num="37" type="NUMERIC" length="12"/>
+        <field num="39" type="NUMERIC" length="2"/>
+        <field num="41" type="ALPHA" length="16"/>
+        <field num="49" type="ALPHA" length="3"/>
     </parse>
 </n8583-config>

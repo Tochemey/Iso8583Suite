@@ -26,7 +26,7 @@ namespace Iso8583.Common.Netty.Pipelines
   ///   configured validator is <c>null</c>, the handler is a transparent pass-through.
   ///
   ///   <para>
-  ///   On outbound writes, a failing validation completes the write task with a
+  ///   On outbound writes, a failing validation completes the write promise with a
   ///   <see cref="MessageValidationException"/> so that the caller sees the failure
   ///   synchronously and the invalid bytes never reach the wire.
   ///   </para>
@@ -91,8 +91,6 @@ namespace Iso8583.Common.Netty.Pipelines
         return;
       }
 
-      // Invalid outbound message: fail the write synchronously so the caller sees the error
-      // and no bytes are forwarded downstream toward the encoder / socket.
       promise.TrySetException(new MessageValidationException(report));
     }
   }

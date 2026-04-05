@@ -14,7 +14,6 @@
 
 using System;
 using System.Runtime.CompilerServices;
-using System.Text;
 using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
@@ -85,15 +84,10 @@ namespace Iso8583.Common.Netty.Codecs
     }
 
     /// <summary>
-    ///   Converts sbyte[] to byte[] using block copy (same memory layout, single allocation).
+    ///   Reinterprets sbyte[] as byte[] without copying (identical memory layout).
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static byte[] SBytesToBytes(sbyte[] source)
-    {
-      var dest = new byte[source.Length];
-      Buffer.BlockCopy(source, 0, dest, 0, source.Length);
-      return dest;
-    }
+    private static byte[] SBytesToBytes(sbyte[] source) => Unsafe.As<sbyte[], byte[]>(ref source);
 
     /// <summary>
     ///   Writes the length header as ASCII digits directly into the buffer.
@@ -101,7 +95,6 @@ namespace Iso8583.Common.Netty.Codecs
     /// </summary>
     private static void WriteLengthHeaderAscii(IByteBuffer buffer, int length, int headerLength)
     {
-      // Write ASCII digits right-to-left, then pad with '0'
       Span<byte> digits = stackalloc byte[headerLength];
       digits.Fill((byte)'0');
 
@@ -111,6 +104,10 @@ namespace Iso8583.Common.Netty.Codecs
         digits[i] = (byte)('0' + value % 10);
         value /= 10;
       }
+
+      if (value > 0)
+        throw new ArgumentException(
+          $"Message length {length} cannot be represented in {headerLength} ASCII digits");
 
       for (var i = 0; i < headerLength; i++)
         buffer.WriteByte(digits[i]);

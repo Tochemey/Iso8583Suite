@@ -15,6 +15,7 @@
 using System;
 using Iso8583.Common.Netty.Pipelines;
 using Iso8583.Common.Validation;
+using DotNettyLogLevel = DotNetty.Handlers.Logging.LogLevel;
 
 namespace Iso8583.Common
 {
@@ -68,6 +69,9 @@ namespace Iso8583.Common
       FrameLengthFieldAdjust = DefaultFrameLengthFieldAdjust;
       SensitiveDataFields = DefaultSensitiveDataFields;
       WorkerThreadCount = Math.Max(2, Environment.ProcessorCount * 2);
+      LogLevel = DotNettyLogLevel.DEBUG;
+      EnableAuditLog = false;
+      AuditLogIncludeFields = false;
     }
 
     /// <summary>
@@ -154,6 +158,37 @@ namespace Iso8583.Common
     ///   synchronously, inbound messages fire an exception event that existing error handlers can react to.
     /// </summary>
     public MessageValidator MessageValidator { get; set; }
+
+    /// <summary>
+    ///   Log level applied to the DotNetty <c>LoggingHandler</c> / <see cref="IsoMessageLoggingHandler"/>
+    ///   installed by the pipeline when <see cref="AddLoggingHandler"/> is <c>true</c>, and to the
+    ///   server's acceptor <c>LoggingHandler</c>. Defaults to <see cref="DotNettyLogLevel.DEBUG"/>.
+    /// </summary>
+    public DotNettyLogLevel LogLevel { get; set; }
+
+    /// <summary>
+    ///   When <c>true</c>, the structured audit log handler is inserted into the channel pipeline
+    ///   and emits one event per inbound and outbound <see cref="NetCore8583.IsoMessage"/> through
+    ///   <see cref="AuditLogger"/>. When <c>false</c> (default), the handler is not installed and
+    ///   there is zero runtime cost.
+    /// </summary>
+    public bool EnableAuditLog { get; set; }
+
+    /// <summary>
+    ///   Logger used by the audit handler to publish structured events. Callers should supply a
+    ///   logger created with category <see cref="Iso8583AuditLogHandler.AuditLogCategory"/> (for
+    ///   example <c>loggerFactory.CreateLogger("Iso8583.Audit")</c>) so downstream sinks can
+    ///   route audit events separately from diagnostic logs. When <see cref="EnableAuditLog"/>
+    ///   is <c>true</c> and this property is <c>null</c>, the handler is still installed but
+    ///   uses a no-op logger.
+    /// </summary>
+    public Microsoft.Extensions.Logging.ILogger AuditLogger { get; set; }
+
+    /// <summary>
+    ///   When <c>true</c>, the audit event carries a masked dictionary of every present ISO 8583
+    ///   field under the <c>Iso8583.Fields</c> property. Disabled by default to keep log volume down.
+    /// </summary>
+    public bool AuditLogIncludeFields { get; set; }
 
     /// <summary>
     ///   Validates the configuration and throws <see cref="ArgumentException"/> for invalid values.

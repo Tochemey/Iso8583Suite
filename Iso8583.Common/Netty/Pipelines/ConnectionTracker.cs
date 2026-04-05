@@ -53,9 +53,9 @@ namespace Iso8583.Common.Netty.Pipelines
     public int ActiveConnectionCount => _connectionCount;
 
     /// <summary>
-    ///   Gets all currently active channels.
+    ///   Gets a snapshot of all currently active channels.
     /// </summary>
-    public IReadOnlyCollection<IChannel> ActiveChannels => _activeChannels.Keys as IReadOnlyCollection<IChannel>;
+    public IReadOnlyCollection<IChannel> ActiveChannels => (IReadOnlyCollection<IChannel>)_activeChannels.Keys;
 
     /// <inheritdoc />
     public override bool IsSharable => true;
@@ -70,7 +70,8 @@ namespace Iso8583.Common.Netty.Pipelines
 
       if (_maxConnections > 0 && count > _maxConnections)
       {
-        Interlocked.Decrement(ref _connectionCount);
+        // Do NOT decrement here. ChannelInactive will fire when CloseAsync
+        // completes and will perform the decrement, keeping the count correct.
         _logger.LogWarning("Max connections ({Max}) exceeded. Rejecting connection from {Remote}",
           _maxConnections, context.Channel.RemoteAddress);
         context.CloseAsync();

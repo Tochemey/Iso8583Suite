@@ -44,7 +44,7 @@ namespace Iso8583.Client
     private int _port;
     private volatile bool _intentionalDisconnect;
     private volatile bool _disposed;
-    private ReconnectOnCloseHandler _reconnectHandler;
+    internal ReconnectOnCloseHandler _reconnectHandler;
 
     /// <summary>
     ///   creates a new instance of <see cref="Iso8583Client{T}" />
@@ -131,7 +131,7 @@ namespace Iso8583.Client
       cancellationToken.ThrowIfCancellationRequested();
 
       // Register the pending request before sending (so we don't miss a fast response)
-      var responseTask = _pendingRequests.RegisterPending((T)message, timeout, cancellationToken);
+      var (key, responseTask) = _pendingRequests.RegisterPending((T)message, timeout, cancellationToken);
 
       try
       {
@@ -139,13 +139,12 @@ namespace Iso8583.Client
       }
       catch (Exception) when (cancellationToken.IsCancellationRequested)
       {
-        _pendingRequests.CancelAll();
+        _pendingRequests.Cancel(key);
         throw new OperationCanceledException(cancellationToken);
       }
       catch
       {
-        // If send fails, cancel the pending registration
-        _pendingRequests.CancelAll();
+        _pendingRequests.Cancel(key);
         throw;
       }
 
@@ -153,7 +152,7 @@ namespace Iso8583.Client
     }
 
     /// <summary>
-    ///   Creates and configures a new SpanNetty <see cref="Bootstrap"/> with the channel initializer,
+    ///   Creates and configures a new DotNetty <see cref="Bootstrap"/> with the channel initializer,
     ///   reconnection handler, and TCP socket options.
     /// </summary>
     private Bootstrap CreateBootstrap()
@@ -175,7 +174,7 @@ namespace Iso8583.Client
       bootstrap.Handler(new Iso8583ChannelInitializer<ClientConfiguration>(
         Configuration, ConnectorConfigurator, WorkerEventLoopGroup,
         MessageFactory as IMessageFactory<IsoMessage>, MessageHandler,
-        _reconnectHandler
+        isClient: true, _reconnectHandler
       ));
 
       ConfigureBootstrap(bootstrap);
@@ -219,6 +218,7 @@ namespace Iso8583.Client
     public async Task Disconnect()
     {
       _intentionalDisconnect = true;
+      _reconnectHandler?.Stop();
       _pendingRequests.CancelAll();
       var channel = GetChannel();
       if (channel != null)
@@ -233,8 +233,9 @@ namespace Iso8583.Client
       // RejectedExecutionException on thread-pool threads.
       try
       {
-        await WorkerEventLoopGroup.ShutdownGracefullyAsync(
-          TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5));
+        var shutdownTask = WorkerEventLoopGroup.ShutdownGracefullyAsync(
+          TimeSpan.FromMilliseconds(200), TimeSpan.FromSeconds(3));
+        await Task.WhenAny(shutdownTask, Task.Delay(TimeSpan.FromSeconds(5)));
       }
       catch
       {
@@ -249,6 +250,24 @@ namespace Iso8583.Client
     {
       var channel = GetChannel();
       return channel is { IsActive: true };
+    }
+
+    /// <summary>
+    ///   Indicates whether the client is currently attempting to reconnect after losing its connection.
+    ///   Returns true when auto-reconnect is enabled, the channel is inactive, disconnection was not
+    ///   requested by the user, the reconnect handler has recorded at least one attempt, and the
+    ///   retry budget has not been exhausted.
+    /// </summary>
+    public bool IsReconnecting
+    {
+      get
+      {
+        if (_disposed || _intentionalDisconnect) return false;
+        var handler = _reconnectHandler;
+        if (handler is null) return false;
+        if (IsConnected()) return false;
+        return handler.CurrentAttempts > 0 && !handler.HasExhaustedAttempts;
+      }
     }
 
     /// <inheritdoc />

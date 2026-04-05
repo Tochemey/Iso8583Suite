@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using DotNetty.Transport.Channels;
 using Iso8583.Common.Iso;
 using Iso8583.Common.Netty.Pipelines;
@@ -23,7 +24,7 @@ namespace Iso8583.Common
     where T : IsoMessage
     where TC : ConnectorConfiguration
   {
-    private IChannel _channel;
+    private volatile IChannel _channel;
 
     /// <summary>
     ///   Creates a new instance of <see cref="Iso8583Connector{T, TC}"/>.

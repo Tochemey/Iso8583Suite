@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using DotNetty.Transport.Channels;
 using Microsoft.Extensions.Logging;
@@ -24,7 +24,10 @@ namespace Iso8583.Common.Netty.Pipelines
 {
   /// <summary>
   ///   Client-side handler that triggers automatic reconnection with exponential backoff
-  ///   when the channel is closed unexpectedly.
+  ///   when the channel is closed unexpectedly. When a reconnection attempt fails (e.g.,
+  ///   the remote host is unreachable and no new channel is created), the handler
+  ///   self-schedules the next attempt on a thread-pool timer so the retry loop survives
+  ///   the death of the original event loop.
   /// </summary>
   public class ReconnectOnCloseHandler : ChannelHandlerAdapter
   {
@@ -34,6 +37,7 @@ namespace Iso8583.Common.Netty.Pipelines
     private readonly int _maxAttempts;
     private readonly ILogger _logger;
     private int _attempt;
+    private volatile bool _stopped;
 
     /// <summary>
     ///   Creates a new instance of <see cref="ReconnectOnCloseHandler"/>.
@@ -56,52 +60,89 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <summary>
     ///   Resets the attempt counter. Call this after a successful connection.
     /// </summary>
-    public void ResetAttempts() => _attempt = 0;
+    public void ResetAttempts() => Interlocked.Exchange(ref _attempt, 0);
 
     /// <summary>
-    ///   Schedules a reconnection attempt with exponential backoff when the channel becomes inactive.
-    ///   Stops retrying after <see cref="_maxAttempts"/> (unless set to 0 for unlimited).
+    ///   Permanently stops the reconnection loop. No further attempts will be scheduled.
+    /// </summary>
+    public void Stop() => _stopped = true;
+
+    /// <summary>
+    ///   Gets the current number of reconnection attempts since the last successful connection.
+    ///   Zero means no reconnection is in progress.
+    /// </summary>
+    public int CurrentAttempts => Volatile.Read(ref _attempt);
+
+    /// <summary>
+    ///   Returns true when the handler has exhausted its retry budget and will no longer
+    ///   attempt to reconnect. Always false when <c>maxAttempts</c> is 0 (unlimited retries).
+    /// </summary>
+    public bool HasExhaustedAttempts => _maxAttempts > 0 && Volatile.Read(ref _attempt) >= _maxAttempts;
+
+    /// <summary>
+    ///   Schedules the first reconnection attempt when the channel becomes inactive.
     /// </summary>
     public override void ChannelInactive(IChannelHandlerContext context)
     {
       base.ChannelInactive(context);
+      ScheduleReconnect();
+    }
 
-      if (_maxAttempts > 0 && _attempt >= _maxAttempts)
+    /// <summary>
+    ///   Schedules a reconnection attempt with exponential backoff. On failure the handler
+    ///   re-schedules itself using <see cref="Task.Delay"/> so the loop survives even when
+    ///   no DotNetty event loop is available (e.g., ConnectAsync threw before a channel was
+    ///   created).
+    /// </summary>
+    private void ScheduleReconnect()
+    {
+      if (_stopped) return;
+
+      var attempt = Volatile.Read(ref _attempt);
+      if (_maxAttempts > 0 && attempt >= _maxAttempts)
       {
         _logger.LogError("Max reconnection attempts ({MaxAttempts}) reached. Giving up", _maxAttempts);
         return;
       }
 
-      var delay = CalculateDelay(_attempt);
-      _attempt++;
+      var delay = CalculateDelay(attempt);
+      var currentAttempt = Interlocked.Increment(ref _attempt);
 
-      _logger.LogInformation("Channel disconnected. Scheduling reconnect attempt {Attempt} in {Delay}ms",
-        _attempt, delay);
+      _logger.LogInformation("Scheduling reconnect attempt {Attempt} in {Delay}ms",
+        currentAttempt, delay);
 
-      // Schedule reconnect on the event loop
-      context.Channel.EventLoop.Schedule(async () =>
+      _ = RunReconnectAsync(delay, currentAttempt);
+    }
+
+    private async Task RunReconnectAsync(int delayMs, int attemptNumber)
+    {
+      try
       {
-        try
-        {
-          await _reconnectFunc();
-        }
-        catch (Exception ex)
-        {
-          _logger.LogWarning(ex, "Reconnection attempt {Attempt} failed", _attempt);
-        }
-      }, TimeSpan.FromMilliseconds(delay));
+        await Task.Delay(delayMs);
+
+        if (_stopped) return;
+
+        await _reconnectFunc();
+      }
+      catch (Exception ex)
+      {
+        _logger.LogWarning(ex, "Reconnection attempt {Attempt} failed", attemptNumber);
+
+        // The reconnect delegate failed (e.g., host unreachable). No new channel was
+        // created, so no new ChannelInactive will fire. Self-schedule the next attempt
+        // so the retry loop stays alive.
+        ScheduleReconnect();
+      }
     }
 
     /// <summary>
     ///   Calculates delay with exponential backoff and jitter.
     /// </summary>
-    private int CalculateDelay(int attempt)
+    internal int CalculateDelay(int attempt)
     {
-      // Exponential: baseDelay * 2^attempt, capped at maxDelay
       var exponentialDelay = (long)_baseDelay * (1L << Math.Min(attempt, 20));
       var cappedDelay = (int)Math.Min(exponentialDelay, _maxDelay);
 
-      // Add jitter: random 0-25% on top
       var jitter = Random.Shared.Next(0, Math.Max(1, cappedDelay / 4));
       return cappedDelay + jitter;
     }

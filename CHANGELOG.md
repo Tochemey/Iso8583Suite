@@ -20,6 +20,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`ValidationReport`** with per-field filtering via `ErrorsForField`, a shared `Valid` singleton, and a diagnostic `ToString()`
 - **Custom validators**: implement `IFieldValidator` to plug in project-specific rules with full access to `IsoValue.Type` and declared length
 - **`CompositeIsoMessageHandler`** marked `IsSharable = true` to support multi-connection scenarios required by the pooled client
+- **Health checks**: ASP.NET Core `IHealthCheck` integration for both client and server, reporting connection state and active connection counts
+- **Structured audit log**: opt-in `Iso8583AuditLogHandler` emits one structured event per inbound and outbound message through a caller-supplied `ILogger` under the conventional `Iso8583.Audit` category, exposing scoped properties (`Iso8583.Direction`, `Iso8583.Mti`, `Iso8583.Stan`, `Iso8583.Rrn`, `Iso8583.CorrelationId`, `Iso8583.RemoteEndpoint`, `Iso8583.DurationMs`, optional `Iso8583.Fields`) for downstream routing to Serilog / NLog / OpenTelemetry sinks
+- **Per-channel request/response correlation** in the audit handler attaches `Iso8583.DurationMs` to the response event for the matching STAN
+- **`SensitiveDataMasker`** shared helper centralises PAN and track-data masking for both the diagnostic logging handler and the audit handler
+- **`ConnectorConfiguration.EnableAuditLog` / `AuditLogger` / `AuditLogIncludeFields`** configuration properties to opt into the audit handler and control whether a masked field dictionary is emitted
+- **`ConnectorConfiguration.LogLevel`** configuration property drives both the DotNetty server acceptor `LoggingHandler` and the pipeline `IsoMessageLoggingHandler`, replacing the previously hardcoded `INFO` / `DEBUG` levels
+
+### Changed
+
+- `Iso8583Server` and `IsoMessageLoggingHandler` now honor `ConnectorConfiguration.LogLevel` instead of using hardcoded log levels
+- `SampleServer` and `SampleClient` set `LogLevel` explicitly and enable the audit logger to demonstrate end-to-end usage
 
 ## [0.1.0] - 2026-04-03
 
