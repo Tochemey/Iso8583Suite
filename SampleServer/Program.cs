@@ -20,11 +20,13 @@ using System.Threading.Tasks;
 using DotNetty.Transport.Channels;
 using Iso8583.Common;
 using Iso8583.Common.Iso;
+using Iso8583.Common.Netty.Pipelines;
 using Iso8583.Server;
 using Microsoft.Extensions.Logging;
 using NetCore8583;
 using NetCore8583.Parse;
 using NLog.Extensions.Logging;
+using DotNettyLogLevel = DotNetty.Handlers.Logging.LogLevel;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace SampleServer
@@ -67,7 +69,14 @@ namespace SampleServer
           ReplyOnError = true,
           AddLoggingHandler = true,
           EncodeFrameLengthAsString = true,
-          FrameLengthFieldLength = 4
+          FrameLengthFieldLength = 4,
+          // Use the application's configured log level rather than a hardcoded INFO so the
+          // DotNetty acceptor / ISO message logging handler honor the NLog configuration.
+          LogLevel = DotNettyLogLevel.DEBUG,
+          // Enable the structured audit log; events are published to the "Iso8583.Audit"
+          // category, which downstream sinks can route to a SIEM or JSON file.
+          EnableAuditLog = true,
+          AuditLogger = _loggerFactory.CreateLogger(Iso8583AuditLogHandler.AuditLogCategory)
         };
 
         var serverLogger = _loggerFactory.CreateLogger<Iso8583Server<IsoMessage>>();

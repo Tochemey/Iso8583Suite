@@ -15,7 +15,6 @@
 using System;
 using System.Security.Cryptography.X509Certificates;
 using DotNetty.Codecs;
-using DotNetty.Handlers.Logging;
 using DotNetty.Handlers.Timeout;
 using DotNetty.Handlers.Tls;
 using DotNetty.Transport.Channels;
@@ -100,7 +99,7 @@ namespace Iso8583.Common.Netty.Pipelines
     ///   Creates the ISO message logging handler with the configured sensitivity and field description settings.
     /// </summary>
     private static IChannelHandler CreateLoggingHandler(TC configuration) =>
-      new IsoMessageLoggingHandler(LogLevel.DEBUG, configuration.LogSensitiveData,
+      new IsoMessageLoggingHandler(configuration.LogLevel, configuration.LogSensitiveData,
         configuration.LogFieldDescription, configuration.SensitiveDataFields);
 
     /// <summary>
@@ -195,6 +194,14 @@ namespace Iso8583.Common.Netty.Pipelines
       // when a validator is attached, invalid messages fail outbound writes and fire exception
       // events on inbound reads so existing error handlers can react.
       pipeline.AddLast("messageValidation", new MessageValidationHandler(_configuration.MessageValidator));
+      if (_configuration.EnableAuditLog)
+      {
+        var auditLogger = _configuration.AuditLogger
+                          ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
+        pipeline.AddLast("auditLog",
+          new Iso8583AuditLogHandler(auditLogger, _configuration.AuditLogIncludeFields,
+            _configuration.SensitiveDataFields));
+      }
       pipeline.AddLast(_workerGroup, "messageHandler", _channelHandler);
 
       // Add reconnect handler for client connections

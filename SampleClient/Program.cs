@@ -17,10 +17,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Iso8583.Client;
 using Iso8583.Common.Iso;
+using Iso8583.Common.Netty.Pipelines;
 using Microsoft.Extensions.Logging;
 using NetCore8583;
 using NetCore8583.Parse;
 using NLog.Extensions.Logging;
+using DotNettyLogLevel = DotNetty.Handlers.Logging.LogLevel;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace SampleClient
@@ -67,7 +69,14 @@ namespace SampleClient
         IdleTimeout = 30,
         AddLoggingHandler = true,
         EncodeFrameLengthAsString = true,
-        FrameLengthFieldLength = 4
+        FrameLengthFieldLength = 4,
+        // Use the application's configured log level rather than a hardcoded INFO so the
+        // ISO message logging handler honors the NLog configuration.
+        LogLevel = DotNettyLogLevel.DEBUG,
+        // Enable the structured audit log; events are published to the "Iso8583.Audit"
+        // category for downstream routing to SIEM / JSON / OTEL sinks.
+        EnableAuditLog = true,
+        AuditLogger = _loggerFactory.CreateLogger(Iso8583AuditLogHandler.AuditLogCategory)
       };
 
       await using var client = new Iso8583Client<IsoMessage>(clientConfig, messageFactory);

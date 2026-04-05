@@ -26,20 +26,11 @@ namespace Iso8583.Common.Netty.Pipelines
   /// </summary>
   public class IsoMessageLoggingHandler : LoggingHandler
   {
-    private const char MaskChar = '*';
-
     /// <summary>
     ///   Default set of ISO 8583 fields that are masked in log output: PAN extended (34), track 2 (35), track 3 (36), track 1 (45).
     /// </summary>
-    public static readonly int[] DefaultMaskedFields =
-    {
-      34, // PAN extended
-      35, // track 2
-      36, // track 3
-      45 // track 1
-    };
+    public static readonly int[] DefaultMaskedFields = SensitiveDataMasker.DefaultMaskedFields;
 
-    private static readonly char[] MaskedValue = "***".ToCharArray();
     private static readonly Lazy<string[]> LazyFieldNames = new(LoadFieldNames);
     private readonly int[] _maskedFields;
     private readonly bool _printFieldDescriptions;
@@ -60,15 +51,7 @@ namespace Iso8583.Common.Netty.Pipelines
     {
       _printSensitiveData = printSensitiveData;
       _printFieldDescriptions = printFieldDescriptions;
-      if (maskedFields is { Length: > 0 })
-      {
-        _maskedFields = (int[])maskedFields.Clone();
-        Array.Sort(_maskedFields);
-      }
-      else
-      {
-        _maskedFields = DefaultMaskedFields;
-      }
+      _maskedFields = SensitiveDataMasker.NormalizeMaskedFields(maskedFields);
     }
 
     private static string[] LoadFieldNames()
@@ -127,9 +110,9 @@ namespace Iso8583.Common.Netty.Pipelines
           else
             formattedValue = i switch
             {
-              2 => MaskPan(field.ToString()),
+              2 => SensitiveDataMasker.MaskPan(field.ToString()),
               _ => Array.BinarySearch(_maskedFields, i) >= 0
-                ? MaskedValue
+                ? SensitiveDataMasker.MaskedValue()
                 : field.ToString().ToCharArray()
             };
 
@@ -138,22 +121,6 @@ namespace Iso8583.Common.Netty.Pipelines
         }
 
       return sb.ToString();
-    }
-
-
-    /// <summary>
-    ///   masks the PAN
-    /// </summary>
-    /// <param name="fullPan">the unmasked PAN value</param>
-    /// <returns>the masked value</returns>
-    private static char[] MaskPan(string fullPan)
-    {
-      var maskedPan = fullPan.ToCharArray();
-      var unmaskedPrefix = Math.Min(6, maskedPan.Length);
-      var unmaskedSuffix = Math.Min(4, Math.Max(0, maskedPan.Length - unmaskedPrefix));
-      for (var i = unmaskedPrefix; i < maskedPan.Length - unmaskedSuffix; i++)
-        maskedPan[i] = MaskChar;
-      return maskedPan;
     }
   }
 }

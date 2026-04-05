@@ -6,7 +6,8 @@
   <a href="https://github.com/Tochemey/Iso8583Suite/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Tochemey/Iso8583Suite/ci.yml" alt="Build Status"/></a>
   <a href="https://codecov.io/gh/Tochemey/Iso8583Suite"><img src="https://codecov.io/gh/Tochemey/Iso8583Suite/branch/main/graph/badge.svg?token=y6tAbZa8VK" alt="codecov"/></a>
   <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"/></a>
-  <a href="https://www.nuget.org/packages/Iso8583.Client"><img src="https://img.shields.io/nuget/v/Iso8583.Client?label=nuget" alt="NuGet"/></a>
+  <a href="https://www.nuget.org/packages/Iso8583.Server"><img src="https://img.shields.io/nuget/v/Iso8583.Server?label=Iso8583Server" alt="Server"/></a>
+   <a href="https://www.nuget.org/packages/Iso8583.Client"><img src="https://img.shields.io/nuget/v/Iso8583.Client?label=Iso8583Client" alt="Client"/></a>
   <a href="https://github.com/Tochemey/Iso8583Suite/releases"><img src="https://img.shields.io/github/v/release/Tochemey/Iso8583Suite" alt="Release"/></a>
 </p>
 
@@ -48,6 +49,7 @@ Targets **.NET 8**, **.NET 9**, and **.NET 10**.
 - **Extensibility** — composable message handler chain (copy-on-write, lock-free reads)
 - **Observability** — metrics interface for Prometheus, OpenTelemetry, etc.
 - **Safety** — sensitive data masking (PAN, track data) in logs
+- **Auditability** — structured audit log emitted through `ILogger` for PCI DSS / PSD2 trails
 - **Keepalive** — idle detection with automatic echo keepalive
 - **Lifecycle** — graceful shutdown with configurable drain period, `IAsyncDisposable`
 - **Validation** — declarative per-field validation, startup configuration validation
@@ -500,12 +502,16 @@ All properties below are defined on `ConnectorConfiguration` and apply to both `
 | `IdleTimeout`               | `30`            | Seconds of read/write inactivity before an echo keepalive is sent. `0` to disable            |
 | `WorkerThreadCount`         | `CPU * 2`       | SpanNetty I/O event loop threads. Minimum 1                                                  |
 | `AddLoggingHandler`         | `false`         | Add `IsoMessageLoggingHandler` to the pipeline for diagnostic message logging                |
+| `LogLevel`                  | `DEBUG`         | DotNetty log level used by the pipeline logging handler and the server's acceptor handler   |
 | `LogSensitiveData`          | `true`          | When `false`, PAN and track data are masked in logs. **Set to `false` in production**        |
 | `LogFieldDescription`       | `true`          | Include ISO field names (e.g. "Primary Account Number") in log output                        |
 | `SensitiveDataFields`       | `[34,35,36,45]` | Field numbers to mask when `LogSensitiveData` is `false`                                     |
 | `ReplyOnError`              | `false`         | Send an administrative error response (function code 650) on parse failures                  |
 | `AddEchoMessageListener`    | `false`         | Auto-respond to echo requests (0x0800) without writing a handler                             |
 | `Ssl`                       | `null`          | TLS/SSL configuration. `null` or `Enabled = false` means plaintext                           |
+| `EnableAuditLog`            | `false`         | Install the structured audit log handler in the pipeline (see [Structured Audit Log](#structured-audit-log)) |
+| `AuditLogger`               | `null`          | `ILogger` the audit handler emits events through (conventionally created with category `Iso8583.Audit`) |
+| `AuditLogIncludeFields`     | `false`         | When `true`, attach a masked dictionary of every present field to each audit event           |
 
 ### Client Configuration
 
@@ -742,6 +748,79 @@ var config = new ServerConfiguration
     SensitiveDataFields = [2, 34, 35, 36, 45, 52] // add PAN (2) and PIN block (52)
 };
 ```
+
+### Structured Audit Log
+
+`Iso8583MessageLoggingHandler` emits diagnostic output for humans; for compliance audit trails
+(PCI DSS, PSD2, scheme audit) the library also ships a dedicated audit handler that writes one
+**structured** event per inbound and outbound message. The handler is published through a
+standard `ILogger` so the host application's logging pipeline — Serilog, NLog, OpenTelemetry —
+owns format and transport. The library does not own the transport.
+
+Enable it by setting two properties on the configuration:
+
+```csharp
+var loggerFactory = LoggerFactory.Create(b => b.AddSerilog()); // or AddNLog, AddOpenTelemetry, …
+
+var serverConfig = new ServerConfiguration
+{
+    EnableAuditLog = true,
+    AuditLogger = loggerFactory.CreateLogger(Iso8583AuditLogHandler.AuditLogCategory), // "Iso8583.Audit"
+    AuditLogIncludeFields = false // set true to attach a masked dictionary of every present field
+};
+```
+
+Each event carries the following structured properties in the logger scope:
+
+| Property                  | Description                                                                                       |
+|---------------------------|---------------------------------------------------------------------------------------------------|
+| `Iso8583.Direction`       | `Inbound` or `Outbound`                                                                           |
+| `Iso8583.Mti`             | Four-digit message type indicator (e.g. `0200`)                                                   |
+| `Iso8583.Stan`            | Field 11 — system trace audit number                                                              |
+| `Iso8583.Rrn`             | Field 37 — retrieval reference number (when present)                                              |
+| `Iso8583.CorrelationId`   | Derived from the MTI class byte and STAN; identical on a request and its matching response      |
+| `Iso8583.RemoteEndpoint`  | Remote address of the channel                                                                     |
+| `Iso8583.DurationMs`      | On response events only: elapsed milliseconds since the matching request on the same channel     |
+| `Iso8583.Fields`          | Optional masked dictionary of every present field; emitted only when `AuditLogIncludeFields=true` |
+
+Field values in `Iso8583.Fields` go through the same `SensitiveDataMasker` used by the diagnostic
+logging handler, so PAN (field 2) is reduced to first-six + last-four and fields listed in
+`SensitiveDataFields` are replaced with `***`.
+
+#### Serilog → JSON file (ELK / Splunk)
+
+```csharp
+var log = new LoggerConfiguration()
+    .Filter.ByIncludingOnly(Matching.FromSource("Iso8583.Audit"))
+    .WriteTo.File(new JsonFormatter(), "audit.log")
+    .CreateLogger();
+
+var loggerFactory = LoggerFactory.Create(b => b.AddSerilog(log));
+serverConfig.AuditLogger = loggerFactory.CreateLogger(Iso8583AuditLogHandler.AuditLogCategory);
+```
+
+Every audit event is written as a JSON line including the scoped `Iso8583.*` properties, ready
+to be shipped to an ELK or Splunk pipeline.
+
+#### OpenTelemetry log exporter
+
+```csharp
+var loggerFactory = LoggerFactory.Create(b => b.AddOpenTelemetry(o =>
+{
+    o.IncludeScopes = true; // required for the Iso8583.* scope properties to flow through
+    o.AddOtlpExporter();
+}));
+
+serverConfig.AuditLogger = loggerFactory.CreateLogger(Iso8583AuditLogHandler.AuditLogCategory);
+```
+
+The same scoped properties are exported to an OTEL collector alongside the log record, where
+they can be indexed, filtered, or forwarded to any supported sink.
+
+#### Cost when disabled
+
+When `EnableAuditLog = false` (the default) the handler is **not installed** in the pipeline, so
+there is zero per-message overhead.
 
 ## Samples
 

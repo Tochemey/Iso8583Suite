@@ -106,7 +106,7 @@ namespace Iso8583.Server
         .ChildOption(ChannelOption.TcpNodelay, true)
         .ChildOption(ChannelOption.SoReuseaddr, true)
         .Channel<TcpServerSocketChannel>()
-        .Handler(new LoggingHandler(LogLevel.INFO))
+        .Handler(new LoggingHandler(Configuration.LogLevel))
         .ChildHandler(new Iso8583ChannelInitializer<ServerConfiguration>(
           Configuration, ConnectorConfigurator, WorkerEventLoopGroup,
           MessageFactory as IMessageFactory<IsoMessage>, MessageHandler,
