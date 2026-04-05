@@ -6,8 +6,8 @@
   <a href="https://github.com/Tochemey/Iso8583Suite/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Tochemey/Iso8583Suite/ci.yml" alt="Build Status"/></a>
   <a href="https://codecov.io/gh/Tochemey/Iso8583Suite"><img src="https://codecov.io/gh/Tochemey/Iso8583Suite/branch/main/graph/badge.svg?token=y6tAbZa8VK" alt="codecov"/></a>
   <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"/></a>
-  <a href="https://www.nuget.org/packages/Iso8583.Server"><img src="https://img.shields.io/nuget/v/Iso8583.Server?label=Iso8583Server" alt="Server"/></a>
-   <a href="https://www.nuget.org/packages/Iso8583.Client"><img src="https://img.shields.io/nuget/v/Iso8583.Client?label=Iso8583Client" alt="Client"/></a>
+  <a href="https://www.nuget.org/packages/Iso8583.Server"><img src="https://img.shields.io/nuget/v/Iso8583.Server?label=Iso8583.Server" alt="Server"/></a>
+   <a href="https://www.nuget.org/packages/Iso8583.Client"><img src="https://img.shields.io/nuget/v/Iso8583.Client?label=Iso8583.Client" alt="Client"/></a>
   <a href="https://github.com/Tochemey/Iso8583Suite/releases"><img src="https://img.shields.io/github/v/release/Tochemey/Iso8583Suite" alt="Release"/></a>
 </p>
 
