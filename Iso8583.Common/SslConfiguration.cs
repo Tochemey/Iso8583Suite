@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Security.Cryptography.X509Certificates;
+
 namespace Iso8583.Common
 {
   /// <summary>
@@ -26,13 +28,22 @@ namespace Iso8583.Common
 
     /// <summary>
     ///   Path to the certificate file (PFX/PKCS12 format for server, PEM for client CA).
+    ///   Ignored when <see cref="Certificate"/> is set.
     /// </summary>
     public string CertificatePath { get; set; }
 
     /// <summary>
-    ///   Password for the certificate file.
+    ///   Password for the certificate file. Ignored when <see cref="Certificate"/> is set.
     /// </summary>
     public string CertificatePassword { get; set; }
+
+    /// <summary>
+    ///   An already-loaded certificate instance. When set, takes precedence over
+    ///   <see cref="CertificatePath"/> and <see cref="CertificatePassword"/>. Use this
+    ///   overload when sourcing certificates from Key Vault, a secret store, or any
+    ///   scenario where the cert is produced programmatically rather than from a file.
+    /// </summary>
+    public X509Certificate2 Certificate { get; set; }
 
     /// <summary>
     ///   Whether mutual TLS (client certificate authentication) is required.
@@ -49,5 +60,14 @@ namespace Iso8583.Common
     ///   If null, uses the connection hostname.
     /// </summary>
     public string TargetHost { get; set; }
+
+    /// <summary>
+    ///   When set to <c>true</c>, the client accepts self-signed certificates, name-mismatch
+    ///   certificates, and certificate chain errors. <b>This is a development-only escape hatch</b>
+    ///   for local testing and staging environments where provisioning a trusted CA is impractical.
+    ///   Production deployments must leave this <c>false</c> and rely on a properly signed server
+    ///   certificate. The flag has no effect on the server side.
+    /// </summary>
+    public bool AllowUntrustedCertificates { get; set; }
   }
 }

@@ -259,4 +259,4 @@ Invalid configuration throws `ArgumentOutOfRangeException` at startup, failing f
 | `ConnectionTracker` active channels         | `ConcurrentDictionary`                                  |
 | `PendingRequestManager` pending map         | `ConcurrentDictionary<string, TaskCompletionSource<T>>` |
 | `Iso8583Client` reconnect                   | `SemaphoreSlim(1,1)` + volatile flags                   |
-| Channel I/O                                 | SpanNetty event loop (single-threaded per channel)      |
+| Channel I/O                                 | SpanNetty event loop (single-threaded per channel)       |

@@ -6,13 +6,11 @@
   <a href="https://github.com/Tochemey/Iso8583Suite/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Tochemey/Iso8583Suite/ci.yml" alt="Build Status"/></a>
   <a href="https://codecov.io/gh/Tochemey/Iso8583Suite"><img src="https://codecov.io/gh/Tochemey/Iso8583Suite/branch/main/graph/badge.svg?token=y6tAbZa8VK" alt="codecov"/></a>
   <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"/></a>
-  <a href="https://www.nuget.org/packages/Iso8583.Client"><img src="https://img.shields.io/nuget/v/Iso8583.Client?label=Iso8583.Client" alt="Iso8583.Client NuGet"/></a>
-  <a href="https://www.nuget.org/packages/Iso8583.Server"><img src="https://img.shields.io/nuget/v/Iso8583.Server?label=Iso8583.Server" alt="Iso8583.Server NuGet"/></a>
-  <a href="https://www.nuget.org/packages/Iso8583.Client"><img src="https://img.shields.io/nuget/dt/Iso8583.Client?label=Iso8583.Client%20downloads" alt="Iso8583.Client Downloads"/></a>
-  <a href="https://www.nuget.org/packages/Iso8583.Server"><img src="https://img.shields.io/nuget/dt/Iso8583.Server?label=Iso8583.Server%20downloads" alt="Iso8583.Server Downloads"/></a>
+  <a href="https://www.nuget.org/packages/Iso8583.Client"><img src="https://img.shields.io/nuget/v/Iso8583.Client?label=nuget" alt="NuGet"/></a>
+  <a href="https://github.com/Tochemey/Iso8583Suite/releases"><img src="https://img.shields.io/github/v/release/Tochemey/Iso8583Suite" alt="Release"/></a>
 </p>
 
-A high-performance .NET TCP client and server library for [ISO 8583](https://en.wikipedia.org/wiki/ISO_8583) financial messaging, built on [NetCore8583](https://github.com/Tochemey/NetCore8583) and [SpanNetty](https://github.com/cuteant/SpanNetty). ISO 8583 is the standard used by payment networks worldwide to exchange transaction data between point-of-sale terminals, ATMs, acquirers, and card issuers.
+A high-performance .NET TCP client and server library for [ISO 8583](https://en.wikipedia.org/wiki/ISO_8583) financial messaging, built on [NetCore8583](https://github.com/Tochemey/NetCore8583) and [SpanNetty](https://github.com/Azure/SpanNetty). ISO 8583 is the standard used by payment networks worldwide to exchange transaction data between point-of-sale terminals, ATMs, acquirers, and card issuers.
 
 Iso8583Suite handles the low-level networking — framing, TLS, reconnection, idle detection, and request/response correlation — so you can focus on your business logic through a simple message handler interface.
 
@@ -29,6 +27,7 @@ Targets **.NET 8**, **.NET 9**, and **.NET 10**.
 - [Connection Pooling](#connection-pooling)
 - [Message Handlers](#message-handlers)
 - [Message Validation](#message-validation)
+- [Health Checks](#health-checks)
 - [Configuration](#configuration)
 - [TLS/SSL](#tlsssl)
 - [Metrics](#metrics)
@@ -41,19 +40,18 @@ Targets **.NET 8**, **.NET 9**, and **.NET 10**.
 
 ## Features
 
-| Category         | Capability                                                                     |
-|------------------|--------------------------------------------------------------------------------|
-| Networking       | Async TCP server and client with non-blocking I/O                              |
-| Correlation      | Request/response matching via STAN (field 11) with timeout                     |
-| Scaling          | Connection pooling with pluggable load balancing (round-robin, least-conn)    |
-| Resilience       | Auto-reconnection with exponential backoff and jitter                          |
-| Security         | TLS/SSL with mutual TLS support                                                |
-| Extensibility    | Composable message handler chain (copy-on-write, lock-free reads)              |
-| Observability    | Metrics interface for Prometheus, OpenTelemetry, etc.                          |
-| Safety           | Sensitive data masking (PAN, track data) in logs                               |
-| Keepalive        | Idle detection with automatic echo keepalive                                   |
-| Lifecycle        | Graceful shutdown with configurable drain period, `IAsyncDisposable`           |
-| Validation       | Declarative per-field validation, startup configuration validation             |
+- **Networking** — async TCP server and client with non-blocking I/O
+- **Correlation** — request/response matching via STAN (field 11) with timeout
+- **Scaling** — connection pooling with pluggable load balancing (round-robin, least-conn)
+- **Resilience** — auto-reconnection with exponential backoff and jitter
+- **Security** — TLS/SSL with mutual TLS support
+- **Extensibility** — composable message handler chain (copy-on-write, lock-free reads)
+- **Observability** — metrics interface for Prometheus, OpenTelemetry, etc.
+- **Safety** — sensitive data masking (PAN, track data) in logs
+- **Keepalive** — idle detection with automatic echo keepalive
+- **Lifecycle** — graceful shutdown with configurable drain period, `IAsyncDisposable`
+- **Validation** — declarative per-field validation, startup configuration validation
+- **Health Checks** — ASP.NET Core `IHealthCheck` integration for client and server
 
 ## Installation
 
@@ -101,11 +99,9 @@ var messageFactory = new IsoMessageFactory<IsoMessage>(mfact, Iso8583Version.V19
 
 ### Methods
 
-| Method            | Description                                                                             |
-|-------------------|-----------------------------------------------------------------------------------------|
-| `NewMessage`      | Creates a new ISO message from a raw MTI or enum-based components                       |
-| `CreateResponse`  | Creates a response message (MTI = request MTI + `0x0010`), optionally copying fields    |
-| `ParseMessage`    | Parses raw bytes into an ISO message                                                    |
+- `NewMessage` — creates a new ISO message from a raw MTI or enum-based components
+- `CreateResponse` — creates a response message (MTI = request MTI + `0x0010`), optionally copying fields
+- `ParseMessage` — parses raw bytes into an ISO message
 
 ### MTI Construction
 
@@ -128,21 +124,17 @@ var msg2 = messageFactory.NewMessage(MessageClass.FINANCIAL, MessageFunction.REQ
 
 ### Methods
 
-| Method                  | Description                                                       |
-|-------------------------|-------------------------------------------------------------------|
-| `Start`                 | Binds to the configured port and begins accepting connections     |
-| `Shutdown`              | Gracefully shuts down with a configurable drain period            |
-| `AddMessageListener`    | Registers a message handler in the chain                          |
-| `RemoveMessageListener` | Removes a previously registered message handler                   |
-| `IsStarted`             | Indicates whether the server channel is open and active           |
-| `DisposeAsync`          | Disposes the server. Idempotent, suppresses errors                |
+- `Start` — binds to the configured port and begins accepting connections
+- `Shutdown` — gracefully shuts down with a configurable drain period
+- `AddMessageListener` — registers a message handler in the chain
+- `RemoveMessageListener` — removes a previously registered message handler
+- `IsStarted` — indicates whether the server channel is open and active
+- `DisposeAsync` — disposes the server. Idempotent, suppresses errors
 
 ### Properties
 
-| Property                | Description                           |
-|-------------------------|---------------------------------------|
-| `ActiveConnectionCount` | Current number of connected clients   |
-| `ActiveConnections`     | All currently active client channels  |
+- `ActiveConnectionCount` — current number of connected clients
+- `ActiveConnections` — all currently active client channels
 
 ### Usage
 
@@ -169,17 +161,15 @@ await server.Shutdown(TimeSpan.FromSeconds(30));
 
 ### Methods
 
-| Method                  | Description                                                                   |
-|-------------------------|-------------------------------------------------------------------------------|
-| `Connect`               | Connects to the server. Supports IP addresses and DNS hostnames               |
-| `Send`                  | Fire-and-forget send, with an optional write timeout                          |
-| `SendAndReceive`        | Sends a request and waits for the correlated response (STAN + MTI matching)  |
-| `Disconnect`            | Gracefully disconnects and cancels all pending requests                       |
-| `IsConnected`           | Indicates whether the channel is currently active                             |
-| `AddMessageListener`    | Registers a handler for incoming messages (e.g. unsolicited notifications)    |
-| `RemoveMessageListener` | Removes a previously registered handler                                       |
-| `IsStarted`             | Indicates whether the channel is open                                         |
-| `DisposeAsync`          | Disconnects and releases all resources. Idempotent                            |
+- `Connect` — connects to the server. Supports IP addresses and DNS hostnames
+- `Send` — fire-and-forget send, with an optional write timeout
+- `SendAndReceive` — sends a request and waits for the correlated response (STAN + MTI matching)
+- `Disconnect` — gracefully disconnects and cancels all pending requests
+- `IsConnected` — indicates whether the channel is currently active
+- `AddMessageListener` — registers a handler for incoming messages (e.g. unsolicited notifications)
+- `RemoveMessageListener` — removes a previously registered handler
+- `IsStarted` — indicates whether the channel is open
+- `DisposeAsync` — disconnects and releases all resources. Idempotent
 
 ### Usage
 
@@ -218,39 +208,33 @@ For high-throughput workloads, `PooledIso8583Client<T>` maintains a pool of pers
 
 ### Methods
 
-| Method                  | Description                                                              |
-|-------------------------|--------------------------------------------------------------------------|
-| `Connect`               | Connects all pooled connections to the server in parallel                |
-| `Send`                  | Fire-and-forget send on a load-balanced connection                       |
-| `SendAndReceive`        | Load-balanced send that waits for the correlated response                |
-| `Disconnect`            | Gracefully disconnects all pooled connections and stops health checks    |
-| `AddMessageListener`    | Registers a listener on every connection in the pool (and replacements)  |
-| `RemoveMessageListener` | Removes a previously registered listener from every connection           |
-| `DisposeAsync`          | Disposes all connections and releases pool resources. Idempotent         |
+- `Connect` — connects all pooled connections to the server in parallel
+- `Send` — fire-and-forget send on a load-balanced connection
+- `SendAndReceive` — load-balanced send that waits for the correlated response
+- `Disconnect` — gracefully disconnects all pooled connections and stops health checks
+- `AddMessageListener` — registers a listener on every connection in the pool (and replacements)
+- `RemoveMessageListener` — removes a previously registered listener from every connection
+- `DisposeAsync` — disposes all connections and releases pool resources. Idempotent
 
 ### Properties
 
-| Property                | Description                                               |
-|-------------------------|-----------------------------------------------------------|
-| `PoolSize`              | Total number of connections in the pool                   |
-| `ActiveConnectionCount` | Current number of connections reporting as healthy/active |
+- `PoolSize` — total number of connections in the pool
+- `ActiveConnectionCount` — current number of connections reporting as healthy/active
 
 ### PooledClientConfiguration
 
-| Property              | Type                  | Default | Description                                                                                      |
-|-----------------------|-----------------------|---------|--------------------------------------------------------------------------------------------------|
-| `PoolSize`            | `int`                 | `4`     | Number of persistent connections to maintain. Must be > 0                                        |
-| `HealthCheckInterval` | `TimeSpan`            | `10s`   | How often to check each connection and replace any that have become inactive                     |
-| `ClientConfiguration` | `ClientConfiguration` | `new()` | Base configuration applied to every pooled connection (frame encoding, TLS, reconnect, etc.)     |
+| Property              | Default | Description                                                                                  |
+|-----------------------|---------|----------------------------------------------------------------------------------------------|
+| `PoolSize`            | `4`     | Number of persistent connections to maintain. Must be > 0                                    |
+| `HealthCheckInterval` | `10s`   | How often to check each connection and replace any that have become inactive                 |
+| `ClientConfiguration` | `new()` | Base configuration applied to every pooled connection (frame encoding, TLS, reconnect, etc.) |
 
 ### Load Balancers
 
 Pass any implementation of `ILoadBalancer` as the third constructor argument. Defaults to `RoundRobinLoadBalancer` when omitted.
 
-| Balancer                       | Selection strategy                                                                                                                        |
-|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| `RoundRobinLoadBalancer`       | Cycles through active connections atomically via `Interlocked.Increment`. Lock-free, predictable distribution                             |
-| `LeastConnectionsLoadBalancer` | Picks the connection with the fewest in-flight requests. Best for workloads with variable response times. Requires a pending-count source |
+- `RoundRobinLoadBalancer` — cycles through active connections atomically via `Interlocked.Increment`. Lock-free, predictable distribution
+- `LeastConnectionsLoadBalancer` — picks the connection with the fewest in-flight requests. Best for workloads with variable response times. Requires a pending-count source
 
 ### Usage
 
@@ -294,12 +278,10 @@ await pool.Connect("payment-gateway.internal", 9000);
 
 ### Behavior
 
-| Aspect                     | Behavior                                                                                                                                                                                               |
-|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Health checks              | Every `HealthCheckInterval`, the pool scans all connections and replaces any that have become inactive. Recovery is best-effort and retries on the next cycle on failure.                              |
-| Listener propagation       | Listeners added via `AddMessageListener` are applied to every connection, including any created during health-check recovery, so you never miss messages on a replaced connection.                    |
-| Correlation                | Each pooled connection has its own `PendingRequestManager`, so STAN-based correlation works per connection. `SendAndReceive` picks a connection via the load balancer and waits on that same one.     |
-| Empty pool                 | If the load balancer is asked to select from an empty set of active connections, it throws `InvalidOperationException`. Combine with `AutoReconnect = true` for fastest recovery.                      |
+- **Health checks** — every `HealthCheckInterval`, the pool scans all connections and replaces any that have become inactive. Recovery is best-effort and retries on the next cycle on failure.
+- **Listener propagation** — listeners added via `AddMessageListener` are applied to every connection, including any created during health-check recovery, so you never miss messages on a replaced connection.
+- **Correlation** — each pooled connection has its own `PendingRequestManager`, so STAN-based correlation works per connection. `SendAndReceive` picks a connection via the load balancer and waits on that same one.
+- **Empty pool** — if the load balancer is asked to select from an empty set of active connections, it throws `InvalidOperationException`. Combine with `AutoReconnect = true` for fastest recovery.
 
 ## Message Handlers
 
@@ -307,10 +289,8 @@ Implement `IIsoMessageListener<T>` to handle incoming messages. Handlers form a 
 
 ### Methods
 
-| Method             | Description                                                                    |
-|--------------------|--------------------------------------------------------------------------------|
-| `CanHandleMessage` | Returns whether this handler should process the message (e.g. filter by MTI)   |
-| `HandleMessage`    | Processes the message. Return `false` to stop the chain, `true` to continue    |
+- `CanHandleMessage` — returns whether this handler should process the message (e.g. filter by MTI)
+- `HandleMessage` — processes the message. Return `false` to stop the chain, `true` to continue
 
 ```csharp
 public class AuthorizationHandler : IIsoMessageListener<IsoMessage>
@@ -349,20 +329,19 @@ Declarative per-field validation catches malformed messages before they reach th
 
 All built-in validators are `IsoType`-aware — they read the `IsoValue.Type` (and `IsoValue.Length` where applicable) and derive their behavior from the NetCore8583 field definition rather than from hand-wired length or format arguments.
 
-| Validator               | Purpose                                                                 |
-|-------------------------|-------------------------------------------------------------------------|
-| `LengthValidator`       | Enforces fixed, declared, or protocol-max lengths per `IsoType`         |
-| `NumericValidator`      | Ensures the value contains only ASCII digits                            |
-| `DateValidator`         | Parses the value against the date/time format implied by the `IsoType`  |
-| `LuhnValidator`         | Applies the Luhn mod-10 checksum for PAN validation                     |
-| `CurrencyCodeValidator` | Checks against the ISO 4217 numeric code set (or a custom allow-list)   |
-| `RegexValidator`        | Matches the value against a configured regular expression               |
+- `LengthValidator` — enforces fixed, declared, or protocol-max lengths per `IsoType`
+- `NumericValidator` — ensures the value contains only ASCII digits
+- `DateValidator` — parses the value against the date/time format implied by the `IsoType`
+- `LuhnValidator` — applies the Luhn mod-10 checksum for PAN validation
+- `CurrencyCodeValidator` — checks against the ISO 4217 numeric code set (or a custom allow-list)
+- `RegexValidator` — matches the value against a configured regular expression
 
 <details>
 <summary><b>Validator details — applicable IsoTypes and rules</b></summary>
 
 **`LengthValidator`** — applies to all IsoTypes.
 Value length must match:
+
 - the fixed length implied by the IsoType for `DATE4` / `DATE6` / `DATE10` / `DATE12` / `DATE14` / `DATE_EXP` / `TIME` / `AMOUNT`,
 - the declared `IsoValue.Length` for `NUMERIC` / `ALPHA` / `BINARY`,
 - the protocol max for `LLVAR` (99) / `LLLVAR` (999) / `LLLLVAR` (9999) and their binary counterparts (`LLBIN` / `LLLBIN` / `LLLLBIN`).
@@ -413,10 +392,8 @@ Fields marked with `.Required()` produce a failure when absent from the message.
 
 Once attached to the configuration, the `MessageValidationHandler` sits between `IdleEventHandler` and the application message handler:
 
-| Direction         | Behavior on failure                                                                                                                                                                                                            |
-|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Outbound writes   | Completes the write task with a `MessageValidationException` synchronously. The invalid bytes never reach the encoder or the wire, so the caller sees the failure on `Send` / `SendAndReceive`                                |
-| Inbound reads     | Fires an exception event on the pipeline and drops the invalid message. When the server is configured with `ReplyOnError = true`, existing error handlers react and may send an administrative error response                 |
+- **Outbound writes** — completes the write task with a `MessageValidationException` synchronously. The invalid bytes never reach the encoder or the wire, so the caller sees the failure on `Send` / `SendAndReceive`.
+- **Inbound reads** — fires an exception event on the pipeline and drops the invalid message. When the server is configured with `ReplyOnError = true`, existing error handlers react and may send an administrative error response.
 
 ### Programmatic Validation
 
@@ -453,39 +430,93 @@ public sealed class TerminalIdValidator : IFieldValidator
 }
 ```
 
+## Health Checks
+
+Iso8583Suite ships first-class [ASP.NET Core health checks](https://learn.microsoft.com/aspnet/core/host-and-deploy/health-checks)
+for both the client and the server, so readiness and liveness endpoints can report the state of the
+ISO 8583 connection alongside the rest of your application.
+
+### States
+
+| Component                     | Status    | When                                                                          |
+|-------------------------------|-----------|-------------------------------------------------------------------------------|
+| `Iso8583ClientHealthCheck<T>` | Healthy   | The client channel is active and connected                                    |
+| `Iso8583ClientHealthCheck<T>` | Degraded  | Auto-reconnect is in progress (channel inactive, at least one retry recorded) |
+| `Iso8583ClientHealthCheck<T>` | Unhealthy | The client is disconnected and not attempting to reconnect                    |
+| `Iso8583ServerHealthCheck<T>` | Healthy   | The server is listening. The result data includes the active connection count |
+| `Iso8583ServerHealthCheck<T>` | Unhealthy | The server is not listening (not started or shut down)                        |
+
+Both checks expose diagnostic details via `HealthCheckResult.Data`:
+
+- **Client:** `connected` (bool), `reconnecting` (bool)
+- **Server:** `listening` (bool), `activeConnections` (int)
+
+### Registration
+
+Register the checks with the standard `IHealthChecksBuilder` extension methods. The client and server
+instances are resolved from the service provider, so add them as singletons first:
+
+```csharp
+using Iso8583.Client.HealthChecks;
+using Iso8583.Server.HealthChecks;
+
+services.AddSingleton(_ => new Iso8583Client<IsoMessage>(clientConfig, messageFactory));
+services.AddSingleton(_ => new Iso8583Server<IsoMessage>(9000, serverConfig, messageFactory));
+
+services.AddHealthChecks()
+    .AddIso8583ClientHealthCheck<IsoMessage>("iso8583-client", tags: new[] { "ready" })
+    .AddIso8583ServerHealthCheck<IsoMessage>("iso8583-server", tags: new[] { "ready" });
+```
+
+Each extension accepts optional `name`, `failureStatus`, and `tags` arguments. An overload that takes
+an explicit instance is also available when the client or server is not registered in DI:
+
+```csharp
+var client = new Iso8583Client<IsoMessage>(clientConfig, messageFactory);
+services.AddHealthChecks().AddIso8583ClientHealthCheck(client);
+```
+
+### Exposing the endpoint
+
+```csharp
+var app = builder.Build();
+app.MapHealthChecks("/health");
+app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = r => r.Tags.Contains("ready") });
+```
+
 ## Configuration
 
 ### Base Configuration (Client and Server)
 
 All properties below are defined on `ConnectorConfiguration` and apply to both `ClientConfiguration` and `ServerConfiguration`.
 
-| Property                    | Type               | Default         | Description                                                                                  |
-|-----------------------------|--------------------|-----------------|----------------------------------------------------------------------------------------------|
-| `EncodeFrameLengthAsString` | `bool`             | `false`         | `true` = ASCII length header (e.g. `"0152"`), `false` = binary                               |
-| `FrameLengthFieldLength`    | `int`              | `2`             | Size of the frame length header in bytes. Valid range: 0–4. Set to 0 to omit the header      |
-| `FrameLengthFieldOffset`    | `int`              | `0`             | Byte offset of the length field from the start of the frame                                  |
-| `FrameLengthFieldAdjust`    | `int`              | `0`             | Compensation value added to the length field (e.g. if the length includes the header itself) |
-| `MaxFrameLength`            | `int`              | `8192`          | Maximum message size in bytes. Messages exceeding this are rejected                          |
-| `IdleTimeout`               | `int`              | `30`            | Seconds of read/write inactivity before an echo keepalive is sent. `0` to disable            |
-| `WorkerThreadCount`         | `int`              | `CPU * 2`       | SpanNetty I/O event loop threads. Minimum 1                                                  |
-| `AddLoggingHandler`         | `bool`             | `false`         | Add `IsoMessageLoggingHandler` to the pipeline for diagnostic message logging                |
-| `LogSensitiveData`          | `bool`             | `true`          | When `false`, PAN and track data are masked in logs. **Set to `false` in production**        |
-| `LogFieldDescription`       | `bool`             | `true`          | Include ISO field names (e.g. "Primary Account Number") in log output                        |
-| `SensitiveDataFields`       | `int[]`            | `[34,35,36,45]` | Field numbers to mask when `LogSensitiveData` is `false`                                     |
-| `ReplyOnError`              | `bool`             | `false`         | Send an administrative error response (function code 650) on parse failures                  |
-| `AddEchoMessageListener`    | `bool`             | `false`         | Auto-respond to echo requests (0x0800) without writing a handler                             |
-| `Ssl`                       | `SslConfiguration` | `null`          | TLS/SSL configuration. `null` or `Enabled = false` means plaintext                           |
+| Property                    | Default         | Description                                                                                  |
+|-----------------------------|-----------------|----------------------------------------------------------------------------------------------|
+| `EncodeFrameLengthAsString` | `false`         | `true` = ASCII length header (e.g. `"0152"`), `false` = binary                               |
+| `FrameLengthFieldLength`    | `2`             | Size of the frame length header in bytes. Valid range: 0–4. Set to 0 to omit the header      |
+| `FrameLengthFieldOffset`    | `0`             | Byte offset of the length field from the start of the frame                                  |
+| `FrameLengthFieldAdjust`    | `0`             | Compensation value added to the length field (e.g. if the length includes the header itself) |
+| `MaxFrameLength`            | `8192`          | Maximum message size in bytes. Messages exceeding this are rejected                          |
+| `IdleTimeout`               | `30`            | Seconds of read/write inactivity before an echo keepalive is sent. `0` to disable            |
+| `WorkerThreadCount`         | `CPU * 2`       | SpanNetty I/O event loop threads. Minimum 1                                                  |
+| `AddLoggingHandler`         | `false`         | Add `IsoMessageLoggingHandler` to the pipeline for diagnostic message logging                |
+| `LogSensitiveData`          | `true`          | When `false`, PAN and track data are masked in logs. **Set to `false` in production**        |
+| `LogFieldDescription`       | `true`          | Include ISO field names (e.g. "Primary Account Number") in log output                        |
+| `SensitiveDataFields`       | `[34,35,36,45]` | Field numbers to mask when `LogSensitiveData` is `false`                                     |
+| `ReplyOnError`              | `false`         | Send an administrative error response (function code 650) on parse failures                  |
+| `AddEchoMessageListener`    | `false`         | Auto-respond to echo requests (0x0800) without writing a handler                             |
+| `Ssl`                       | `null`          | TLS/SSL configuration. `null` or `Enabled = false` means plaintext                           |
 
 ### Client Configuration
 
 `ClientConfiguration` extends `ConnectorConfiguration` with reconnection settings.
 
-| Property               | Type   | Default | Description                                                                     |
-|------------------------|--------|---------|---------------------------------------------------------------------------------|
-| `AutoReconnect`        | `bool` | `true`  | Automatically reconnect when the connection is lost                             |
-| `ReconnectInterval`    | `int`  | `100`   | Base delay in milliseconds before the first retry (exponential backoff applied) |
-| `MaxReconnectDelay`    | `int`  | `30000` | Maximum backoff delay in milliseconds                                           |
-| `MaxReconnectAttempts` | `int`  | `10`    | Maximum retry count. `0` = unlimited                                            |
+| Property               | Default | Description                                                                     |
+|------------------------|---------|---------------------------------------------------------------------------------|
+| `AutoReconnect`        | `true`  | Automatically reconnect when the connection is lost                             |
+| `ReconnectInterval`    | `100`   | Base delay in milliseconds before the first retry (exponential backoff applied) |
+| `MaxReconnectDelay`    | `30000` | Maximum backoff delay in milliseconds                                           |
+| `MaxReconnectAttempts` | `10`    | Maximum retry count. `0` = unlimited                                            |
 
 **Reconnection backoff formula:** `delay = min(ReconnectInterval * 2^attempt, MaxReconnectDelay) + random jitter (0–25%)`
 
@@ -493,24 +524,22 @@ All properties below are defined on `ConnectorConfiguration` and apply to both `
 
 `ServerConfiguration` extends `ConnectorConfiguration`.
 
-| Property         | Type  | Default | Description                                                                                                  |
-|------------------|-------|---------|--------------------------------------------------------------------------------------------------------------|
-| `MaxConnections` | `int` | `100`   | Maximum concurrent client connections. `0` = unlimited. Connections beyond this limit are immediately closed |
+| Property         | Default | Description                                                                                                  |
+|------------------|---------|--------------------------------------------------------------------------------------------------------------|
+| `MaxConnections` | `100`   | Maximum concurrent client connections. `0` = unlimited. Connections beyond this limit are immediately closed |
 
 ### Configuration Validation
 
 Both configurations call `Validate()` at construction time and throw `ArgumentException` for invalid values:
 
-| Rule                                   |
-|----------------------------------------|
-| `MaxFrameLength` must be > 0           |
-| `IdleTimeout` must be >= 0             |
-| `WorkerThreadCount` must be >= 1       |
-| `FrameLengthFieldLength` must be 0–4   |
-| `FrameLengthFieldOffset` must be >= 0  |
-| `ReconnectInterval` must be > 0        |
-| `MaxReconnectDelay` must be > 0        |
-| `MaxReconnectAttempts` must be >= 0    |
+- `MaxFrameLength` must be > 0
+- `IdleTimeout` must be >= 0
+- `WorkerThreadCount` must be >= 1
+- `FrameLengthFieldLength` must be 0–4
+- `FrameLengthFieldOffset` must be >= 0
+- `ReconnectInterval` must be > 0
+- `MaxReconnectDelay` must be > 0
+- `MaxReconnectAttempts` must be >= 0
 
 ## TLS/SSL
 
@@ -518,14 +547,14 @@ TLS is configured via the `SslConfiguration` class, set on the `Ssl` property of
 
 ### Properties
 
-| Property              | Type     | Default | Description                                                                                                                                 |
-|-----------------------|----------|---------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| `Enabled`             | `bool`   | `false` | Enable TLS on the connection                                                                                                                |
-| `CertificatePath`     | `string` | `null`  | Path to the certificate file. **Server:** PFX/PKCS12 format. **Client (mTLS):** PFX/PKCS12 for the client certificate                       |
-| `CertificatePassword` | `string` | `null`  | Password for the certificate file, if encrypted                                                                                             |
-| `MutualTls`           | `bool`   | `false` | Require mutual TLS (client certificate authentication). **Server:** demands a client certificate. **Client:** presents a client certificate |
-| `CaCertificatePath`   | `string` | `null`  | Path to the CA certificate (PEM) for verifying the remote peer                                                                              |
-| `TargetHost`          | `string` | `null`  | Server hostname for certificate validation and SNI (client-side only). Defaults to the connection hostname if not set                       |
+| Property              | Default | Description                                                                                                                                 |
+|-----------------------|---------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `Enabled`             | `false` | Enable TLS on the connection                                                                                                                |
+| `CertificatePath`     | `null`  | Path to the certificate file. **Server:** PFX/PKCS12 format. **Client (mTLS):** PFX/PKCS12 for the client certificate                       |
+| `CertificatePassword` | `null`  | Password for the certificate file, if encrypted                                                                                             |
+| `MutualTls`           | `false` | Require mutual TLS (client certificate authentication). **Server:** demands a client certificate. **Client:** presents a client certificate |
+| `CaCertificatePath`   | `null`  | Path to the CA certificate (PEM) for verifying the remote peer                                                                              |
+| `TargetHost`          | `null`  | Server hostname for certificate validation and SNI (client-side only). Defaults to the connection hostname if not set                       |
 
 ### Server TLS
 
@@ -592,23 +621,19 @@ Implement `IIso8583Metrics` to integrate with your observability stack (Promethe
 
 ### Methods
 
-| Method                  | Called when                                                    |
-|-------------------------|----------------------------------------------------------------|
-| `MessageSent`           | A message is encoded and written to the wire                   |
-| `MessageReceived`       | A message is received and decoded from the wire                |
-| `MessageHandled`        | A message handler chain completes successfully                 |
-| `MessageError`          | An error occurs during message handling                        |
-| `ConnectionEstablished` | A new connection is opened (client connects or server accepts) |
-| `ConnectionLost`        | A connection is closed                                         |
+- `MessageSent` — a message is encoded and written to the wire
+- `MessageReceived` — a message is received and decoded from the wire
+- `MessageHandled` — a message handler chain completes successfully
+- `MessageError` — an error occurs during message handling
+- `ConnectionEstablished` — a new connection is opened (client connects or server accepts)
+- `ConnectionLost` — a connection is closed
 
 ### Integration Points
 
-| Component                    | Metrics calls                                                     |
-|------------------------------|-------------------------------------------------------------------|
-| `IsoMessageEncoder`          | `MessageSent` after encoding each message                         |
-| `IsoMessageDecoder`          | `MessageReceived` after decoding each message                     |
-| `CompositeIsoMessageHandler` | `MessageHandled` on success, `MessageError` on exception          |
-| `ConnectionTracker`          | `ConnectionEstablished` and `ConnectionLost` on channel lifecycle |
+- `IsoMessageEncoder` — `MessageSent` after encoding each message
+- `IsoMessageDecoder` — `MessageReceived` after decoding each message
+- `CompositeIsoMessageHandler` — `MessageHandled` on success, `MessageError` on exception
+- `ConnectionTracker` — `ConnectionEstablished` and `ConnectionLost` on channel lifecycle
 
 ### Example Implementation
 
@@ -635,7 +660,7 @@ var server = new Iso8583Server<IsoMessage>(9000, config, messageFactory, logger,
 
 ## Pipeline Customization
 
-Both client and server accept an optional pipeline configurator to add custom DotNetty handlers. The configurator is called **after** all built-in handlers are added.
+Both client and server accept an optional pipeline configurator to add custom SpanNetty handlers. The configurator is called **after** all built-in handlers are added.
 
 ### Built-in Pipeline Order
 
@@ -703,12 +728,10 @@ The library depends on `ILogger` from `Microsoft.Extensions.Logging` — bring y
 
 When `LogSensitiveData = false`, the logging handler masks fields listed in `SensitiveDataFields`. PAN values are masked as `123456****1234` (first 6, last 4 visible). The default masked fields are:
 
-| Field | Description  |
-|-------|--------------|
-| 34    | PAN Extended |
-| 35    | Track 2 Data |
-| 36    | Track 3 Data |
-| 45    | Track 1 Data |
+- Field 34 — PAN Extended
+- Field 35 — Track 2 Data
+- Field 36 — Track 3 Data
+- Field 45 — Track 1 Data
 
 Override `SensitiveDataFields` to customize:
 

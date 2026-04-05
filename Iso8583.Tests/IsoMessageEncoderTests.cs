@@ -82,11 +82,12 @@ public class IsoMessageEncoderTests : IDisposable
     }
 
     [Fact]
-    public void Encode_StringLengthHeader_2Bytes_Works()
+    public void Encode_StringLengthHeader_2Bytes_OverflowThrows()
     {
         var encoder = new IsoMessageEncoder(2, true);
-        encoder.DoEncode(null!, _message, _buffer);
-        Assert.True(_buffer.ReadableBytes > 2);
+        var ex = Assert.Throws<System.Reflection.TargetInvocationException>(() =>
+            encoder.DoEncode(null!, _message, _buffer));
+        Assert.IsType<ArgumentException>(ex.InnerException);
     }
 }
 

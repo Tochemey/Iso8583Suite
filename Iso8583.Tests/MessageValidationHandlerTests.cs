@@ -64,8 +64,9 @@ public class MessageValidationHandlerTests
     }
 
     /// <summary>
-    ///   Write a single outbound message and flush. In SpanNetty's EmbeddedChannel, the write
-    ///   promise only completes once the pipeline is flushed, so tests must flush explicitly.
+    ///   Write a single outbound message and flush. Uses WriteOneOutbound + FlushOutbound
+    ///   so the returned task carries any validation failure from the handler, unlike
+    ///   WriteOutbound which swallows exceptions internally.
     /// </summary>
     private static async Task WriteAndFlushAsync(EmbeddedChannel channel, object message)
     {

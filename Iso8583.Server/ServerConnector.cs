@@ -20,7 +20,7 @@ using NetCore8583;
 namespace Iso8583.Server
 {
   /// <summary>
-  ///   Base class for ISO 8583 TCP servers. Sets up the SpanNetty <see cref="ServerBootstrap"/>
+  ///   Base class for ISO 8583 TCP servers. Sets up the DotNetty <see cref="ServerBootstrap"/>
   ///   and delegates further customization to an optional <see cref="IServerConnectorConfigurator{T}"/>.
   /// </summary>
   /// <typeparam name="T">The ISO message type.</typeparam>

@@ -37,13 +37,15 @@ namespace Iso8583.Client
     internal int PendingCount => _pending.Count;
 
     /// <summary>
-    ///   Registers a pending request and returns a task that completes when the matching response arrives.
+    ///   Registers a pending request and returns the correlation key together with a task
+    ///   that completes when the matching response arrives.
     /// </summary>
     /// <param name="request">the outbound request message</param>
     /// <param name="timeout">how long to wait for a response</param>
     /// <param name="cancellationToken">optional cancellation token</param>
-    /// <returns>the response message</returns>
-    public async Task<T> RegisterPending(T request, TimeSpan timeout, CancellationToken cancellationToken = default)
+    /// <returns>A tuple of the correlation key and the response task.</returns>
+    public (string key, Task<T> task) RegisterPending(T request, TimeSpan timeout,
+      CancellationToken cancellationToken = default)
     {
       var key = BuildCorrelationKey(request);
       var tcs = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -52,7 +54,13 @@ namespace Iso8583.Client
         throw new InvalidOperationException(
           $"A pending request with the same correlation key already exists: {key}");
 
-      // Register timeout and cancellation
+      var task = WaitForResponseAsync(key, tcs, timeout, cancellationToken);
+      return (key, task);
+    }
+
+    private async Task<T> WaitForResponseAsync(string key, TaskCompletionSource<T> tcs,
+      TimeSpan timeout, CancellationToken cancellationToken)
+    {
       using var timeoutCts = new CancellationTokenSource(timeout);
       using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, cancellationToken);
 
@@ -69,6 +77,15 @@ namespace Iso8583.Client
       });
 
       return await tcs.Task;
+    }
+
+    /// <summary>
+    ///   Cancels a single pending request by its correlation key.
+    /// </summary>
+    public void Cancel(string key)
+    {
+      if (_pending.TryRemove(key, out var tcs))
+        tcs.TrySetCanceled();
     }
 
     /// <summary>

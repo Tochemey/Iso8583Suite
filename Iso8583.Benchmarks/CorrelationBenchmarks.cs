@@ -55,10 +55,8 @@ public class CorrelationBenchmarks
     [Benchmark(Description = "Register + Complete pending request cycle")]
     public async Task RegisterAndComplete()
     {
-        // Register
-        var responseTask = _manager.RegisterPending(_request, TimeSpan.FromSeconds(5));
+        var (_, responseTask) = _manager.RegisterPending(_request, TimeSpan.FromSeconds(5));
 
-        // Simulate response arrival
         _manager.CanHandleMessage(_response);
         await _manager.HandleMessage(null, _response);
 
@@ -72,7 +70,7 @@ public class CorrelationBenchmarks
     {
         private readonly PendingRequestManager<IsoMessage> _inner = new();
 
-        public Task<IsoMessage> RegisterPending(IsoMessage msg, TimeSpan timeout) =>
+        public (string key, Task<IsoMessage> task) RegisterPending(IsoMessage msg, TimeSpan timeout) =>
             _inner.RegisterPending(msg, timeout);
 
         public bool CanHandleMessage(IsoMessage isoMessage) => _inner.CanHandleMessage(isoMessage);

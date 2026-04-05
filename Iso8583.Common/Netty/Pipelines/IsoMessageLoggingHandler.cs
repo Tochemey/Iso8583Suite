@@ -40,7 +40,7 @@ namespace Iso8583.Common.Netty.Pipelines
     };
 
     private static readonly char[] MaskedValue = "***".ToCharArray();
-    private static readonly string[] FieldNames = new string[128];
+    private static readonly Lazy<string[]> LazyFieldNames = new(LoadFieldNames);
     private readonly int[] _maskedFields;
     private readonly bool _printFieldDescriptions;
 
@@ -53,29 +53,34 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <param name="printSensitiveData">should print sensible data or not</param>
     /// <param name="printFieldDescriptions">should print fields descriptions or not</param>
     /// <param name="maskedFields">masked fields</param>
-    /// <exception cref="Exception"></exception>
     public IsoMessageLoggingHandler(LogLevel level,
       bool printSensitiveData = true,
       bool printFieldDescriptions = true,
       params int[] maskedFields) : base(level)
     {
-      var fields = Iso8583Fields.Fields;
-      try
-      {
-        foreach (var key in fields.Keys)
-        {
-          var field = int.Parse(key);
-          FieldNames[field - 1] = fields[key];
-        }
-      }
-      catch (Exception e)
-      {
-        throw new Exception($"Unable to load ISO8583 field descriptions: Cause[{e}] ");
-      }
-
       _printSensitiveData = printSensitiveData;
       _printFieldDescriptions = printFieldDescriptions;
-      _maskedFields = maskedFields is { Length: > 0 } ? maskedFields : DefaultMaskedFields;
+      if (maskedFields is { Length: > 0 })
+      {
+        _maskedFields = (int[])maskedFields.Clone();
+        Array.Sort(_maskedFields);
+      }
+      else
+      {
+        _maskedFields = DefaultMaskedFields;
+      }
+    }
+
+    private static string[] LoadFieldNames()
+    {
+      var names = new string[128];
+      var fields = Iso8583Fields.Fields;
+      foreach (var key in fields.Keys)
+      {
+        if (int.TryParse(key, out var field) && field >= 1 && field <= 128)
+          names[field - 1] = fields[key];
+      }
+      return names;
     }
 
     /// <inheritdoc />
@@ -114,7 +119,7 @@ namespace Iso8583.Common.Netty.Pipelines
           var field = isoMessage.GetField(i);
           sb.Append("\n  ").Append(i).Append(": [");
 
-          if (_printFieldDescriptions) sb.Append(FieldNames[i - 1]).Append(':');
+          if (_printFieldDescriptions) sb.Append(LazyFieldNames.Value[i - 1]).Append(':');
 
           char[] formattedValue;
           if (_printSensitiveData)
@@ -144,7 +149,10 @@ namespace Iso8583.Common.Netty.Pipelines
     private static char[] MaskPan(string fullPan)
     {
       var maskedPan = fullPan.ToCharArray();
-      for (var i = 6; i < maskedPan.Length - 4; i++) maskedPan[i] = MaskChar;
+      var unmaskedPrefix = Math.Min(6, maskedPan.Length);
+      var unmaskedSuffix = Math.Min(4, Math.Max(0, maskedPan.Length - unmaskedPrefix));
+      for (var i = unmaskedPrefix; i < maskedPan.Length - unmaskedSuffix; i++)
+        maskedPan[i] = MaskChar;
       return maskedPan;
     }
   }

@@ -184,11 +184,10 @@ namespace Iso8583.Common.Netty.Pipelines
     {
       _logger.LogDebug("Handling received message type 0x{Type}", isoMessage.Type.ToString("X4"));
 
-      var sw = Stopwatch.StartNew();
+      var startTimestamp = Stopwatch.GetTimestamp();
 
       try
       {
-        // Snapshot the listener array (copy-on-write: reads are lock-free)
         var listeners = _listeners;
 
         for (var i = 0; i < listeners.Length; i++)
@@ -203,12 +202,10 @@ namespace Iso8583.Common.Netty.Pipelines
           }
         }
 
-        sw.Stop();
-        _metrics.MessageHandled(isoMessage.Type, sw.Elapsed);
+        _metrics.MessageHandled(isoMessage.Type, Stopwatch.GetElapsedTime(startTimestamp));
       }
       catch (Exception e)
       {
-        sw.Stop();
         _metrics.MessageError(isoMessage.Type, e);
         throw;
       }

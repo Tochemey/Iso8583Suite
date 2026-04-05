@@ -21,7 +21,7 @@ using NetCore8583;
 namespace Iso8583.Client
 {
   /// <summary>
-  ///   Base class for ISO 8583 TCP clients. Sets up the SpanNetty <see cref="Bootstrap"/>
+  ///   Base class for ISO 8583 TCP clients. Sets up the DotNetty <see cref="Bootstrap"/>
   ///   with TCP options (nodelay, keepalive, reuse-addr) and delegates further customization
   ///   to an optional <see cref="IClientConnectorConfigurator{T}"/>.
   /// </summary>

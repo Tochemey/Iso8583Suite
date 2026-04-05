@@ -94,7 +94,7 @@ namespace Iso8583.Server
     public IReadOnlyCollection<IChannel> ActiveConnections => _connectionTracker.ActiveChannels;
 
     /// <summary>
-    ///   Creates and configures the SpanNetty <see cref="ServerBootstrap"/> with child channel options
+    ///   Creates and configures the DotNetty <see cref="ServerBootstrap"/> with child channel options
     ///   (keepalive, nodelay, linger), the ISO 8583 channel initializer, connection tracker, and metrics.
     /// </summary>
     protected override ServerBootstrap CreateBootstrap()
@@ -110,6 +110,7 @@ namespace Iso8583.Server
         .ChildHandler(new Iso8583ChannelInitializer<ServerConfiguration>(
           Configuration, ConnectorConfigurator, WorkerEventLoopGroup,
           MessageFactory as IMessageFactory<IsoMessage>, MessageHandler,
+          isClient: false,
           connectionTracker: _connectionTracker, metrics: _metrics
         ));
       ConfigureBootstrap(boostrap);
@@ -149,13 +150,24 @@ namespace Iso8583.Server
       var channel = GetChannel();
       if (channel != null)
       {
-        await channel.DeregisterAsync();
-        await Task.Delay(gracePeriod);
-        await channel.CloseAsync();
+        try { await channel.CloseAsync(); }
+        catch { /* best effort */ }
       }
 
-      await WorkerEventLoopGroup.ShutdownGracefullyAsync();
-      await BossEventLoopGroup.ShutdownGracefullyAsync();
+      // DotNetty's ShutdownGracefullyAsync may stall on some platforms when
+      // child channels are still draining. We impose a hard outer timeout
+      // so callers are never blocked indefinitely.
+      var hardTimeout = gracePeriod.Add(TimeSpan.FromSeconds(2));
+      try
+      {
+        var shutdownTask = Task.WhenAll(
+          WorkerEventLoopGroup.ShutdownGracefullyAsync(
+            TimeSpan.FromMilliseconds(100), gracePeriod),
+          BossEventLoopGroup.ShutdownGracefullyAsync(
+            TimeSpan.FromMilliseconds(100), gracePeriod));
+        await Task.WhenAny(shutdownTask, Task.Delay(hardTimeout));
+      }
+      catch { /* suppress shutdown errors */ }
     }
 
     /// <inheritdoc />

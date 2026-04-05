@@ -17,7 +17,7 @@ using DotNetty.Transport.Channels;
 namespace Iso8583.Common
 {
   /// <summary>
-  ///   Defines a strategy for configuring the SpanNetty channel pipeline.
+  ///   Defines a strategy for configuring the DotNetty channel pipeline.
   ///   Implementations add codecs, handlers, and other channel handlers to the pipeline
   ///   based on the provided <typeparamref name="T"/> configuration.
   /// </summary>

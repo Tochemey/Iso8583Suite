@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="NetCore8583" Version="2.4.0" />
+        <PackageReference Include="NetCore8583" Version="2.5.0" />
         <PackageReference Include="NLog.Extensions.Logging" Version="6.1.1" />
         <PackageReference Include="SpanNetty.Buffers" Version="0.7.2012.2221" />
         <PackageReference Include="SpanNetty.Codecs" Version="0.7.2012.2221" />

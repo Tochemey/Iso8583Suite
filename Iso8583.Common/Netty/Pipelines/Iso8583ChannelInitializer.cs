@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Security.Cryptography.X509Certificates;
 using DotNetty.Codecs;
 using DotNetty.Handlers.Logging;
@@ -50,12 +51,16 @@ namespace Iso8583.Common.Netty.Pipelines
     /// <param name="workerGroup">the worker group</param>
     /// <param name="messageFactory">the message factory</param>
     /// <param name="channelHandler">the channel handler</param>
+    /// <param name="isClient">
+    ///   True when this initializer is used on the client side, false on the server side.
+    ///   Controls TLS handler type (client vs server) and client-only pipeline handlers.
+    /// </param>
     /// <param name="reconnectHandler">optional reconnect handler for client connections</param>
     /// <param name="connectionTracker">optional connection tracker for server connections</param>
     /// <param name="metrics">optional metrics provider</param>
     public Iso8583ChannelInitializer(TC configuration, IPipelineConfigurator<TC> configurator,
       MultithreadEventLoopGroup workerGroup, IMessageFactory<IsoMessage> messageFactory,
-      IChannelHandler channelHandler, IChannelHandler reconnectHandler = null,
+      IChannelHandler channelHandler, bool isClient, IChannelHandler reconnectHandler = null,
       IChannelHandler connectionTracker = null, IIso8583Metrics metrics = null)
     {
       _configuration = configuration;
@@ -66,7 +71,7 @@ namespace Iso8583.Common.Netty.Pipelines
       _reconnectHandler = reconnectHandler;
       _connectionTracker = connectionTracker;
       _metrics = metrics ?? NullIso8583Metrics.Instance;
-      _isClient = reconnectHandler != null;
+      _isClient = isClient;
     }
 
     /// <summary>
@@ -142,20 +147,32 @@ namespace Iso8583.Common.Netty.Pipelines
         if (_isClient)
         {
           var targetHost = ssl.TargetHost ?? channel.RemoteAddress?.ToString() ?? "localhost";
-          if (ssl.MutualTls && !string.IsNullOrEmpty(ssl.CertificatePath))
+          ClientTlsSettings clientSettings;
+          var clientCert = ResolveCertificate(ssl);
+          if (ssl.MutualTls && clientCert != null)
           {
-            var clientCert = LoadCertificate(ssl.CertificatePath, ssl.CertificatePassword);
-            var clientSettings = new ClientTlsSettings(targetHost, [clientCert]);
-            pipeline.AddLast("tls", new TlsHandler(clientSettings));
+            clientSettings = new ClientTlsSettings(targetHost, [clientCert]);
           }
           else
           {
-            pipeline.AddLast("tls", new TlsHandler(new ClientTlsSettings(targetHost)));
+            clientSettings = new ClientTlsSettings(targetHost);
           }
+
+          if (ssl.AllowUntrustedCertificates)
+          {
+            clientSettings.AllowUnstrustedCertificate = true;
+            clientSettings.AllowNameMismatchCertificate = true;
+            clientSettings.AllowCertificateChainErrors = true;
+          }
+
+          pipeline.AddLast("tls", new TlsHandler(clientSettings));
         }
         else
         {
-          var serverCert = LoadCertificate(ssl.CertificatePath, ssl.CertificatePassword);
+          var serverCert = ResolveCertificate(ssl)
+                           ?? throw new InvalidOperationException(
+                             "Server SSL is enabled but no certificate is configured. " +
+                             "Set SslConfiguration.Certificate or SslConfiguration.CertificatePath.");
           pipeline.AddLast("tls", new TlsHandler(new ServerTlsSettings(serverCert, ssl.MutualTls)));
         }
       }
@@ -185,6 +202,18 @@ namespace Iso8583.Common.Netty.Pipelines
         pipeline.AddLast("reconnect", _reconnectHandler);
 
       _configurator?.ConfigurePipeline(pipeline, _configuration);
+    }
+
+    /// <summary>
+    ///   Resolves the certificate from an <see cref="SslConfiguration"/>, preferring an
+    ///   already-loaded <see cref="SslConfiguration.Certificate"/> instance when present and
+    ///   falling back to loading from <see cref="SslConfiguration.CertificatePath"/>.
+    /// </summary>
+    private static X509Certificate2 ResolveCertificate(SslConfiguration ssl)
+    {
+      if (ssl.Certificate != null) return ssl.Certificate;
+      if (string.IsNullOrEmpty(ssl.CertificatePath)) return null;
+      return LoadCertificate(ssl.CertificatePath, ssl.CertificatePassword);
     }
 
     /// <summary>
