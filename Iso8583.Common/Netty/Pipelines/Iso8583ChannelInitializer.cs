@@ -140,41 +140,8 @@ namespace Iso8583.Common.Netty.Pipelines
         pipeline.AddLast("connectionTracker", _connectionTracker);
 
       // Add TLS handler if SSL is configured
-      var ssl = _configuration.Ssl;
-      if (ssl is { Enabled: true })
-      {
-        if (_isClient)
-        {
-          var targetHost = ssl.TargetHost ?? channel.RemoteAddress?.ToString() ?? "localhost";
-          ClientTlsSettings clientSettings;
-          var clientCert = ResolveCertificate(ssl);
-          if (ssl.MutualTls && clientCert != null)
-          {
-            clientSettings = new ClientTlsSettings(targetHost, [clientCert]);
-          }
-          else
-          {
-            clientSettings = new ClientTlsSettings(targetHost);
-          }
-
-          if (ssl.AllowUntrustedCertificates)
-          {
-            clientSettings.AllowUnstrustedCertificate = true;
-            clientSettings.AllowNameMismatchCertificate = true;
-            clientSettings.AllowCertificateChainErrors = true;
-          }
-
-          pipeline.AddLast("tls", new TlsHandler(clientSettings));
-        }
-        else
-        {
-          var serverCert = ResolveCertificate(ssl)
-                           ?? throw new InvalidOperationException(
-                             "Server SSL is enabled but no certificate is configured. " +
-                             "Set SslConfiguration.Certificate or SslConfiguration.CertificatePath.");
-          pipeline.AddLast("tls", new TlsHandler(new ServerTlsSettings(serverCert, ssl.MutualTls)));
-        }
-      }
+      TryAddTlsHandler(pipeline, _configuration.Ssl, _isClient,
+        _isClient ? channel.RemoteAddress?.ToString() : null);
 
       var isoMessageEncoder = CreateIsoMessageEncoder(_configuration);
       var loggingHandler = CreateLoggingHandler(_configuration);
@@ -212,11 +179,55 @@ namespace Iso8583.Common.Netty.Pipelines
     }
 
     /// <summary>
+    ///   Installs a <see cref="TlsHandler"/> at the head of the given pipeline when SSL is
+    ///   enabled. Extracted from <see cref="InitChannel"/> so the TLS wiring can be exercised
+    ///   by unit tests with an <c>EmbeddedChannel</c> pipeline without requiring a real
+    ///   TCP handshake.
+    /// </summary>
+    internal static void TryAddTlsHandler(IChannelPipeline pipeline, SslConfiguration ssl, bool isClient,
+      string clientRemoteAddress)
+    {
+      if (ssl is not { Enabled: true }) return;
+
+      if (isClient)
+      {
+        var targetHost = ssl.TargetHost ?? clientRemoteAddress ?? "localhost";
+        ClientTlsSettings clientSettings;
+        var clientCert = ResolveCertificate(ssl);
+        if (ssl.MutualTls && clientCert != null)
+        {
+          clientSettings = new ClientTlsSettings(targetHost, [clientCert]);
+        }
+        else
+        {
+          clientSettings = new ClientTlsSettings(targetHost);
+        }
+
+        if (ssl.AllowUntrustedCertificates)
+        {
+          clientSettings.AllowUnstrustedCertificate = true;
+          clientSettings.AllowNameMismatchCertificate = true;
+          clientSettings.AllowCertificateChainErrors = true;
+        }
+
+        pipeline.AddLast("tls", new TlsHandler(clientSettings));
+      }
+      else
+      {
+        var serverCert = ResolveCertificate(ssl)
+                         ?? throw new InvalidOperationException(
+                           "Server SSL is enabled but no certificate is configured. " +
+                           "Set SslConfiguration.Certificate or SslConfiguration.CertificatePath.");
+        pipeline.AddLast("tls", new TlsHandler(new ServerTlsSettings(serverCert, ssl.MutualTls)));
+      }
+    }
+
+    /// <summary>
     ///   Resolves the certificate from an <see cref="SslConfiguration"/>, preferring an
     ///   already-loaded <see cref="SslConfiguration.Certificate"/> instance when present and
     ///   falling back to loading from <see cref="SslConfiguration.CertificatePath"/>.
     /// </summary>
-    private static X509Certificate2 ResolveCertificate(SslConfiguration ssl)
+    internal static X509Certificate2 ResolveCertificate(SslConfiguration ssl)
     {
       if (ssl.Certificate != null) return ssl.Certificate;
       if (string.IsNullOrEmpty(ssl.CertificatePath)) return null;
@@ -227,7 +238,7 @@ namespace Iso8583.Common.Netty.Pipelines
     ///   Loads a PKCS#12 certificate from the given file path. Uses the platform-appropriate loader
     ///   (<c>X509CertificateLoader</c> on .NET 9+, constructor on older runtimes).
     /// </summary>
-    private static X509Certificate2 LoadCertificate(string path, string password)
+    internal static X509Certificate2 LoadCertificate(string path, string password)
     {
 #if NET9_0_OR_GREATER
       return X509CertificateLoader.LoadPkcs12FromFile(path, password);

@@ -128,6 +128,46 @@ public class IsoMessageLoggingHandlerTests
         var result = _handlerSensitive.FormatIsoMessage(_message);
         Assert.Contains("LLVAR", result);
     }
+
+    [Fact]
+    public void Format_WithIsoMessage_InvokesCustomFormatter()
+    {
+        // Exercises the protected Format override via a test subclass so the
+        // "arg is IsoMessage" branch (routes to FormatIsoMessage) is covered.
+        var handler = new ExposedLoggingHandler(LogLevel.DEBUG, printSensitiveData: false);
+        var channel = new DotNetty.Transport.Channels.Embedded.EmbeddedChannel(handler);
+        var ctx = channel.Pipeline.Context(handler);
+
+        var formatted = handler.InvokeFormat(ctx, "WRITE", _message);
+
+        Assert.Contains("0x0200", formatted);
+        Assert.Contains("516412******2481", formatted);
+        channel.CloseAsync().Wait();
+    }
+
+    [Fact]
+    public void Format_WithNonIsoMessage_FallsBackToBase()
+    {
+        var handler = new ExposedLoggingHandler(LogLevel.DEBUG, printSensitiveData: true);
+        var channel = new DotNetty.Transport.Channels.Embedded.EmbeddedChannel(handler);
+        var ctx = channel.Pipeline.Context(handler);
+
+        // Passing a non-IsoMessage arg exercises the "message != null" false branch,
+        // which forwards the original argument to the base Format implementation.
+        var formatted = handler.InvokeFormat(ctx, "READ", "plain-string");
+
+        Assert.Contains("plain-string", formatted);
+        channel.CloseAsync().Wait();
+    }
+
+    private sealed class ExposedLoggingHandler : IsoMessageLoggingHandler
+    {
+        public ExposedLoggingHandler(LogLevel level, bool printSensitiveData)
+            : base(level, printSensitiveData, printFieldDescriptions: true) { }
+
+        public string InvokeFormat(IChannelHandlerContext ctx, string eventName, object arg) =>
+            Format(ctx, eventName, arg);
+    }
 }
 
 public class IdleEventHandlerTests

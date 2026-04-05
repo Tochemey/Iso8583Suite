@@ -156,6 +156,67 @@ public class Iso8583ClientTests : IAsyncLifetime
         await client.Disconnect();
     }
 
+    [Fact]
+    public async Task Send_BeforeConnect_ThrowsInvalidOperation()
+    {
+        await using var client = CreateClient();
+
+        var msg = _factory.NewMessage(0x1100);
+        msg.SetField(11, new IsoValue(IsoType.ALPHA, "000010", 6));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => client.Send(msg));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => client.Send(msg, 1000));
+    }
+
+    [Fact]
+    public async Task Send_WithTimeout_AfterDispose_ThrowsObjectDisposed()
+    {
+        var client = CreateClient();
+        await client.DisposeAsync();
+
+        var msg = _factory.NewMessage(0x1100);
+        msg.SetField(11, new IsoValue(IsoType.ALPHA, "000011", 6));
+
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => client.Send(msg, 500));
+    }
+
+    [Fact]
+    public async Task SendAndReceive_BeforeConnect_FailsAndClearsPending()
+    {
+        await using var client = CreateClient();
+
+        var msg = _factory.NewMessage(0x1100);
+        msg.SetField(11, new IsoValue(IsoType.ALPHA, "000012", 6));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            client.SendAndReceive(msg, TimeSpan.FromSeconds(1)));
+
+        // The pending registration must have been cleaned up on Send failure
+        // so the manager is back to zero in-flight requests.
+        Assert.Equal(0, client.PendingCount);
+    }
+
+    [Fact]
+    public async Task Connect_WithUnresolvableHostname_ExercisesDnsBranch()
+    {
+        // Forces Connect to enter the DNS-resolution branch (IPAddress.TryParse
+        // fails → Dns.GetHostAddressesAsync is invoked). A non-existent hostname
+        // throws from the resolver, which is the expected outcome; the important
+        // bit for coverage is that the branch runs.
+        await using var client = CreateClient();
+
+        await Assert.ThrowsAnyAsync<Exception>(() =>
+            client.Connect("iso8583-nonexistent-host-for-tests.invalid", Port));
+    }
+
+    [Fact]
+    public async Task Constructor_WithMessageFactoryOnly_CreatesUsableInstance()
+    {
+        // Exercises the overload that takes only a message factory (default configuration).
+        await using var client = new Iso8583Client<IsoMessage>(_factory);
+        Assert.False(client.IsConnected());
+    }
+
     private class EchoBackListener : IIsoMessageListener<IsoMessage>
     {
         private readonly IsoMessageFactory<IsoMessage> _factory;

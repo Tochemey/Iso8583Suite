@@ -149,4 +149,27 @@ public class PendingRequestManagerTests
         Assert.ThrowsAny<Exception>(() =>
             _manager.RegisterPending(msg, TimeSpan.FromSeconds(5)));
     }
+
+    [Fact]
+    public async Task Cancel_ByKey_CancelsOnlyThatRequest()
+    {
+        var r1 = CreateRequest(0x0200, "200001");
+        var r2 = CreateRequest(0x0200, "200002");
+        var (key1, task1) = _manager.RegisterPending(r1, TimeSpan.FromSeconds(30));
+        var (_, task2) = _manager.RegisterPending(r2, TimeSpan.FromSeconds(30));
+
+        _manager.Cancel(key1);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => task1);
+        Assert.False(task2.IsCompleted);
+
+        _manager.CancelAll();
+    }
+
+    [Fact]
+    public void Cancel_UnknownKey_IsNoOp()
+    {
+        _manager.Cancel("unknown:key"); // should not throw
+        Assert.Equal(0, _manager.PendingCount);
+    }
 }
