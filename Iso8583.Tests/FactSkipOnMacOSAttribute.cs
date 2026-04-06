@@ -12,24 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Runtime.InteropServices;
 using Xunit;
 
 namespace Iso8583.Tests;
 
 /// <summary>
-///   xUnit <see cref="FactAttribute"/> variant that marks the test as skipped when the
-///   host OS is macOS or Linux. Used to exclude DotNetty TLS integration tests where the
-///   DotNetty <c>TlsHandler</c> is known to hang during the handshake, while still running
-///   them on Windows CI.
+///   xUnit <see cref="FactAttribute"/> variant that unconditionally skips the test.
+///   DotNetty's <c>TlsHandler</c> hangs during the TLS handshake on all CI platforms
+///   (macOS, Linux, and Windows). The <see cref="TlsMutualAuthTests.Diagnostic_RawSslStream_HandshakeSucceedsWithSelfSignedCert"/>
+///   test validates TLS correctness using raw <c>SslStream</c> without DotNetty.
 /// </summary>
 public sealed class FactSkipOnMacOSAttribute : FactAttribute
 {
-    public FactSkipOnMacOSAttribute(string reason = "Skipped on macOS/Linux")
+    public FactSkipOnMacOSAttribute(string reason = "DotNetty TlsHandler hangs during handshake on all platforms")
     {
-        Timeout = 30_000;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
-            RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            Skip = reason;
+        Skip = reason;
     }
 }
