@@ -19,16 +19,17 @@ namespace Iso8583.Tests;
 
 /// <summary>
 ///   xUnit <see cref="FactAttribute"/> variant that marks the test as skipped when the
-///   host OS is macOS. Used to exclude DotNetty TLS integration tests on macOS, where the
+///   host OS is macOS or Linux. Used to exclude DotNetty TLS integration tests where the
 ///   DotNetty <c>TlsHandler</c> is known to hang during the handshake, while still running
-///   them on Linux and Windows CI.
+///   them on Windows CI.
 /// </summary>
 public sealed class FactSkipOnMacOSAttribute : FactAttribute
 {
-    public FactSkipOnMacOSAttribute(string reason = "Skipped on macOS")
+    public FactSkipOnMacOSAttribute(string reason = "Skipped on macOS/Linux")
     {
         Timeout = 30_000;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
+            RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             Skip = reason;
     }
 }
