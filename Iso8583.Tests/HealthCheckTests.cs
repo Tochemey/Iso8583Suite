@@ -59,7 +59,7 @@ public class HealthCheckTests
 
     // ---------------- Client health check ----------------
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task ClientHealthCheck_BeforeConnect_ReportsUnhealthy()
     {
         var factory = CreateFactory();
@@ -73,7 +73,7 @@ public class HealthCheckTests
         Assert.False((bool)result.Data["reconnecting"]);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task ClientHealthCheck_WhenConnected_ReportsHealthy()
     {
         var port = TestPorts.Next();
@@ -94,7 +94,7 @@ public class HealthCheckTests
         await client.Disconnect();
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task ClientHealthCheck_AfterExplicitDisconnect_ReportsUnhealthy()
     {
         var port = TestPorts.Next();
@@ -115,7 +115,7 @@ public class HealthCheckTests
         Assert.False((bool)result.Data["reconnecting"]);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task ClientHealthCheck_DuringReconnect_ReportsDegraded()
     {
         var factory = CreateFactory();
@@ -148,7 +148,7 @@ public class HealthCheckTests
         Assert.False((bool)result.Data["connected"]);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task ClientHealthCheck_AfterMaxAttemptsExhausted_ReportsUnhealthy()
     {
         var factory = CreateFactory();
@@ -179,7 +179,7 @@ public class HealthCheckTests
         Assert.False((bool)result.Data["reconnecting"]);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task AddIso8583ClientHealthCheck_FromDI_RegistersCheck()
     {
         var factory = CreateFactory();
@@ -198,7 +198,7 @@ public class HealthCheckTests
         Assert.Equal(HealthStatus.Unhealthy, report.Entries["client-check"].Status);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task AddIso8583ClientHealthCheck_ExplicitInstance_RegistersCheck()
     {
         var factory = CreateFactory();
@@ -217,7 +217,7 @@ public class HealthCheckTests
 
     // ---------------- Server health check ----------------
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task ServerHealthCheck_BeforeStart_ReportsUnhealthy()
     {
         var port = TestPorts.Next();
@@ -232,7 +232,7 @@ public class HealthCheckTests
         Assert.Equal(0, (int)result.Data["activeConnections"]);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task ServerHealthCheck_WhenListening_ReportsHealthyWithZeroConnections()
     {
         var port = TestPorts.Next();
@@ -249,7 +249,7 @@ public class HealthCheckTests
         Assert.Equal(0, (int)result.Data["activeConnections"]);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task ServerHealthCheck_WithActiveClient_ReportsConnectionCount()
     {
         var port = TestPorts.Next();
@@ -275,7 +275,7 @@ public class HealthCheckTests
         await client.Disconnect();
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task ServerHealthCheck_AfterShutdown_ReportsUnhealthy()
     {
         var port = TestPorts.Next();
@@ -291,7 +291,7 @@ public class HealthCheckTests
         Assert.Equal(HealthStatus.Unhealthy, result.Status);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task AddIso8583ServerHealthCheck_FromDI_RegistersCheck()
     {
         var port = TestPorts.Next();
@@ -313,7 +313,7 @@ public class HealthCheckTests
         Assert.Equal(HealthStatus.Healthy, report.Entries["server-check"].Status);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task AddIso8583ServerHealthCheck_ExplicitInstance_RegistersCheck()
     {
         var port = TestPorts.Next();

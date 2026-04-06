@@ -27,6 +27,7 @@ public sealed class FactSkipOnMacOSAttribute : FactAttribute
 {
     public FactSkipOnMacOSAttribute(string reason = "Skipped on macOS")
     {
+        Timeout = 30_000;
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             Skip = reason;
     }

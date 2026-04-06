@@ -36,7 +36,7 @@ namespace Iso8583.Tests;
 [Collection(nameof(TcpServerCollection))]
 public class AutoReconnectTests
 {
-    [Fact]
+    [Fact(Timeout = 60_000)]
     public async Task AutoReconnect_AfterConnectionDrop_ClientReconnectsAndCanSendMessages()
     {
         var port = TestPorts.Next();

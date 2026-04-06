@@ -73,19 +73,19 @@ public class EndToEndTests : IAsyncLifetime
         try { await _server.Shutdown(TimeSpan.FromSeconds(1)); } catch { /* ignore */ }
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public void Server_IsStarted()
     {
         Assert.True(_server.IsStarted());
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public void Client_IsConnected()
     {
         Assert.True(_client.IsConnected());
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task SendAndReceive_AuthorizationRequest_GetsResponse()
     {
         var request = CreateAuthRequest("000001");
@@ -97,7 +97,7 @@ public class EndToEndTests : IAsyncLifetime
         Assert.Equal("000", response.GetField(39)?.Value?.ToString());
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Send_FireAndForget_DoesNotThrow()
     {
         var request = CreateAuthRequest("000002");
@@ -106,7 +106,7 @@ public class EndToEndTests : IAsyncLifetime
         await Task.Delay(200);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task SendAndReceive_MultipleRequests_AllCorrelateCorrectly()
     {
         var tasks = new Task<IsoMessage>[5];
@@ -126,7 +126,7 @@ public class EndToEndTests : IAsyncLifetime
         }
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Client_SendNotConnected_ThrowsInvalidOperation()
     {
         var disconnectedClient = new Iso8583Client<IsoMessage>(
@@ -142,7 +142,7 @@ public class EndToEndTests : IAsyncLifetime
             await disconnectedClient.Send(_factory.NewMessage(0x1100)));
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Server_ActiveConnectionCount_IsOne()
     {
         // Allow time for ChannelActive to fire on the server pipeline
@@ -152,7 +152,7 @@ public class EndToEndTests : IAsyncLifetime
         Assert.Equal(1, _server.ActiveConnectionCount);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Client_Disconnect_ThenSend_ThrowsInvalidOperation()
     {
         var separateClient = new Iso8583Client<IsoMessage>(
@@ -170,7 +170,7 @@ public class EndToEndTests : IAsyncLifetime
             await separateClient.Send(_factory.NewMessage(0x1100)));
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Client_DisposeAsync_ThenSend_ThrowsObjectDisposed()
     {
         var separateClient = new Iso8583Client<IsoMessage>(

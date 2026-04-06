@@ -73,7 +73,7 @@ public class PooledIso8583ClientTests : IAsyncLifetime
         };
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Connect_AllConnectionsEstablished()
     {
         var config = CreateConfig(3);
@@ -91,7 +91,7 @@ public class PooledIso8583ClientTests : IAsyncLifetime
         Assert.Equal(3, pool.ActiveConnectionCount);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Send_FireAndForget_Succeeds()
     {
         var config = CreateConfig(2);
@@ -105,7 +105,7 @@ public class PooledIso8583ClientTests : IAsyncLifetime
         await pool.Send(msg); // should not throw
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Send_WithTimeout_Succeeds()
     {
         var config = CreateConfig(2);
@@ -119,7 +119,7 @@ public class PooledIso8583ClientTests : IAsyncLifetime
         await pool.Send(msg, 5000); // should not throw
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task SendAndReceive_GetsCorrelatedResponse()
     {
         var config = CreateConfig(2);
@@ -136,7 +136,7 @@ public class PooledIso8583ClientTests : IAsyncLifetime
         Assert.True(response.HasField(39)); // response code
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task SendAndReceive_MultipleRequests_DistributedAcrossPool()
     {
         var config = CreateConfig(3);
@@ -155,7 +155,7 @@ public class PooledIso8583ClientTests : IAsyncLifetime
         }
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task SendAndReceive_WithLeastConnectionsBalancer_Succeeds()
     {
         var config = CreateConfig(2);
@@ -177,7 +177,7 @@ public class PooledIso8583ClientTests : IAsyncLifetime
         }
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Disconnect_AllConnectionsClosed()
     {
         var config = CreateConfig(2);
@@ -194,7 +194,7 @@ public class PooledIso8583ClientTests : IAsyncLifetime
         Assert.Equal(0, pool.ActiveConnectionCount);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task DisposeAsync_MultipleCalls_DoesNotThrow()
     {
         var config = CreateConfig(2);
@@ -204,7 +204,7 @@ public class PooledIso8583ClientTests : IAsyncLifetime
         await pool.DisposeAsync(); // second call should be safe
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Send_AfterDispose_ThrowsObjectDisposed()
     {
         var config = CreateConfig(2);
@@ -217,7 +217,7 @@ public class PooledIso8583ClientTests : IAsyncLifetime
         await Assert.ThrowsAsync<ObjectDisposedException>(async () => await pool.Send(msg));
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public void Constructor_InvalidConfig_Throws()
     {
         var config = new PooledClientConfiguration { PoolSize = 0 };

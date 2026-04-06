@@ -30,12 +30,17 @@ env:
   NUGET_KEY: ${{ secrets.NUGET_KEY }}
 
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
@@ -56,10 +61,10 @@ jobs:
         run: dotnet build -c Release --no-restore
       - name: Test
         if: matrix.os != 'ubuntu-latest'
-        run: dotnet test -c Release
+        run: dotnet test -c Release --blame-hang-timeout 60s
       - name: Test with Coverage
         if: matrix.os == 'ubuntu-latest'
-        run: dotnet test -c Release --collect:"XPlat Code Coverage" --framework net8.0 --results-directory ./coverage
+        run: dotnet test -c Release --collect:"XPlat Code Coverage" --framework net8.0 --results-directory ./coverage --blame-hang-timeout 60s
       - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v5

@@ -81,7 +81,7 @@ public class ScenarioTests : IAsyncLifetime
 
     // ---------------- Network management (0800 → 0810) ----------------
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task NetworkManagement_SignOn_GetsApprovalResponse()
     {
         var request = _factory.NewMessage(0x0800);
@@ -95,7 +95,7 @@ public class ScenarioTests : IAsyncLifetime
         Assert.Equal("001", response.GetField(70)?.Value?.ToString());
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task NetworkManagement_Echo_GetsEchoResponse()
     {
         var request = _factory.NewMessage(0x0800);
@@ -109,7 +109,7 @@ public class ScenarioTests : IAsyncLifetime
         Assert.Equal("301", response.GetField(70)?.Value?.ToString());
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task NetworkManagement_SignOff_GetsApprovalResponse()
     {
         var request = _factory.NewMessage(0x0800);
@@ -125,7 +125,7 @@ public class ScenarioTests : IAsyncLifetime
 
     // ---------------- Purchase authorization (0200 → 0210) ----------------
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Purchase_AmountBelowLimit_Approved()
     {
         var request = BuildPurchase("000100", amountMinorUnits: 12345);
@@ -136,7 +136,7 @@ public class ScenarioTests : IAsyncLifetime
         Assert.Equal("00", response.GetField(39)?.Value?.ToString());
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Purchase_AmountAboveLimit_Declined()
     {
         var request = BuildPurchase("000101", amountMinorUnits: 99999);
@@ -149,7 +149,7 @@ public class ScenarioTests : IAsyncLifetime
 
     // ---------------- Reversal flow (0420 → 0430) ----------------
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Reversal_AfterDeclinedPurchase_Accepted()
     {
         // Step 1: send a purchase that will be declined.
@@ -174,7 +174,7 @@ public class ScenarioTests : IAsyncLifetime
         Assert.Equal("00", reversalResponse.GetField(39)?.Value?.ToString());
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Reversal_Duplicate_StillAcknowledged()
     {
         // Idempotent reversal handling: replaying the same reversal STAN must still succeed.

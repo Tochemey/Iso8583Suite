@@ -71,7 +71,7 @@ public class TlsMutualAuthTests : IAsyncLifetime
 
     // ---------------- Diagnostic: raw SslStream with the same cert ----------------
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Diagnostic_RawSslStream_HandshakeSucceedsWithSelfSignedCert()
     {
         // Verifies that .NET's built-in SslStream can complete a TLS handshake over loopback

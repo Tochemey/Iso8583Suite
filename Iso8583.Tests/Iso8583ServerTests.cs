@@ -38,7 +38,7 @@ public class Iso8583ServerTests
         _factory = new IsoMessageFactory<IsoMessage>(mfact, Iso8583Version.V1987);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Start_And_Shutdown_Succeeds()
     {
         var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
@@ -47,7 +47,7 @@ public class Iso8583ServerTests
         await server.Shutdown(TimeSpan.FromSeconds(1));
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Shutdown_WithGracePeriod_Completes()
     {
         var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
@@ -55,7 +55,7 @@ public class Iso8583ServerTests
         await server.Shutdown(TimeSpan.FromMilliseconds(100));
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task DisposeAsync_WhenStarted_ShutsDown()
     {
         var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
@@ -64,14 +64,14 @@ public class Iso8583ServerTests
         await server.DisposeAsync();
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task DisposeAsync_WhenNotStarted_DoesNotThrow()
     {
         var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
         await server.DisposeAsync();
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task DisposeAsync_MultipleCalls_Safe()
     {
         var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
@@ -80,7 +80,7 @@ public class Iso8583ServerTests
         await server.DisposeAsync(); // second call safe
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Start_AfterDispose_ThrowsObjectDisposed()
     {
         var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
@@ -88,7 +88,7 @@ public class Iso8583ServerTests
         await Assert.ThrowsAsync<ObjectDisposedException>(async () => await server.Start());
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task ActiveConnectionCount_NoClients_IsZero()
     {
         var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), new ServerConfiguration(), _factory);
@@ -98,7 +98,7 @@ public class Iso8583ServerTests
         await server.Shutdown(TimeSpan.FromSeconds(1));
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Constructor_WithMetrics_DoesNotThrow()
     {
         var server = new Iso8583Server<IsoMessage>(
@@ -108,7 +108,7 @@ public class Iso8583ServerTests
         await server.Shutdown(TimeSpan.FromSeconds(1));
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Constructor_MinimalParams_UsesDefaults()
     {
         var server = new Iso8583Server<IsoMessage>(TestPorts.Next(), _factory);

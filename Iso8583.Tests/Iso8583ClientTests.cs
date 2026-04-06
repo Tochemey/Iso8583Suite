@@ -72,7 +72,7 @@ public class Iso8583ClientTests : IAsyncLifetime
         }, _factory);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Send_WithTimeout_Succeeds()
     {
         var client = CreateClient();
@@ -86,14 +86,14 @@ public class Iso8583ClientTests : IAsyncLifetime
         await client.Disconnect();
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task IsConnected_BeforeConnect_ReturnsFalse()
     {
         var client = CreateClient();
         Assert.False(client.IsConnected());
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task IsConnected_AfterConnect_ReturnsTrue()
     {
         var client = CreateClient();
@@ -102,7 +102,7 @@ public class Iso8583ClientTests : IAsyncLifetime
         await client.Disconnect();
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task IsConnected_AfterDisconnect_ReturnsFalse()
     {
         var client = CreateClient();
@@ -111,7 +111,7 @@ public class Iso8583ClientTests : IAsyncLifetime
         Assert.False(client.IsConnected());
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task SendAndReceive_WithCancellation_ThrowsWhenCancelled()
     {
         var client = CreateClient();
@@ -129,7 +129,7 @@ public class Iso8583ClientTests : IAsyncLifetime
         await client.Disconnect();
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task DisposeAsync_MultipleCalls_DoesNotThrow()
     {
         var client = CreateClient();
@@ -138,7 +138,7 @@ public class Iso8583ClientTests : IAsyncLifetime
         await client.DisposeAsync(); // second call should be safe
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Connect_AfterDispose_ThrowsObjectDisposed()
     {
         var client = CreateClient();
@@ -147,7 +147,7 @@ public class Iso8583ClientTests : IAsyncLifetime
             await client.Connect("127.0.0.1", Port));
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Connect_ByIpString_Succeeds()
     {
         var client = CreateClient();
@@ -156,7 +156,7 @@ public class Iso8583ClientTests : IAsyncLifetime
         await client.Disconnect();
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Send_BeforeConnect_ThrowsInvalidOperation()
     {
         await using var client = CreateClient();
@@ -168,7 +168,7 @@ public class Iso8583ClientTests : IAsyncLifetime
         await Assert.ThrowsAsync<InvalidOperationException>(() => client.Send(msg, 1000));
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Send_WithTimeout_AfterDispose_ThrowsObjectDisposed()
     {
         var client = CreateClient();
@@ -180,7 +180,7 @@ public class Iso8583ClientTests : IAsyncLifetime
         await Assert.ThrowsAsync<ObjectDisposedException>(() => client.Send(msg, 500));
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task SendAndReceive_BeforeConnect_FailsAndClearsPending()
     {
         await using var client = CreateClient();
@@ -196,7 +196,7 @@ public class Iso8583ClientTests : IAsyncLifetime
         Assert.Equal(0, client.PendingCount);
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Connect_WithUnresolvableHostname_ExercisesDnsBranch()
     {
         // Forces Connect to enter the DNS-resolution branch (IPAddress.TryParse
@@ -209,7 +209,7 @@ public class Iso8583ClientTests : IAsyncLifetime
             client.Connect("iso8583-nonexistent-host-for-tests.invalid", Port));
     }
 
-    [Fact]
+    [Fact(Timeout = 30_000)]
     public async Task Constructor_WithMessageFactoryOnly_CreatesUsableInstance()
     {
         // Exercises the overload that takes only a message factory (default configuration).
