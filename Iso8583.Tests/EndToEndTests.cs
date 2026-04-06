@@ -73,13 +73,13 @@ public class EndToEndTests : IAsyncLifetime
         try { await _server.Shutdown(TimeSpan.FromSeconds(1)); } catch { /* ignore */ }
     }
 
-    [Fact(Timeout = 30_000)]
+    [Fact]
     public void Server_IsStarted()
     {
         Assert.True(_server.IsStarted());
     }
 
-    [Fact(Timeout = 30_000)]
+    [Fact]
     public void Client_IsConnected()
     {
         Assert.True(_client.IsConnected());

@@ -217,7 +217,7 @@ public class PooledIso8583ClientTests : IAsyncLifetime
         await Assert.ThrowsAsync<ObjectDisposedException>(async () => await pool.Send(msg));
     }
 
-    [Fact(Timeout = 30_000)]
+    [Fact]
     public void Constructor_InvalidConfig_Throws()
     {
         var config = new PooledClientConfiguration { PoolSize = 0 };
